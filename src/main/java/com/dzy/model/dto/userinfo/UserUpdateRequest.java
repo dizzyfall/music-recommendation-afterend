@@ -46,16 +46,6 @@ public class UserUpdateRequest implements Serializable {
     private String description;
 
     /**
-     * 用户密码
-     */
-    private String password;
-
-    /**
-     * 用户确认密码
-     */
-    private String checkPassword;
-
-    /**
      * 用户性别 0:男 1:女 2:其他
      */
     private Integer sex;

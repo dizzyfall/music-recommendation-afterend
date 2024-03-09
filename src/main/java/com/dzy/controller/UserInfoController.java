@@ -5,6 +5,7 @@ import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.userinfo.UserLoginRequest;
 import com.dzy.model.dto.userinfo.UserRegisterRequest;
+import com.dzy.model.dto.userinfo.UserUpdatePasswordRequest;
 import com.dzy.model.dto.userinfo.UserUpdateRequest;
 import com.dzy.model.entity.UserInfo;
 import com.dzy.model.vo.userinfo.UserLoginVO;
@@ -50,7 +51,7 @@ public class UserInfoController {
      * 用户登录
      *
      * @param userLoginRequest 登录请求的参数
-     * @param request 请求域
+     * @param request          请求域
      * @return UserLoginVO
      */
     @PostMapping("/login")
@@ -84,28 +85,60 @@ public class UserInfoController {
      * 用户更新信息
      *
      * @param userUpdateRequest 更新请求的参数
-     * @param request 请求域
+     * @param request           请求域
      * @return Boolean
      */
-    public BaseResponse<Boolean> userInfoUpdate(@RequestBody UserUpdateRequest userUpdateRequest,HttpServletRequest request){
+    @PostMapping("/update")
+    public BaseResponse<Boolean> userInfoUpdate(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
         if (userUpdateRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "更新请求参数为空");
         }
         if (request == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        UserInfo userInfoLoginState = userInfoService.getUserInfoLoginState(request);
-        if(userInfoLoginState == null){
+        UserLoginVO userInfoLoginState = userInfoService.getUserInfoLoginState(request);
+        if (userInfoLoginState == null) {
             throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
         }
         Long loginUserId = userInfoLoginState.getId();
         Long requestId = userUpdateRequest.getId();
-        if(loginUserId.equals(requestId)){
-            throw new BusinessException(StatusCode.PARAMS_ERROR,"用户信息错误");
+        if (!loginUserId.equals(requestId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
-        boolean isUserUpdate = userInfoService.updateUserInfo(userUpdateRequest,request);
-        if(!isUserUpdate){
-            throw new BusinessException(StatusCode.UPDATE_ERROR,"用户更新信息失败");
+        Boolean isUserUpdate = userInfoService.updateUserInfo(userUpdateRequest, request);
+        if (!isUserUpdate) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR, "用户更新信息失败");
+        }
+        return ResponseUtil.success(StatusCode.UPDATE_SUCESS);
+    }
+
+    /**
+     * 用户更新密码
+     *
+     * @param userUpdatePasswordRequest 更新请求的参数
+     * @param request                   请求域
+     * @return Boolean
+     */
+    @PostMapping("/update/password")
+    public BaseResponse<Boolean> userPasswordUpdate(@RequestBody UserUpdatePasswordRequest userUpdatePasswordRequest, HttpServletRequest request) {
+        if (userUpdatePasswordRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "更新请求参数为空");
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        UserLoginVO userInfoLoginState = userInfoService.getUserInfoLoginState(request);
+        if (userInfoLoginState == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        Long loginUserId = userInfoLoginState.getId();
+        Long requestId = userUpdatePasswordRequest.getId();
+        if (!loginUserId.equals(requestId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        Boolean isUserUpdatePassword = userInfoService.updateUserInfoPassword(userUpdatePasswordRequest, request);
+        if (!isUserUpdatePassword) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR, "用户更新密码失败");
         }
         return ResponseUtil.success(StatusCode.UPDATE_SUCESS);
     }

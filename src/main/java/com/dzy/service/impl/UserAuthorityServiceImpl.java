@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.model.entity.UserAuthority;
 import com.dzy.model.entity.UserInfo;
+import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserAuthorityService;
 import com.dzy.mapper.UserAuthorityMapper;
 import com.dzy.service.UserInfoService;
@@ -36,7 +37,7 @@ public class UserAuthorityServiceImpl extends ServiceImpl<UserAuthorityMapper, U
      */
     @Override
     public boolean isAdmin(HttpServletRequest request) {
-        UserInfo userInfoLoginState = userInfoService.getUserInfoLoginState(request);
+        UserLoginVO userInfoLoginState = userInfoService.getUserInfoLoginState(request);
         Long userId = userInfoLoginState.getId();
         return isAdmin(userId);
     }

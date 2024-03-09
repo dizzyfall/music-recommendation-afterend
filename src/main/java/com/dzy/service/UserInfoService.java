@@ -2,6 +2,7 @@ package com.dzy.service;
 
 import com.dzy.model.dto.userinfo.UserLoginRequest;
 import com.dzy.model.dto.userinfo.UserRegisterRequest;
+import com.dzy.model.dto.userinfo.UserUpdatePasswordRequest;
 import com.dzy.model.dto.userinfo.UserUpdateRequest;
 import com.dzy.model.entity.UserInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -39,16 +40,17 @@ public interface UserInfoService extends IService<UserInfo> {
      * 获取用户登录态
      *
      * @param request 请求域
-     * @return UserInfo
+     * @return UserLoginVO
      */
-    UserInfo getUserInfoLoginState(HttpServletRequest request);
+    UserLoginVO getUserInfoLoginState(HttpServletRequest request);
 
     /**
      * 设置用户登录态
      *
      * @param userLoginVO 用户脱敏信息
+     * @return Boolean
      */
-    void setUserInfoLoginState(UserLoginVO userLoginVO, HttpServletRequest request);
+    Boolean setUserInfoLoginState(UserLoginVO userLoginVO, HttpServletRequest request);
 
     /**
      * 移除用户登录态
@@ -77,8 +79,17 @@ public interface UserInfoService extends IService<UserInfo> {
      * 用户更新信息
      *
      * @param userUpdateRequest 更新请求的参数
-     * @param request 请求域
+     * @param request           请求域
      * @return Boolean
      */
-    boolean updateUserInfo(UserUpdateRequest userUpdateRequest, HttpServletRequest request);
+    Boolean updateUserInfo(UserUpdateRequest userUpdateRequest, HttpServletRequest request);
+
+    /**
+     * 用户修改密码
+     *
+     * @param userUpdatePasswordRequest 密码更新的请求参数
+     * @param request                   请求域
+     * @return Boolean
+     */
+    Boolean updateUserInfoPassword(UserUpdatePasswordRequest userUpdatePasswordRequest, HttpServletRequest request);
 }

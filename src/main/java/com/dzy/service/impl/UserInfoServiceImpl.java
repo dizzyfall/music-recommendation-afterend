@@ -1,22 +1,26 @@
 package com.dzy.service.impl;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.userinfo.UserLoginRequest;
 import com.dzy.model.dto.userinfo.UserRegisterRequest;
+import com.dzy.model.dto.userinfo.UserUpdatePasswordRequest;
 import com.dzy.model.dto.userinfo.UserUpdateRequest;
 import com.dzy.model.entity.UserInfo;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserInfoService;
 import com.dzy.mapper.UserInfoMapper;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +38,9 @@ import static com.dzy.constant.UserInfoConstant.USER_LOGIN_STATE;
 @Service
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         implements UserInfoService {
+
+    @Resource
+    private UserInfoMapper userInfoMapper;
 
     /**
      * 用户注册
@@ -107,7 +114,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      * 用户登录
      *
      * @param userLoginRequest 登录请求的参数
-     * @param request 请求域
+     * @param request          请求域
      * @return Boolean
      */
     @Override
@@ -164,7 +171,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      * @return UserInfo
      */
     @Override
-    public UserInfo getUserInfoLoginState(HttpServletRequest request) {
+    public UserLoginVO getUserInfoLoginState(HttpServletRequest request) {
         if (request == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
         }
@@ -172,16 +179,17 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         if (userInfoObj == null) {
             throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
         }
-        return (UserInfo) userInfoObj;
+        return (UserLoginVO) userInfoObj;
     }
 
     /**
      * 设置用户登录态
      *
      * @param userLoginVO 用户脱敏信息
+     * @return Boolean
      */
     @Override
-    public void setUserInfoLoginState(UserLoginVO userLoginVO, HttpServletRequest request) {
+    public Boolean setUserInfoLoginState(UserLoginVO userLoginVO, HttpServletRequest request) {
         if (userLoginVO == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -189,6 +197,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
         }
         request.getSession().setAttribute(USER_LOGIN_STATE, userLoginVO);
+        return getUserInfoLoginState(request).equals(userLoginVO);
     }
 
     /**
@@ -237,12 +246,166 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      * 用户更新信息
      *
      * @param userUpdateRequest 更新请求的参数
-     * @param request 请求域
+     * @param request           请求域
      * @return Boolean
      */
     @Override
-    public boolean updateUserInfo(UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
-        return true;
+    public Boolean updateUserInfo(UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
+        //只有自己才能修改信息
+        Long requestUserid = userUpdateRequest.getId();
+        UserLoginVO userInfoLoginState = getUserInfoLoginState(request);
+        Long loginUserId = userInfoLoginState.getId();
+        if (!requestUserid.equals(loginUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR);
+        }
+        //数据库查询用户信息
+        UserInfo userInfo = this.getById(loginUserId);
+        UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
+        //todo 头像、背景修改
+        //是否修改头像
+        Long avatarId = userInfo.getAvatarId();
+        //是否修改背景
+        Long backgroundId = userInfo.getBackgroundId();
+        //是否修改昵称
+        String newNickname = userUpdateRequest.getNickname();
+        String oldNickName = userInfo.getNickname();
+        //新数据不为空且新数据不为空且和原数据不相等才修改，否则不修改
+        if (StringUtils.isNotBlank(newNickname) && !newNickname.equals(oldNickName)) {
+            updateWrapper.set("user_info_nickname", newNickname);
+        }
+        //是否修改简介
+        String newDescription = userUpdateRequest.getDescription();
+        String oldDescription = userInfo.getDescription();
+        //新数据不为空且和原数据不相等才修改，否则不修改
+        if (StringUtils.isNotBlank(newDescription) && !newDescription.equals(oldDescription)) {
+            updateWrapper.set("user_info_description", newDescription);
+        }
+        //是否修改性别
+        Integer newSex = userUpdateRequest.getSex();
+        Integer oldSex = userInfo.getSex();
+        //新数据不为空且和原数据不相等才修改，否则不修改
+        if (newSex != null && !newSex.equals(oldSex)) {
+            updateWrapper.set("user_info_sex", newSex);
+        }
+        //是否修改所属地
+        String newRegion = userUpdateRequest.getRegion();
+        String oldRegion = userInfo.getRegion();
+        //新数据不为空且和原数据不相等才修改，否则不修改
+        if (StringUtils.isNotBlank(newRegion) && !newRegion.equals(oldRegion)) {
+            updateWrapper.set("user_info_region", newRegion);
+        }
+        //是否修改手机号码
+        String newPhone = userUpdateRequest.getPhone();
+        String oldPhone = userInfo.getPhone();
+        //新数据不为空且和原数据不相等才修改，否则不修改
+        if (StringUtils.isNotBlank(newPhone) && !newPhone.equals(oldPhone)) {
+            updateWrapper.set("user_info_phone", newPhone);
+        }
+        //是否修改邮箱
+        String newEmail = userUpdateRequest.getEmail();
+        String oldEmail = userInfo.getEmail();
+        //新数据不为空且和原数据不相等才修改，否则不修改
+        if (StringUtils.isNotBlank(newEmail) && !newEmail.equals(oldEmail)) {
+            updateWrapper.set("user_info_email", newEmail);
+        }
+        //是否修改地址
+        String newAddress = userUpdateRequest.getAddress();
+        String oldAddress = userInfo.getAddress();
+        //新数据不为空且和原数据不相等才修改，否则不修改
+        if (StringUtils.isNotBlank(newAddress) && !newAddress.equals(oldAddress)) {
+            updateWrapper.set("user_info_address", newAddress);
+        }
+        //是否修改生日
+        Date newBirthday = userUpdateRequest.getBirthday();
+        Date oldBirthday = userInfo.getBirthday();
+        //新数据不为空且和原数据不相等才修改，否则不修改
+        if (newBirthday != null && !newBirthday.equals(oldBirthday)) {
+            updateWrapper.set("user_info_birthday", newBirthday);
+        }
+        //更新用户信息
+        updateWrapper.eq("user_info_id", loginUserId);
+        boolean isUpdate = this.update(updateWrapper);
+        if (!isUpdate) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR, "用户信息更新失败");
+        }
+        //获取更新后的用户信息
+        UserInfo newUserInfo = this.getById(loginUserId);
+        //用户数据脱敏
+        UserLoginVO newUserLoginVO = userInfoToUserLoginVO(newUserInfo);
+        //更新用户登录态
+        return setUserInfoLoginState(newUserLoginVO, request);
+    }
+
+    /**
+     * 用户修改密码
+     *
+     * @param userUpdatePasswordRequest 密码更新的请求参数
+     * @param request                   请求域
+     * @return Boolean
+     */
+    @Override
+    public Boolean updateUserInfoPassword(UserUpdatePasswordRequest userUpdatePasswordRequest, HttpServletRequest request) {
+        //只有自己才能修改信息
+        Long requestUserid = userUpdatePasswordRequest.getId();
+        UserLoginVO userInfoLoginState = getUserInfoLoginState(request);
+        Long loginUserId = userInfoLoginState.getId();
+        if (!requestUserid.equals(loginUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR);
+        }
+        //是否修改密码
+        String newPassword = userUpdatePasswordRequest.getPassword();
+        String newCheckPassword = userUpdatePasswordRequest.getCheckPassword();
+        //密码和确认密码是否为空
+        if (StringUtils.isBlank(newPassword) && StringUtils.isBlank(newCheckPassword)) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "两次输入的密码不能为空");
+        }
+        //密码长度是否合法
+        if (newPassword.length() < 8 || newPassword.length() > 20) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "密码长度需要8-20个字符");
+        }
+        //密码是否合法
+        if (!newPassword.matches("[A-Za-z0-9_~!@#$%^&*()+\\S]{8,20}")) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "密码存在非法字符");
+        }
+        //密码和确认密码是否相同
+        if (!newPassword.equals(newCheckPassword)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "两次输入的密码不一致");
+        }
+        //加密新密码
+        String newEncryptPassword = DigestUtils.md5DigestAsHex((SALT + newPassword).getBytes());
+        //获取原加密密码
+        UserInfo userInfo = this.getById(loginUserId);
+        String oldEncryptPassword = userInfo.getPassword();
+        //新数据和原数据不相等才修改，否则不修改
+        if (newEncryptPassword.equals(oldEncryptPassword)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "新密码和旧密码一致");
+        }
+        UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("user_info_password", newEncryptPassword);
+        updateWrapper.eq("user_info_id", loginUserId);
+        return isUpateUserInfo(updateWrapper, loginUserId, request);
+    }
+
+    /**
+     * 是否成功更新用户信息
+     *
+     * @param updateWrapper
+     * @param loginUserId
+     * @param request
+     * @return
+     */
+    //todo 有必要提出来吗？
+    public Boolean isUpateUserInfo(UpdateWrapper<UserInfo> updateWrapper, Long loginUserId, HttpServletRequest request) {
+        boolean isUpdate = this.update(updateWrapper);
+        if (!isUpdate) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR, "用户密码更新失败");
+        }
+        //获取更新后的用户信息
+        UserInfo newUserInfo = this.getById(loginUserId);
+        //用户数据脱敏
+        UserLoginVO newUserLoginVO = userInfoToUserLoginVO(newUserInfo);
+        //更新用户登录态
+        return setUserInfoLoginState(newUserLoginVO, request);
     }
 }
 

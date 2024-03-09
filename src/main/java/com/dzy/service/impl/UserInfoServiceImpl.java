@@ -22,6 +22,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -260,78 +261,81 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         }
         //数据库查询用户信息
         UserInfo userInfo = this.getById(loginUserId);
-        UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
+        //新用户信息对象
+        UserInfo newUserInfo = new UserInfo();
+        BeanUtils.copyProperties(userInfo, newUserInfo);
         //todo 头像、背景修改
         //是否修改头像
         Long avatarId = userInfo.getAvatarId();
+        newUserInfo.setAvatarId(0L);
         //是否修改背景
         Long backgroundId = userInfo.getBackgroundId();
+        newUserInfo.setBackgroundId(0L);
         //是否修改昵称
         String newNickname = userUpdateRequest.getNickname();
         String oldNickName = userInfo.getNickname();
-        //新数据不为空且新数据不为空且和原数据不相等才修改，否则不修改
-        if (StringUtils.isNotBlank(newNickname) && !newNickname.equals(oldNickName)) {
-            updateWrapper.set("user_info_nickname", newNickname);
+        //新数据和原数据不相等才修改，否则不修改
+        if (!newNickname.equals(oldNickName)) {
+            newUserInfo.setNickname(newNickname);
         }
         //是否修改简介
         String newDescription = userUpdateRequest.getDescription();
         String oldDescription = userInfo.getDescription();
         //新数据不为空且和原数据不相等才修改，否则不修改
-        if (StringUtils.isNotBlank(newDescription) && !newDescription.equals(oldDescription)) {
-            updateWrapper.set("user_info_description", newDescription);
+        if (!newDescription.equals(oldDescription)) {
+            newUserInfo.setDescription(newDescription);
         }
         //是否修改性别
         Integer newSex = userUpdateRequest.getSex();
         Integer oldSex = userInfo.getSex();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (newSex != null && !newSex.equals(oldSex)) {
-            updateWrapper.set("user_info_sex", newSex);
+            newUserInfo.setSex(newSex);
         }
         //是否修改所属地
         String newRegion = userUpdateRequest.getRegion();
         String oldRegion = userInfo.getRegion();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (StringUtils.isNotBlank(newRegion) && !newRegion.equals(oldRegion)) {
-            updateWrapper.set("user_info_region", newRegion);
+            newUserInfo.setRegion(newRegion);
         }
         //是否修改手机号码
         String newPhone = userUpdateRequest.getPhone();
         String oldPhone = userInfo.getPhone();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (StringUtils.isNotBlank(newPhone) && !newPhone.equals(oldPhone)) {
-            updateWrapper.set("user_info_phone", newPhone);
+            newUserInfo.setPhone(newPhone);
         }
         //是否修改邮箱
         String newEmail = userUpdateRequest.getEmail();
         String oldEmail = userInfo.getEmail();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (StringUtils.isNotBlank(newEmail) && !newEmail.equals(oldEmail)) {
-            updateWrapper.set("user_info_email", newEmail);
+            newUserInfo.setEmail(newEmail);
         }
         //是否修改地址
         String newAddress = userUpdateRequest.getAddress();
         String oldAddress = userInfo.getAddress();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (StringUtils.isNotBlank(newAddress) && !newAddress.equals(oldAddress)) {
-            updateWrapper.set("user_info_address", newAddress);
+            newUserInfo.setAddress(newAddress);
         }
         //是否修改生日
         Date newBirthday = userUpdateRequest.getBirthday();
         Date oldBirthday = userInfo.getBirthday();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (newBirthday != null && !newBirthday.equals(oldBirthday)) {
-            updateWrapper.set("user_info_birthday", newBirthday);
+            newUserInfo.setBirthday(newBirthday);
         }
         //更新用户信息
-        updateWrapper.eq("user_info_id", loginUserId);
-        boolean isUpdate = this.update(updateWrapper);
-        if (!isUpdate) {
+        int update = userInfoMapper.updateById(newUserInfo);
+        if (update != 1) {
             throw new BusinessException(StatusCode.UPDATE_ERROR, "用户信息更新失败");
         }
         //获取更新后的用户信息
-        UserInfo newUserInfo = this.getById(loginUserId);
+        UserInfo updateUserInfo = this.getById(loginUserId);
         //用户数据脱敏
-        UserLoginVO newUserLoginVO = userInfoToUserLoginVO(newUserInfo);
+        UserLoginVO newUserLoginVO = userInfoToUserLoginVO(updateUserInfo);
         //更新用户登录态
         return setUserInfoLoginState(newUserLoginVO, request);
     }
@@ -356,7 +360,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         String newPassword = userUpdatePasswordRequest.getPassword();
         String newCheckPassword = userUpdatePasswordRequest.getCheckPassword();
         //密码和确认密码是否为空
-        if (StringUtils.isBlank(newPassword) && StringUtils.isBlank(newCheckPassword)) {
+        if (StringUtils.isAnyBlank(newPassword, newCheckPassword)) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "两次输入的密码不能为空");
         }
         //密码长度是否合法
@@ -383,19 +387,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
         updateWrapper.set("user_info_password", newEncryptPassword);
         updateWrapper.eq("user_info_id", loginUserId);
-        return isUpateUserInfo(updateWrapper, loginUserId, request);
-    }
-
-    /**
-     * 是否成功更新用户信息
-     *
-     * @param updateWrapper
-     * @param loginUserId
-     * @param request
-     * @return
-     */
-    //todo 有必要提出来吗？
-    public Boolean isUpateUserInfo(UpdateWrapper<UserInfo> updateWrapper, Long loginUserId, HttpServletRequest request) {
+        //更新用户信息
         boolean isUpdate = this.update(updateWrapper);
         if (!isUpdate) {
             throw new BusinessException(StatusCode.UPDATE_ERROR, "用户密码更新失败");
@@ -407,6 +399,8 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         //更新用户登录态
         return setUserInfoLoginState(newUserLoginVO, request);
     }
+
+
 }
 
 

@@ -56,8 +56,9 @@ public interface UserInfoService extends IService<UserInfo> {
      * 移除用户登录态
      *
      * @param request 请求域
+     * @return Boolean
      */
-    void removeUserInfoLoginState(HttpServletRequest request);
+    Boolean removeUserInfoLoginState(HttpServletRequest request);
 
     /**
      * 用户信息脱敏，将userInfo转为UserLoginVO

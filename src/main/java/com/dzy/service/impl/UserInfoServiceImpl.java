@@ -207,11 +207,12 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      * @param request 请求域
      */
     @Override
-    public void removeUserInfoLoginState(HttpServletRequest request) {
+    public Boolean removeUserInfoLoginState(HttpServletRequest request) {
         if (request == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
         }
         request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return request.getSession().getAttribute(USER_LOGIN_STATE)==null;
     }
 
     /**
@@ -238,9 +239,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      */
     @Override
     public Boolean logoutUser(HttpServletRequest request) {
-        removeUserInfoLoginState(request);
-        Object userInfoLoginState = request.getSession().getAttribute(USER_LOGIN_STATE);
-        return userInfoLoginState == null;
+        return removeUserInfoLoginState(request);
     }
 
     /**
@@ -400,6 +399,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         return setUserInfoLoginState(newUserLoginVO, request);
     }
 
+    
 
 }
 

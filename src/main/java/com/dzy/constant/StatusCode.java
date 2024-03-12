@@ -35,7 +35,6 @@ public enum StatusCode {
     SYSTEM_ERROR("50000", "服务器错误", ""),
     DATABASE_ERROR("50001", "数据库错误", "");
 
-
     /**
      * 状态码
      */

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dzy.mapper.UserImageMapper">
+
+    <resultMap id="BaseResultMap" type="com.dzy.model.entity.UserImage">
+            <id property="id" column="user_image_id" jdbcType="BIGINT"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="avatarPath" column="user_image_avatar_path" jdbcType="VARCHAR"/>
+            <result property="backgroundPath" column="user_image_background_path" jdbcType="VARCHAR"/>
+            <result property="createTime" column="user_image_create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="user_image_update_time" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="user_image_is_delete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_image_id,user_id,user_image_avatar_path,
+        user_image_background_path,user_image_create_time,user_image_update_time,
+        user_image_is_delete
+    </sql>
+</mapper>

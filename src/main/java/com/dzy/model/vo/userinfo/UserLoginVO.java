@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * 用户返回登录信息VO
+ *
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
  * @Date 2024/3/5  23:49
  */
@@ -20,14 +22,9 @@ public class UserLoginVO implements Serializable {
     private Long id;
 
     /**
-     * 用户头像id
+     * 用户图片id
      */
-    private Long avatarId;
-
-    /**
-     * 用户背景id
-     */
-    private Long backgroundId;
+    private Long imageId;
 
     /**
      * 用户昵称

@@ -1,12 +1,11 @@
 package com.dzy.service;
 
-import com.dzy.model.dto.userinfo.UserLoginRequest;
-import com.dzy.model.dto.userinfo.UserRegisterRequest;
-import com.dzy.model.dto.userinfo.UserUpdatePasswordRequest;
-import com.dzy.model.dto.userinfo.UserUpdateRequest;
+import com.dzy.model.dto.userinfo.*;
+import com.dzy.model.entity.UserImage;
 import com.dzy.model.entity.UserInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.vo.userinfo.UserLoginVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -79,11 +78,11 @@ public interface UserInfoService extends IService<UserInfo> {
     /**
      * 用户更新信息
      *
-     * @param userUpdateRequest 更新请求的参数
+     * @param userUpdateInfoRequest 更新请求的参数
      * @param request           请求域
      * @return Boolean
      */
-    Boolean updateUserInfo(UserUpdateRequest userUpdateRequest, HttpServletRequest request);
+    Boolean updateUserInfo(UserUpdateInfoRequest userUpdateInfoRequest, HttpServletRequest request);
 
     /**
      * 用户修改密码
@@ -93,4 +92,14 @@ public interface UserInfoService extends IService<UserInfo> {
      * @return Boolean
      */
     Boolean updateUserInfoPassword(UserUpdatePasswordRequest userUpdatePasswordRequest, HttpServletRequest request);
+
+    /**
+     * 用户更新图片
+     *
+     * @param multipartFile
+     * @param userUpdateImageRequest
+     * @param loginUserVO
+     * @return
+     */
+    Boolean updateUserImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO);
 }

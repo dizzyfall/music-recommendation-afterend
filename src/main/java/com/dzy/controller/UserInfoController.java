@@ -3,16 +3,14 @@ package com.dzy.controller;
 import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
-import com.dzy.model.dto.userinfo.UserLoginRequest;
-import com.dzy.model.dto.userinfo.UserRegisterRequest;
-import com.dzy.model.dto.userinfo.UserUpdatePasswordRequest;
-import com.dzy.model.dto.userinfo.UserUpdateRequest;
-import com.dzy.model.entity.UserInfo;
+import com.dzy.model.dto.userinfo.*;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserInfoService;
 import com.dzy.utils.ResponseUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -84,13 +82,13 @@ public class UserInfoController {
     /**
      * 用户更新信息
      *
-     * @param userUpdateRequest 更新请求的参数
+     * @param userUpdateInfoRequest 更新请求的参数
      * @param request           请求域
      * @return Boolean
      */
     @PostMapping("/update")
-    public BaseResponse<Boolean> userInfoUpdate(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
-        if (userUpdateRequest == null) {
+    public BaseResponse<Boolean> userInfoUpdate(@RequestBody UserUpdateInfoRequest userUpdateInfoRequest, HttpServletRequest request) {
+        if (userUpdateInfoRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "更新请求参数为空");
         }
         if (request == null) {
@@ -101,11 +99,11 @@ public class UserInfoController {
             throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
         }
         Long loginUserId = userInfoLoginState.getId();
-        Long requestId = userUpdateRequest.getId();
+        Long requestId = userUpdateInfoRequest.getId();
         if (!loginUserId.equals(requestId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
-        Boolean isUserUpdate = userInfoService.updateUserInfo(userUpdateRequest, request);
+        Boolean isUserUpdate = userInfoService.updateUserInfo(userUpdateInfoRequest, request);
         if (!isUserUpdate) {
             throw new BusinessException(StatusCode.UPDATE_ERROR, "用户更新信息失败");
         }
@@ -142,4 +140,43 @@ public class UserInfoController {
         }
         return ResponseUtil.success(StatusCode.UPDATE_SUCESS);
     }
+
+    /**
+     * 用户更新图片
+     *
+     * @param multipartFile
+     * @param userUpdateImageRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/update/image")
+    public BaseResponse<Boolean> userImageUpdate(@RequestPart MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, HttpServletRequest request) {
+        if(multipartFile==null){
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        if (userUpdateImageRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "更新请求参数为空");
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if(loginUserVO == null){
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestId = userUpdateImageRequest.getId();
+        if (!loginUserId.equals(requestId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        //更新数据
+        Boolean isUserUpdateImage = userInfoService.updateUserImageByType(multipartFile,userUpdateImageRequest,loginUserVO);
+        if(!isUserUpdateImage){
+            throw new BusinessException(StatusCode.SYSTEM_ERROR,"更新图片失败");
+        }
+        return ResponseUtil.success(StatusCode.UPDATE_SUCESS);
+    }
+
 }

@@ -1,9 +1,5 @@
 package com.dzy.model.dto.userinfo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,7 +12,7 @@ import java.util.Date;
  * @Date 2024/3/8  15:53
  */
 @Data
-public class UserUpdateRequest implements Serializable {
+public class UserUpdateInfoRequest implements Serializable {
 
     private static final long serialVersionUID = -4066119876412280417L;
 
@@ -24,16 +20,6 @@ public class UserUpdateRequest implements Serializable {
      * 用户id
      */
     private Long id;
-
-    /**
-     * 用户头像id
-     */
-    private Long avatarId;
-
-    /**
-     * 用户背景id
-     */
-    private Long backgroundId;
 
     /**
      * 用户昵称

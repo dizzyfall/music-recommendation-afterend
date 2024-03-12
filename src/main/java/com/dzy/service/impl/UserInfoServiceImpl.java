@@ -7,22 +7,21 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
-import com.dzy.model.dto.userinfo.UserLoginRequest;
-import com.dzy.model.dto.userinfo.UserRegisterRequest;
-import com.dzy.model.dto.userinfo.UserUpdatePasswordRequest;
-import com.dzy.model.dto.userinfo.UserUpdateRequest;
+import com.dzy.model.dto.userinfo.*;
+import com.dzy.model.entity.UserImage;
 import com.dzy.model.entity.UserInfo;
 import com.dzy.model.vo.userinfo.UserLoginVO;
+import com.dzy.service.UserImageService;
 import com.dzy.service.UserInfoService;
 import com.dzy.mapper.UserInfoMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +41,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
     @Resource
     private UserInfoMapper userInfoMapper;
+
+    @Resource
+    private UserImageService userImageService;
 
     /**
      * 用户注册
@@ -227,7 +229,11 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         UserLoginVO userLoginVO = new UserLoginVO();
-        BeanUtils.copyProperties(userInfo, userLoginVO);
+        try {
+            BeanUtils.copyProperties(userInfo, userLoginVO);
+        } catch (BusinessException e) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR,"Bean复制属性错误");
+        }
         return userLoginVO;
     }
 
@@ -245,14 +251,14 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     /**
      * 用户更新信息
      *
-     * @param userUpdateRequest 更新请求的参数
+     * @param userUpdateInfoRequest 更新请求的参数
      * @param request           请求域
      * @return Boolean
      */
     @Override
-    public Boolean updateUserInfo(UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
+    public Boolean updateUserInfo(UserUpdateInfoRequest userUpdateInfoRequest, HttpServletRequest request) {
         //只有自己才能修改信息
-        Long requestUserid = userUpdateRequest.getId();
+        Long requestUserid = userUpdateInfoRequest.getId();
         UserLoginVO userInfoLoginState = getUserInfoLoginState(request);
         Long loginUserId = userInfoLoginState.getId();
         if (!requestUserid.equals(loginUserId)) {
@@ -263,64 +269,57 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         //新用户信息对象
         UserInfo newUserInfo = new UserInfo();
         BeanUtils.copyProperties(userInfo, newUserInfo);
-        //todo 头像、背景修改
-        //是否修改头像
-        Long avatarId = userInfo.getAvatarId();
-        newUserInfo.setAvatarId(0L);
-        //是否修改背景
-        Long backgroundId = userInfo.getBackgroundId();
-        newUserInfo.setBackgroundId(0L);
         //是否修改昵称
-        String newNickname = userUpdateRequest.getNickname();
+        String newNickname = userUpdateInfoRequest.getNickname();
         String oldNickName = userInfo.getNickname();
         //新数据和原数据不相等才修改，否则不修改
         if (!newNickname.equals(oldNickName)) {
             newUserInfo.setNickname(newNickname);
         }
         //是否修改简介
-        String newDescription = userUpdateRequest.getDescription();
+        String newDescription = userUpdateInfoRequest.getDescription();
         String oldDescription = userInfo.getDescription();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (!newDescription.equals(oldDescription)) {
             newUserInfo.setDescription(newDescription);
         }
         //是否修改性别
-        Integer newSex = userUpdateRequest.getSex();
+        Integer newSex = userUpdateInfoRequest.getSex();
         Integer oldSex = userInfo.getSex();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (newSex != null && !newSex.equals(oldSex)) {
             newUserInfo.setSex(newSex);
         }
         //是否修改所属地
-        String newRegion = userUpdateRequest.getRegion();
+        String newRegion = userUpdateInfoRequest.getRegion();
         String oldRegion = userInfo.getRegion();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (StringUtils.isNotBlank(newRegion) && !newRegion.equals(oldRegion)) {
             newUserInfo.setRegion(newRegion);
         }
         //是否修改手机号码
-        String newPhone = userUpdateRequest.getPhone();
+        String newPhone = userUpdateInfoRequest.getPhone();
         String oldPhone = userInfo.getPhone();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (StringUtils.isNotBlank(newPhone) && !newPhone.equals(oldPhone)) {
             newUserInfo.setPhone(newPhone);
         }
         //是否修改邮箱
-        String newEmail = userUpdateRequest.getEmail();
+        String newEmail = userUpdateInfoRequest.getEmail();
         String oldEmail = userInfo.getEmail();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (StringUtils.isNotBlank(newEmail) && !newEmail.equals(oldEmail)) {
             newUserInfo.setEmail(newEmail);
         }
         //是否修改地址
-        String newAddress = userUpdateRequest.getAddress();
+        String newAddress = userUpdateInfoRequest.getAddress();
         String oldAddress = userInfo.getAddress();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (StringUtils.isNotBlank(newAddress) && !newAddress.equals(oldAddress)) {
             newUserInfo.setAddress(newAddress);
         }
         //是否修改生日
-        Date newBirthday = userUpdateRequest.getBirthday();
+        Date newBirthday = userUpdateInfoRequest.getBirthday();
         Date oldBirthday = userInfo.getBirthday();
         //新数据不为空且和原数据不相等才修改，否则不修改
         if (newBirthday != null && !newBirthday.equals(oldBirthday)) {
@@ -399,8 +398,28 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         return setUserInfoLoginState(newUserLoginVO, request);
     }
 
-    
-
+    /**
+     * 用户更新图片
+     *
+     * @param multipartFile
+     * @param userUpdateImageRequest
+     * @param loginUserVO
+     * @return
+     */
+    @Override
+    public Boolean updateUserImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO) {
+        //获取更新图片类型
+        String type = userUpdateImageRequest.getType();
+        if(StringUtils.isBlank(type)){
+            throw new BusinessException(StatusCode.PARAMS_ERROR);
+        }
+        //更新添加图片
+        String imageName = userImageService.uploadImageByType(multipartFile,type,loginUserVO);
+        if(StringUtils.isBlank(imageName)){
+            throw new BusinessException(StatusCode.SYSTEM_ERROR,"图片名称为空");
+        }
+        return true;
+    }
 }
 
 

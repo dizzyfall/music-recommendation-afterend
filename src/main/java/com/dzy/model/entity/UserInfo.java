@@ -1,20 +1,22 @@
 package com.dzy.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * 用户表
+ *
  * @TableName user_info
  */
-@TableName(value ="user_info")
+@TableName(value = "user_info")
 @Data
 @Component
 public class UserInfo implements Serializable {
+
     /**
      * 用户id
      */

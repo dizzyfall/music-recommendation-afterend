@@ -11,7 +11,7 @@ public interface FileConstant {
     /**
      * 最大上传图片大小
      */
-    Long IMAGE_MAXSIZE = 5*1024*1024L;
+    Long IMAGE_MAXSIZE = 5 * 1024 * 1024L;
 
     String PROJECT_PATH = "C:\\Users\\DZY\\Desktop\\user";
 }

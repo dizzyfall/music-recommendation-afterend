@@ -7,7 +7,6 @@ import com.dzy.model.dto.userinfo.*;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserInfoService;
 import com.dzy.utils.ResponseUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -83,7 +82,7 @@ public class UserInfoController {
      * 用户更新信息
      *
      * @param userUpdateInfoRequest 更新请求的参数
-     * @param request           请求域
+     * @param request               请求域
      * @return Boolean
      */
     @PostMapping("/update")
@@ -151,7 +150,7 @@ public class UserInfoController {
      */
     @PostMapping("/update/image")
     public BaseResponse<Boolean> userImageUpdate(@RequestPart MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, HttpServletRequest request) {
-        if(multipartFile==null){
+        if (multipartFile == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         if (userUpdateImageRequest == null) {
@@ -162,7 +161,7 @@ public class UserInfoController {
         }
         //是否登录
         UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
-        if(loginUserVO == null){
+        if (loginUserVO == null) {
             throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
         }
         //是否是本人
@@ -172,9 +171,9 @@ public class UserInfoController {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
         //更新数据
-        Boolean isUserUpdateImage = userInfoService.updateUserImageByType(multipartFile,userUpdateImageRequest,loginUserVO);
-        if(!isUserUpdateImage){
-            throw new BusinessException(StatusCode.SYSTEM_ERROR,"更新图片失败");
+        Boolean isUserUpdateImage = userInfoService.updateUserImageByType(multipartFile, userUpdateImageRequest, loginUserVO);
+        if (!isUserUpdateImage) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "更新图片失败");
         }
         return ResponseUtil.success(StatusCode.UPDATE_SUCESS);
     }

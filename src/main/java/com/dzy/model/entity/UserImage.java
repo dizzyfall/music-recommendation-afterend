@@ -1,20 +1,22 @@
 package com.dzy.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * 用户图片表
+ *
  * @TableName user_image
  */
-@TableName(value ="user_image")
+@TableName(value = "user_image")
 @Data
 @Component
 public class UserImage implements Serializable {
+
     /**
      * 用户图片id
      */

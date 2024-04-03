@@ -1,9 +1,8 @@
 package com.dzy.service;
 
-import com.dzy.model.dto.userinfo.*;
-import com.dzy.model.entity.UserImage;
-import com.dzy.model.entity.UserInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dzy.model.dto.userinfo.*;
+import com.dzy.model.entity.UserInfo;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -79,7 +78,7 @@ public interface UserInfoService extends IService<UserInfo> {
      * 用户更新信息
      *
      * @param userUpdateInfoRequest 更新请求的参数
-     * @param request           请求域
+     * @param request               请求域
      * @return Boolean
      */
     Boolean updateUserInfo(UserUpdateInfoRequest userUpdateInfoRequest, HttpServletRequest request);
@@ -102,4 +101,13 @@ public interface UserInfoService extends IService<UserInfo> {
      * @return
      */
     Boolean updateUserImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO);
+
+    /**
+     * 用户是否登录，用户信息是否一致
+     *
+     * @param loginUser
+     * @param request
+     * @return
+     */
+    public Boolean isLogin(UserLoginVO loginUser, HttpServletRequest request);
 }

@@ -1,6 +1,5 @@
 package com.dzy.model.dto.singer;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.dzy.common.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,23 +12,18 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SingerQueryRequest extends PageRequest implements Serializable {
+public class SingerSearchTextQueryRequest extends PageRequest implements Serializable {
 
     private static final long serialVersionUID = 3330937688653421684L;
 
     /**
-     * 歌手名字
+     * 搜索词
      */
-    private String name;
+    private String searchText;
 
     /**
-     * 歌手别名
+     * 歌手拼音
      */
-    private String alias;
-
-    /**
-     * 歌手类别
-     */
-    private String category;
+    private String spell;
 
 }

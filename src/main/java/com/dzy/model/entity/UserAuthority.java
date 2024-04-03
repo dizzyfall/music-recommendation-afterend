@@ -1,12 +1,11 @@
 package com.dzy.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Date;
-
-import lombok.Data;
-import org.springframework.stereotype.Component;
 
 /**
  * 用户权限表
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class UserAuthority implements Serializable {
+
     /**
      * 用户权限id
      */

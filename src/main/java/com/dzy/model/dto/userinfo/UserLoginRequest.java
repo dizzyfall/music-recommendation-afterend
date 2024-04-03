@@ -1,10 +1,8 @@
 package com.dzy.model.dto.userinfo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 用户登录请求参数封装

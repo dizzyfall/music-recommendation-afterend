@@ -3,7 +3,6 @@ package com.dzy.model.dto.userinfo;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 用户更新请求参数封装

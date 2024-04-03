@@ -1,6 +1,5 @@
 package com.dzy.model.enums;
 
-import com.dzy.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -9,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum UserImageUploadEnum {
 
-    USER_AVATAR("用户头像","user_avatar"),
-    USER_BACKGROUND("用户空间背景","user_background");
+    USER_AVATAR("用户头像", "user_avatar"),
+    USER_BACKGROUND("用户空间背景", "user_background");
 
     private final String key;
 
@@ -29,12 +28,12 @@ public enum UserImageUploadEnum {
         return value;
     }
 
-    public static UserImageUploadEnum getEnumByValue(String value){
-        if(StringUtils.isBlank(value)){
+    public static UserImageUploadEnum getEnumByValue(String value) {
+        if (StringUtils.isBlank(value)) {
             return null;
         }
         for (UserImageUploadEnum uploadEnum : UserImageUploadEnum.values()) {
-            if(value.equals(uploadEnum.getValue())){
+            if (value.equals(uploadEnum.getValue())) {
                 return uploadEnum;
             }
         }

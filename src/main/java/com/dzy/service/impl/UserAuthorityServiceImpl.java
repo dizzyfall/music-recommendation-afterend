@@ -2,11 +2,10 @@ package com.dzy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dzy.mapper.UserAuthorityMapper;
 import com.dzy.model.entity.UserAuthority;
-import com.dzy.model.entity.UserInfo;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserAuthorityService;
-import com.dzy.mapper.UserAuthorityMapper;
 import com.dzy.service.UserInfoService;
 import org.springframework.stereotype.Service;
 

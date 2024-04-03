@@ -1,7 +1,7 @@
 package com.dzy.service;
 
-import com.dzy.model.entity.UserAuthority;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dzy.model.entity.UserAuthority;
 
 import javax.servlet.http.HttpServletRequest;
 

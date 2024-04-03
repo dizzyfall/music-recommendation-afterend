@@ -1,12 +1,11 @@
 package com.dzy.service.impl;
 
-import java.util.*;
-
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
+import com.dzy.mapper.UserImageMapper;
 import com.dzy.mapper.UserInfoMapper;
 import com.dzy.model.dto.userinfo.UserUpdateImageRequest;
 import com.dzy.model.entity.UserImage;
@@ -14,7 +13,6 @@ import com.dzy.model.entity.UserInfo;
 import com.dzy.model.enums.UserImageUploadEnum;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserImageService;
-import com.dzy.mapper.UserImageMapper;
 import com.dzy.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -25,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.Arrays;
+import java.util.UUID;
 
 import static com.dzy.constant.FileConstant.IMAGE_MAXSIZE;
 import static com.dzy.constant.FileConstant.PROJECT_PATH;
@@ -59,7 +59,7 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
     @Transactional(rollbackFor = Exception.class)
     public String uploadImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO) {
         String type = userUpdateImageRequest.getType();
-        return uploadImageByType(multipartFile,type,loginUserVO);
+        return uploadImageByType(multipartFile, type, loginUserVO);
     }
 
     /**
@@ -73,7 +73,7 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
     //todo 返回可访问地址
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String uploadImageByType(MultipartFile multipartFile, String type ,UserLoginVO loginUserVO) {
+    public String uploadImageByType(MultipartFile multipartFile, String type, UserLoginVO loginUserVO) {
         //获取上传图片类型
         UserImageUploadEnum userImageUploadEnum = UserImageUploadEnum.getEnumByValue(type);
         if (userImageUploadEnum == null) {
@@ -90,7 +90,7 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
         String imageContent = String.format("%s\\%s\\%s", PROJECT_PATH, type, loginUserId);
         File content = new File(imageContent);
         if (!content.isDirectory() && !content.exists()) {
-            boolean isExistDir= content.mkdirs();
+            boolean isExistDir = content.mkdirs();
             if (!isExistDir) {
                 throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建文件夹失败");
             }
@@ -147,12 +147,12 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
     @Transactional(rollbackFor = Exception.class)
     public String saveImage(String type, String imageName, Long loginUserId) {
         //根据用户Id获取数据
-        QueryWrapper<UserImage> queryWrapper =new QueryWrapper<>();
-        queryWrapper.eq("user_id",loginUserId);
+        QueryWrapper<UserImage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", loginUserId);
         UserImage userImage = this.getOne(queryWrapper);
         //设置图片信息
         //如果没有加入用户图片
-        if(ObjectUtils.isEmpty(userImage)) {
+        if (ObjectUtils.isEmpty(userImage)) {
             //设置用户id
             userImage = new UserImage();
             userImage.setUserId(loginUserId);
@@ -174,7 +174,7 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
         //获取登录用户
         UserInfo oldUserInfo = userInfoMapper.selectById(loginUserId);
         UserInfo newUserInfo = new UserInfo();
-        BeanUtils.copyProperties(oldUserInfo,newUserInfo);
+        BeanUtils.copyProperties(oldUserInfo, newUserInfo);
         //获取新保存的用户图片
         UserImage newUserImage = this.getOne(queryWrapper);
         Long newUserImageId = newUserImage.getId();

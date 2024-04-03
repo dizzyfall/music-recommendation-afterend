@@ -1,19 +1,16 @@
 package com.dzy.service.impl;
 
-import java.util.Date;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
+import com.dzy.mapper.UserInfoMapper;
 import com.dzy.model.dto.userinfo.*;
-import com.dzy.model.entity.UserImage;
 import com.dzy.model.entity.UserInfo;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserImageService;
 import com.dzy.service.UserInfoService;
-import com.dzy.mapper.UserInfoMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -22,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -214,7 +212,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
         }
         request.getSession().removeAttribute(USER_LOGIN_STATE);
-        return request.getSession().getAttribute(USER_LOGIN_STATE)==null;
+        return request.getSession().getAttribute(USER_LOGIN_STATE) == null;
     }
 
     /**
@@ -232,7 +230,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         try {
             BeanUtils.copyProperties(userInfo, userLoginVO);
         } catch (BusinessException e) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR,"Bean复制属性错误");
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
         }
         return userLoginVO;
     }
@@ -252,7 +250,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      * 用户更新信息
      *
      * @param userUpdateInfoRequest 更新请求的参数
-     * @param request           请求域
+     * @param request               请求域
      * @return Boolean
      */
     @Override
@@ -410,15 +408,26 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     public Boolean updateUserImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO) {
         //获取更新图片类型
         String type = userUpdateImageRequest.getType();
-        if(StringUtils.isBlank(type)){
+        if (StringUtils.isBlank(type)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR);
         }
         //更新添加图片
-        String imageName = userImageService.uploadImageByType(multipartFile,type,loginUserVO);
-        if(StringUtils.isBlank(imageName)){
-            throw new BusinessException(StatusCode.SYSTEM_ERROR,"图片名称为空");
+        String imageName = userImageService.uploadImageByType(multipartFile, type, loginUserVO);
+        if (StringUtils.isBlank(imageName)) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "图片名称为空");
         }
         return true;
+    }
+
+    /**
+     * 用户是否登录，用户信息是否一致
+     *
+     * @param loginUser
+     * @param request
+     * @return
+     */
+    public Boolean isLogin(UserLoginVO loginUser, HttpServletRequest request) {
+        return null;
     }
 }
 

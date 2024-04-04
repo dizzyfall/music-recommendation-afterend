@@ -31,6 +31,7 @@ public enum StatusCode {
     DELETE_ERROR("40306", "删除失败", ""),
     UPDATE_ERROR("40307", "更新失败", ""),
     RETRIEVE_ERROR("40308", "查询失败", ""),
+    NOT_FOUND_ERROR("40400", "请求数据不存在",""),
 
     SYSTEM_ERROR("50000", "服务器错误", ""),
     DATABASE_ERROR("50001", "数据库错误", "");

@@ -7,7 +7,7 @@
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.ReCommentFavour">
         <id property="reCommentFavourId" column="re_comment_favour_id" jdbcType="BIGINT"/>
         <result property="cmtId" column="cmt_id" jdbcType="BIGINT"/>
-        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>

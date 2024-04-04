@@ -35,7 +35,7 @@ public class ReCommentFavour implements Serializable {
      * 用户id
      */
     @TableField(value = "user_id")
-    private Integer userId;
+    private Long userId;
 
     /**
      *

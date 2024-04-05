@@ -5,29 +5,28 @@
 <mapper namespace="com.dzy.mapper.SingerMapper">
 
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.Singer">
-        <id property="id" column="singer_id" jdbcType="BIGINT"/>
-        <result property="avatarPath" column="singer_avatar_path" jdbcType="VARCHAR"/>
-        <result property="name" column="singer_name" jdbcType="VARCHAR"/>
-        <result property="alias" column="singer_alias" jdbcType="VARCHAR"/>
-        <result property="spell" column="singer_spell" jdbcType="VARCHAR"/>
-        <result property="description" column="singer_description" jdbcType="VARCHAR"/>
-        <result property="area" column="singer_area" jdbcType="TINYINT"/>
-        <result property="genre" column="singer_genre" jdbcType="TINYINT"/>
-        <result property="sex" column="singer_sex" jdbcType="TINYINT"/>
-        <result property="songCount" column="singer_song_count" jdbcType="SMALLINT"/>
-        <result property="albumCount" column="singer_album_count" jdbcType="SMALLINT"/>
-        <result property="fanCount" column="singer_fan_count" jdbcType="INTEGER"/>
-        <result property="createTime" column="singer_create_time" jdbcType="TIMESTAMP"/>
-        <result property="updateTime" column="singer_update_time" jdbcType="TIMESTAMP"/>
-        <result property="isDelete" column="singer_is_delete" jdbcType="TINYINT"/>
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="avatarPath" column="avatar_path" jdbcType="VARCHAR"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="alias" column="alias" jdbcType="VARCHAR"/>
+            <result property="spell" column="spell" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="area" column="area" jdbcType="TINYINT"/>
+            <result property="genre" column="genre" jdbcType="TINYINT"/>
+            <result property="sex" column="sex" jdbcType="TINYINT"/>
+            <result property="songCount" column="song_count" jdbcType="SMALLINT"/>
+            <result property="albumCount" column="album_count" jdbcType="SMALLINT"/>
+            <result property="fanCount" column="fan_count" jdbcType="INTEGER"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        singer_id
-        ,singer_avatar_path,singer_name,
-        singer_alias,singer_spell,singer_description,
-        singer_area,singer_genre,singer_sex,
-        singer_song_count,singer_album_count,singer_fan_count,
-        singer_create_time,singer_update_time,singer_is_delete
+        id,avatar_path,name,
+        alias,spell,description,
+        area,genre,sex,
+        song_count,album_count,fan_count,
+        create_time,update_time,is_delete
     </sql>
 </mapper>

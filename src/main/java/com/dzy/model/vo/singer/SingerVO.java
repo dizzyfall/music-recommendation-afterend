@@ -2,6 +2,8 @@ package com.dzy.model.vo.singer;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 歌手返回信息VO
  *
@@ -9,7 +11,10 @@ import lombok.Data;
  * @Date 2024/3/10  11:49
  */
 @Data
-public class SingerVO {
+public class SingerVO implements Serializable {
+
+    private static final long serialVersionUID = -3946719007014582672L;
+
     /**
      * 歌手id
      */

@@ -1,68 +1,64 @@
 package com.dzy.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
-import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
 
 /**
  * 用户评论表
- *
- * @TableName user_comment
+ * @TableName comment
  */
-@TableName(value = "user_comment")
+@TableName(value ="comment")
 @Data
-@Component
-public class UserComment implements Serializable {
-
+public class Comment implements Serializable {
     /**
-     * 用户评论id
+     * 评论id
      */
-    @TableId(value = "user_cmt_id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
      * 用户id
      */
-    @TableField(value = "user_cmt_user_id")
+    @TableField(value = "user_id")
     private Long userId;
 
     /**
      * 用户评论内容
      */
-    @TableField(value = "user_cmt_content")
+    @TableField(value = "content")
     private String content;
 
     /**
      * 用户评论点赞数量
      */
-    @TableField(value = "user_cmt_favour_count")
+    @TableField(value = "favour_count")
     private Long favourCount;
 
     /**
      * 用户评论发布时间
      */
-    @TableField(value = "user_cmt_publish_time")
+    @TableField(value = "publish_time")
     private Date publishTime;
 
     /**
      * 用户评论创建时间
      */
-    @TableField(value = "user_cmt_create_time")
+    @TableField(value = "create_time")
     private Date createTime;
 
     /**
      * 用户评论更新时间
      */
-    @TableField(value = "user_cmt_update_time")
+    @TableField(value = "update_time")
     private Date updateTime;
 
     /**
      * 逻辑删除
      */
-    @TableField(value = "user_cmt_is_delete")
+    @TableField(value = "is_delete")
     @TableLogic
     private Integer isDelete;
 

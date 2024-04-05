@@ -2,6 +2,7 @@ package com.dzy.model.vo.song;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -9,7 +10,9 @@ import java.util.Date;
  * @Date 2024/4/3  12:21
  */
 @Data
-public class SongCommentVO {
+public class SongCommentVO implements Serializable {
+
+    private static final long serialVersionUID = 5106304122881221758L;
 
     /**
      * 歌曲id

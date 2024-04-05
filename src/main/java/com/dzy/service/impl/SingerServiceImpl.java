@@ -118,10 +118,12 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         int pageSize = singerTagsQueryRequest.getPageSize();
         Page<Singer> page = new Page<>(pageCurrent, pageSize);
         Page<Singer> singerPage = this.page(page, queryWrapper);
+        //脱敏
         List<SingerVO> singerVOList = singerPage.getRecords().stream().map(this::singerToSingerVO).collect(Collectors.toList());
         //新分页对象
         Page<SingerVO> singerVOPage = new Page<>(pageCurrent, pageSize, singerPage.getTotal());
-        return singerVOPage.setRecords(singerVOList);
+        singerVOPage.setRecords(singerVOList);
+        return singerVOPage;
     }
 }
 

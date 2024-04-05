@@ -16,119 +16,118 @@ import java.util.Date;
 @Data
 @Component
 public class UserInfo implements Serializable {
-
     /**
      * 用户id
      */
-    @TableId(value = "user_info_id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
      * 用户头像id
      */
-    @TableField(value = "user_info_image_id")
+    @TableField(value = "image_id")
     private Long imageId;
 
     /**
      * 用户昵称
      */
-    @TableField(value = "user_info_nickname")
+    @TableField(value = "nickname")
     private String nickname;
 
     /**
      * 用户简介
      */
-    @TableField(value = "user_info_description")
+    @TableField(value = "description")
     private String description;
 
     /**
      * 用户账号
      */
-    @TableField(value = "user_info_account")
+    @TableField(value = "account")
     private String account;
 
     /**
      * 用户密码
      */
-    @TableField(value = "user_info_password")
+    @TableField(value = "password")
     private String password;
 
     /**
      * 用户性别 0:男 1:女 2:其他
      */
-    @TableField(value = "user_info_sex")
+    @TableField(value = "sex")
     private Integer sex;
 
     /**
      * 用户所属地
      */
-    @TableField(value = "user_info_region")
+    @TableField(value = "region")
     private String region;
 
     /**
      * 用户电话号码
      */
-    @TableField(value = "user_info_phone")
+    @TableField(value = "phone")
     private String phone;
 
     /**
      * 用户邮箱
      */
-    @TableField(value = "user_info_email")
+    @TableField(value = "email")
     private String email;
 
     /**
      * 用户地址
      */
-    @TableField(value = "user_info_address")
+    @TableField(value = "address")
     private String address;
 
     /**
      * 用户生日
      */
-    @TableField(value = "user_info_birthday")
+    @TableField(value = "birthday")
     private Date birthday;
 
     /**
      * 用户关注数量
      */
-    @TableField(value = "user_info_attention_count")
+    @TableField(value = "attention_count")
     private Integer attentionCount;
 
     /**
      * 用户粉丝数量
      */
-    @TableField(value = "user_info_fan_count")
+    @TableField(value = "fan_count")
     private Integer fanCount;
 
     /**
      * 用户好友数量
      */
-    @TableField(value = "user_info_friend_count")
+    @TableField(value = "friend_count")
     private Integer friendCount;
 
     /**
      * 用户访客数量
      */
-    @TableField(value = "user_info_visitor_count")
+    @TableField(value = "visitor_count")
     private Integer visitorCount;
 
     /**
      * 用户创建时间
      */
-    @TableField(value = "user_info_create_time")
+    @TableField(value = "create_time")
     private Date createTime;
 
     /**
      * 用户更新时间
      */
-    @TableField(value = "user_info_update_time")
+    @TableField(value = "update_time")
     private Date updateTime;
 
     /**
      * 逻辑删除
      */
-    @TableField(value = "user_info_is_delete")
+    @TableField(value = "is_delete")
     @TableLogic
     private Integer isDelete;
 

@@ -1,17 +1,18 @@
 package com.dzy.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * 歌手表
+ *
  * @TableName singer
  */
-@TableName(value ="singer")
+@TableName(value = "singer")
 @Data
 @Component
 public class Singer implements Serializable {
@@ -40,7 +41,7 @@ public class Singer implements Serializable {
     private String alias;
 
     /**
-     * 
+     *
      */
     @TableField(value = "spell")
     private String spell;

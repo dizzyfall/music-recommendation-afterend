@@ -1,17 +1,18 @@
 package com.dzy.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * 歌曲表
+ *
  * @TableName song
  */
-@TableName(value ="song")
+@TableName(value = "song")
 @Data
 @Component
 public class Song implements Serializable {

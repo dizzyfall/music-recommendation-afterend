@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
+import com.dzy.mapper.UserImageMapper;
 import com.dzy.mapper.UserInfoMapper;
 import com.dzy.model.dto.userinfo.UserUpdateImageRequest;
 import com.dzy.model.entity.UserImage;
@@ -12,7 +13,6 @@ import com.dzy.model.entity.UserInfo;
 import com.dzy.model.enums.UserImageUploadEnum;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserImageService;
-import com.dzy.mapper.UserImageMapper;
 import com.dzy.service.UserInfoService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
@@ -29,13 +29,13 @@ import static com.dzy.constant.FileConstant.IMAGE_MAXSIZE;
 import static com.dzy.constant.FileConstant.PROJECT_PATH;
 
 /**
-* @author DZY
-* @description 针对表【user_image(用户图片表)】的数据库操作Service实现
-* @createDate 2024-04-05 13:13:09
-*/
+ * @author DZY
+ * @description 针对表【user_image(用户图片表)】的数据库操作Service实现
+ * @createDate 2024-04-05 13:13:09
+ */
 @Service
 public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage>
-    implements UserImageService{
+        implements UserImageService {
 
     @Resource
     private UserInfoService userInfoService;

@@ -5,28 +5,29 @@
 <mapper namespace="com.dzy.mapper.SongMapper">
 
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.Song">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="singerListId" column="singer_list_id" jdbcType="VARCHAR"/>
-            <result property="writerId" column="writer_id" jdbcType="BIGINT"/>
-            <result property="composerId" column="composer_id" jdbcType="BIGINT"/>
-            <result property="albumId" column="album_id" jdbcType="BIGINT"/>
-            <result property="lyricId" column="lyric_id" jdbcType="BIGINT"/>
-            <result property="imagePath" column="image_path" jdbcType="VARCHAR"/>
-            <result property="title" column="title" jdbcType="VARCHAR"/>
-            <result property="description" column="description" jdbcType="VARCHAR"/>
-            <result property="lang" column="lang" jdbcType="VARCHAR"/>
-            <result property="genre" column="genre" jdbcType="VARCHAR"/>
-            <result property="collectCount" column="collect_count" jdbcType="INTEGER"/>
-            <result property="favourCount" column="favour_count" jdbcType="INTEGER"/>
-            <result property="commentCount" column="comment_count" jdbcType="INTEGER"/>
-            <result property="publishTime" column="publish_time" jdbcType="DATE"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="singerListId" column="singer_list_id" jdbcType="VARCHAR"/>
+        <result property="writerId" column="writer_id" jdbcType="BIGINT"/>
+        <result property="composerId" column="composer_id" jdbcType="BIGINT"/>
+        <result property="albumId" column="album_id" jdbcType="BIGINT"/>
+        <result property="lyricId" column="lyric_id" jdbcType="BIGINT"/>
+        <result property="imagePath" column="image_path" jdbcType="VARCHAR"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="lang" column="lang" jdbcType="VARCHAR"/>
+        <result property="genre" column="genre" jdbcType="VARCHAR"/>
+        <result property="collectCount" column="collect_count" jdbcType="INTEGER"/>
+        <result property="favourCount" column="favour_count" jdbcType="INTEGER"/>
+        <result property="commentCount" column="comment_count" jdbcType="INTEGER"/>
+        <result property="publishTime" column="publish_time" jdbcType="DATE"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,singer_list_id,writer_id,
+        id
+        ,singer_list_id,writer_id,
         composer_id,album_id,lyric_id,
         image_path,title,description,
         lang,genre,collect_count,

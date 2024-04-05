@@ -5,17 +5,18 @@
 <mapper namespace="com.dzy.mapper.UserImageMapper">
 
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.UserImage">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="userId" column="user_id" jdbcType="BIGINT"/>
-            <result property="avatarPath" column="avatar_path" jdbcType="VARCHAR"/>
-            <result property="backgroundPath" column="background_path" jdbcType="VARCHAR"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+        <result property="avatarPath" column="avatar_path" jdbcType="VARCHAR"/>
+        <result property="backgroundPath" column="background_path" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,user_id,avatar_path,
+        id
+        ,user_id,avatar_path,
         background_path,create_time,update_time,
         is_delete
     </sql>

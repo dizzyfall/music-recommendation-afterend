@@ -5,25 +5,26 @@
 <mapper namespace="com.dzy.mapper.SingerMapper">
 
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.Singer">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="avatarPath" column="avatar_path" jdbcType="VARCHAR"/>
-            <result property="name" column="name" jdbcType="VARCHAR"/>
-            <result property="alias" column="alias" jdbcType="VARCHAR"/>
-            <result property="spell" column="spell" jdbcType="VARCHAR"/>
-            <result property="description" column="description" jdbcType="VARCHAR"/>
-            <result property="area" column="area" jdbcType="TINYINT"/>
-            <result property="genre" column="genre" jdbcType="TINYINT"/>
-            <result property="sex" column="sex" jdbcType="TINYINT"/>
-            <result property="songCount" column="song_count" jdbcType="SMALLINT"/>
-            <result property="albumCount" column="album_count" jdbcType="SMALLINT"/>
-            <result property="fanCount" column="fan_count" jdbcType="INTEGER"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="avatarPath" column="avatar_path" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="alias" column="alias" jdbcType="VARCHAR"/>
+        <result property="spell" column="spell" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="area" column="area" jdbcType="TINYINT"/>
+        <result property="genre" column="genre" jdbcType="TINYINT"/>
+        <result property="sex" column="sex" jdbcType="TINYINT"/>
+        <result property="songCount" column="song_count" jdbcType="SMALLINT"/>
+        <result property="albumCount" column="album_count" jdbcType="SMALLINT"/>
+        <result property="fanCount" column="fan_count" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,avatar_path,name,
+        id
+        ,avatar_path,name,
         alias,spell,description,
         area,genre,sex,
         song_count,album_count,fan_count,

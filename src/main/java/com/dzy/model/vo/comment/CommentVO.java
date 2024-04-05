@@ -1,8 +1,5 @@
 package com.dzy.model.vo.comment;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.dzy.model.vo.song.SongCommentVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import lombok.Data;

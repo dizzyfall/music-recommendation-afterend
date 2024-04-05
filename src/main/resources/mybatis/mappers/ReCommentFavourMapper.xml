@@ -5,16 +5,16 @@
 <mapper namespace="com.dzy.mapper.ReCommentFavourMapper">
 
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.ReCommentFavour">
-        <id property="reCommentFavourId" column="re_comment_favour_id" jdbcType="BIGINT"/>
-        <result property="cmtId" column="cmt_id" jdbcType="BIGINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="commentId" column="comment_id" jdbcType="BIGINT"/>
         <result property="userId" column="user_id" jdbcType="BIGINT"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        re_comment_favour_id
-        ,cmt_id,user_id,
+        id
+        ,comment_id,user_id,
         create_time,update_time
     </sql>
 </mapper>

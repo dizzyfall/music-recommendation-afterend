@@ -13,7 +13,7 @@ public class CommentFavourAddRequest implements Serializable {
 
     private static final long serialVersionUID = 7117923009716196726L;
 
-    private Long cmtId;
+    private Long commentId;
 
     private Long userId;
 

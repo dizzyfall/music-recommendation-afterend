@@ -20,16 +20,16 @@ import java.util.Date;
 @Component
 public class ReCommentFavour implements Serializable {
     /**
-     *
+     * 关联id
      */
-    @TableId(value = "re_comment_favour_id", type = IdType.AUTO)
-    private Long reCommentFavourId;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     /**
      * 评论id
      */
-    @TableField(value = "cmt_id")
-    private Long cmtId;
+    @TableField(value = "comment_id")
+    private Long commentId;
 
     /**
      * 用户id
@@ -38,17 +38,16 @@ public class ReCommentFavour implements Serializable {
     private Long userId;
 
     /**
-     *
+     * 创建时间
      */
     @TableField(value = "create_time")
     private Date createTime;
 
     /**
-     *
+     * 更新时间
      */
     @TableField(value = "update_time")
     private Date updateTime;
 
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -261520587293968985L;
 }

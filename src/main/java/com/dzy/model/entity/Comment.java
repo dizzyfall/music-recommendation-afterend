@@ -1,16 +1,17 @@
 package com.dzy.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 用户评论表
+ *
  * @TableName comment
  */
-@TableName(value ="comment")
+@TableName(value = "comment")
 @Data
 public class Comment implements Serializable {
     /**

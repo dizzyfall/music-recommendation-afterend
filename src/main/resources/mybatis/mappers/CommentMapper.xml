@@ -5,18 +5,19 @@
 <mapper namespace="com.dzy.mapper.CommentMapper">
 
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.Comment">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="userId" column="user_id" jdbcType="BIGINT"/>
-            <result property="content" column="content" jdbcType="VARCHAR"/>
-            <result property="favourCount" column="favour_count" jdbcType="BIGINT"/>
-            <result property="publishTime" column="publish_time" jdbcType="TIMESTAMP"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="favourCount" column="favour_count" jdbcType="BIGINT"/>
+        <result property="publishTime" column="publish_time" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,user_id,content,
+        id
+        ,user_id,content,
         favour_count,publish_time,create_time,
         update_time,is_delete
     </sql>

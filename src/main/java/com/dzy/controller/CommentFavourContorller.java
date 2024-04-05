@@ -4,7 +4,6 @@ import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.commentfavour.CommentFavourAddRequest;
-import com.dzy.model.entity.ReCommentFavour;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.ReCommentFavourService;
 import com.dzy.service.UserInfoService;
@@ -38,7 +37,7 @@ public class CommentFavourContorller {
      * @return 点赞数
      */
     @RequestMapping("/")
-    public BaseResponse<Boolean> doFavour(@RequestBody CommentFavourAddRequest commentFavourAddRequest, HttpServletRequest request){
+    public BaseResponse<Boolean> doFavour(@RequestBody CommentFavourAddRequest commentFavourAddRequest, HttpServletRequest request) {
         if (commentFavourAddRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "更新请求参数为空");
         }
@@ -55,7 +54,7 @@ public class CommentFavourContorller {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
         Boolean isFavourCount = reCommentFavourService.doCommentFavour(commentFavourAddRequest, loginUserVO);
-        if(!isFavourCount){
+        if (!isFavourCount) {
             throw new BusinessException(StatusCode.UPDATE_ERROR);
         }
         return ResponseUtil.success(StatusCode.UPDATE_SUCESS);

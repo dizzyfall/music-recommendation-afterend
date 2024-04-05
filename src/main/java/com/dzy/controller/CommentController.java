@@ -40,7 +40,7 @@ public class CommentController {
      * @return
      */
     @RequestMapping("/my/list/page")
-    public BaseResponse<List<CommentVO>> myCommentListRetrieveByPage(@RequestBody CommentQueryRequest commentQueryRequest, HttpServletRequest request){
+    public BaseResponse<List<CommentVO>> myCommentListRetrieveByPage(@RequestBody CommentQueryRequest commentQueryRequest, HttpServletRequest request) {
         if (commentQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "查询请求参数为空");
         }
@@ -56,8 +56,8 @@ public class CommentController {
         if (!loginUserId.equals(requestId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
-        Page<CommentVO> commentVOPage= commentService.listMyCommentByPage(commentQueryRequest, loginUserVO);
+        Page<CommentVO> commentVOPage = commentService.listMyCommentByPage(commentQueryRequest, loginUserVO);
         List<CommentVO> commentVOList = commentVOPage.getRecords();
-        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS,commentVOList,"获取用户评论成功");
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, commentVOList, "获取用户评论成功");
     }
 }

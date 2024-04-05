@@ -18,7 +18,7 @@ public class UserUpdateImageRequest implements Serializable {
     /**
      * 用户id
      */
-    private Long id;
+    private Long userId;
 
     /**
      * 用户图片id

@@ -166,8 +166,8 @@ public class UserInfoController {
         }
         //是否是本人
         Long loginUserId = loginUserVO.getId();
-        Long requestId = userUpdateImageRequest.getId();
-        if (!loginUserId.equals(requestId)) {
+        Long requestUserId = userUpdateImageRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
         //更新数据

@@ -21,7 +21,7 @@ public class ReplyCreateRequest implements Serializable {
     /**
      * 评论id
      */
-    private Long userCmtId;
+    private Long commentId;
 
     /**
      * 创建评论用户id
@@ -34,13 +34,13 @@ public class ReplyCreateRequest implements Serializable {
     private String content;
 
     /**
-     * 被回复用户id
+     * 接受回复用户id
      */
-    private Long followerId;
+    private Long receiverId;
 
     /**
      * 回复用户id
      */
-    private Long replyUserId;
+    private Long replierId;
 
 }

@@ -5,21 +5,21 @@
 <mapper namespace="com.dzy.mapper.ReSongCommentMapper">
 
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.ReSongComment">
-        <id property="reSongCommentId" column="re_song_comment_id" jdbcType="BIGINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="songId" column="song_id" jdbcType="BIGINT"/>
-        <result property="userCmtId" column="user_cmt_id" jdbcType="BIGINT"/>
+        <result property="commentId" column="comment_id" jdbcType="BIGINT"/>
         <result property="createUserId" column="create_user_id" jdbcType="BIGINT"/>
-        <result property="followerId" column="follower_id" jdbcType="BIGINT"/>
-        <result property="replyUserId" column="reply_user_id" jdbcType="BIGINT"/>
+        <result property="receiverId" column="receiver_id" jdbcType="BIGINT"/>
+        <result property="replierId" column="replier_id" jdbcType="BIGINT"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        re_song_comment_id
-        ,song_id,user_cmt_id,
-        create_user_id,follower_id,reply_user_id,
+        id
+        ,song_id,comment_id,
+        create_user_id,receiver_id,replier_id,
         create_time,update_time,is_delete
     </sql>
 </mapper>

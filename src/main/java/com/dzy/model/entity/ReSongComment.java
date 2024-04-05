@@ -19,8 +19,8 @@ public class ReSongComment implements Serializable {
     /**
      * 关联表id
      */
-    @TableId(value = "re_song_comment_id", type = IdType.AUTO)
-    private Long reSongCommentId;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     /**
      * 歌曲id
@@ -31,8 +31,8 @@ public class ReSongComment implements Serializable {
     /**
      * 评论id
      */
-    @TableField(value = "user_cmt_id")
-    private Long userCmtId;
+    @TableField(value = "comment_id")
+    private Long commentId;
 
     /**
      * 评论用户id
@@ -41,31 +41,31 @@ public class ReSongComment implements Serializable {
     private Long createUserId;
 
     /**
-     * 被回复用户id
+     * 接受回复用户id
      */
-    @TableField(value = "follower_id")
-    private Long followerId;
+    @TableField(value = "receiver_id")
+    private Long receiverId;
 
     /**
      * 回复用户id
      */
-    @TableField(value = "reply_user_id")
-    private Long replyUserId;
+    @TableField(value = "replier_id")
+    private Long replierId;
 
     /**
-     *
+     * 创建时间
      */
     @TableField(value = "create_time")
     private Date createTime;
 
     /**
-     *
+     * 更新时间
      */
     @TableField(value = "update_time")
     private Date updateTime;
 
     /**
-     *
+     * 逻辑删除
      */
     @TableField(value = "is_delete")
     @TableLogic

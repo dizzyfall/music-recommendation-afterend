@@ -5,24 +5,24 @@
 <mapper namespace="com.dzy.mapper.UserAuthorityMapper">
 
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.UserAuthority">
-        <id property="id" column="authority_user_id" jdbcType="BIGINT"/>
-        <result property="isAdmin" column="authority_is_admin" jdbcType="TINYINT"/>
-        <result property="showHome" column="authority_show_home" jdbcType="TINYINT"/>
-        <result property="showCollection" column="authority_show_collection" jdbcType="TINYINT"/>
-        <result property="showSonglist" column="authority_show_songlist" jdbcType="TINYINT"/>
-        <result property="showRegion" column="authority_show_region" jdbcType="TINYINT"/>
-        <result property="showSex" column="authority_show_sex" jdbcType="TINYINT"/>
-        <result property="showComment" column="authority_show_comment" jdbcType="TINYINT"/>
-        <result property="createTime" column="authority_create_time" jdbcType="TIMESTAMP"/>
-        <result property="updateTime" column="authority_update_time" jdbcType="TIMESTAMP"/>
-        <result property="isDelete" column="authority_is_delete" jdbcType="TINYINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="isAdmin" column="is_admin" jdbcType="TINYINT"/>
+        <result property="showHome" column="show_home" jdbcType="TINYINT"/>
+        <result property="showCollection" column="show_collection" jdbcType="TINYINT"/>
+        <result property="showSonglist" column="show_songlist" jdbcType="TINYINT"/>
+        <result property="showRegion" column="show_region" jdbcType="TINYINT"/>
+        <result property="showSex" column="show_sex" jdbcType="TINYINT"/>
+        <result property="showComment" column="show_comment" jdbcType="TINYINT"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        authority_user_id
-        ,authority_is_admin,authority_show_home,
-        authority_show_collection,authority_show_songlist,authority_show_region,
-        authority_show_sex,authority_show_comment,authority_create_time,
-        authority_update_time,authority_is_delete
+        id
+        ,is_admin,show_home,
+        show_collection,show_songlist,show_region,
+        show_sex,show_comment,create_time,
+        update_time,is_delete
     </sql>
 </mapper>

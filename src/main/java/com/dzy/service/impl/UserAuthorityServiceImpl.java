@@ -50,7 +50,7 @@ public class UserAuthorityServiceImpl extends ServiceImpl<UserAuthorityMapper, U
     @Override
     public boolean isAdmin(Long id) {
         QueryWrapper<UserAuthority> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("authority_user_id");
+        queryWrapper.select("user_id");
         UserAuthority admin = this.getOne(queryWrapper);
         Integer isAdmin = admin.getIsAdmin();
         return ADMIN_ROLE.equals(isAdmin);

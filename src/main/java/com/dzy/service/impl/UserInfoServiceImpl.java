@@ -73,7 +73,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         }
         //账号是否重复
         QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_info_account", account);
+        queryWrapper.eq("account", account);
         long count = this.count(queryWrapper);
         if (count > 0) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "账号已被注册");
@@ -152,8 +152,8 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         //查询没有被逻辑删除的数据，mybatis-plus配置逻辑删除！！！
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + password).getBytes());
         QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_info_account", account);
-        queryWrapper.eq("user_info_password", encryptPassword);
+        queryWrapper.eq("account", account);
+        queryWrapper.eq("password", encryptPassword);
         UserInfo userInfo = this.getOne(queryWrapper);
         if (userInfo == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "账号不存在或密码错误");
@@ -381,8 +381,8 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
             throw new BusinessException(StatusCode.PARAMS_ERROR, "新密码和旧密码一致");
         }
         UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.set("user_info_password", newEncryptPassword);
-        updateWrapper.eq("user_info_id", loginUserId);
+        updateWrapper.set("password", newEncryptPassword);
+        updateWrapper.eq("id", loginUserId);
         //更新用户信息
         boolean isUpdate = this.update(updateWrapper);
         if (!isUpdate) {

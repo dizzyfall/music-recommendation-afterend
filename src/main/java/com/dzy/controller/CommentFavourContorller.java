@@ -9,6 +9,7 @@ import com.dzy.service.ReCommentFavourService;
 import com.dzy.service.UserInfoService;
 import com.dzy.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +37,7 @@ public class CommentFavourContorller {
      * @param request
      * @return 点赞数
      */
-    @RequestMapping("/")
+    @PostMapping("/")
     public BaseResponse<Boolean> doFavour(@RequestBody CommentFavourAddRequest commentFavourAddRequest, HttpServletRequest request) {
         if (commentFavourAddRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "更新请求参数为空");

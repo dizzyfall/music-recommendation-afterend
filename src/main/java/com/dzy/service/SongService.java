@@ -1,10 +1,10 @@
 package com.dzy.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.dzy.model.dto.song.ReplyCreateRequest;
-import com.dzy.model.dto.song.SongCommentCreateRequest;
+import com.dzy.model.dto.song.SongCommentQueryRequest;
 import com.dzy.model.entity.Song;
-import com.dzy.model.vo.userinfo.UserLoginVO;
+import com.dzy.model.vo.comment.CommentVO;
 
 /**
  * @author DZY
@@ -14,21 +14,10 @@ import com.dzy.model.vo.userinfo.UserLoginVO;
 public interface SongService extends IService<Song> {
 
     /**
-     * 创建歌曲评论
+     * 分页查询歌曲的评论
      *
-     * @param songCommentCreateRequest
-     * @param loginUserVO
+     * @param songCommentQueryRequest
      * @return
      */
-    Boolean createComment(SongCommentCreateRequest songCommentCreateRequest, UserLoginVO loginUserVO);
-
-    /**
-     * 创建歌曲评论回复
-     *
-     * @param replyCreateRequest
-     * @param loginUserVO
-     * @return
-     */
-    Boolean createReply(ReplyCreateRequest replyCreateRequest, UserLoginVO loginUserVO);
-
+    Page<CommentVO> listSongCommentByPage(SongCommentQueryRequest songCommentQueryRequest);
 }

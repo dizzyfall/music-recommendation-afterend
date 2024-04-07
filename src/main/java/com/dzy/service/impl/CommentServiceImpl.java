@@ -7,6 +7,7 @@ import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.CommentMapper;
 import com.dzy.model.dto.comment.CommentCreateRequest;
+import com.dzy.model.dto.comment.CommentDeleteRequest;
 import com.dzy.model.dto.comment.CommentQueryRequest;
 import com.dzy.model.dto.comment.ReplyCreateRequest;
 import com.dzy.model.entity.Comment;
@@ -213,6 +214,48 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
         }
         return commentVO;
+    }
+
+    /**
+     * 删除自己的评论
+     *
+     * @param commentDeleteRequest
+     * @param loginUserVO
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean deleteMySongComment(CommentDeleteRequest commentDeleteRequest, UserLoginVO loginUserVO) {
+        Long userId = commentDeleteRequest.getUserId();
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long commentId = commentDeleteRequest.getCommentId();
+        if (commentId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //自己评论是否存在
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", commentId).eq("user_id", userId);
+        Comment comment = this.getOne(queryWrapper);
+        if (comment == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR);
+        }
+        //删除自己评论歌曲的评论，而不是回复他人的评论
+        //TODO 删除回复他人的评论之后实现
+        QueryWrapper<ReSongComment> deleteQueryWrapper = new QueryWrapper<>();
+        deleteQueryWrapper.eq("comment_id", commentId);
+        //删关联表数据
+        boolean isRemoveRe = reSongCommentService.remove(deleteQueryWrapper);
+        if (!isRemoveRe) {
+            throw new BusinessException(StatusCode.DELETE_ERROR);
+        }
+        //删除评论表数据
+        boolean isRemove = this.removeById(commentId);
+        if (!isRemove) {
+            throw new BusinessException(StatusCode.DELETE_ERROR);
+        }
+        return true;
     }
 
 }

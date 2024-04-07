@@ -98,8 +98,8 @@ public class UserInfoController {
             throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
         }
         Long loginUserId = userInfoLoginState.getId();
-        Long requestId = userUpdateInfoRequest.getId();
-        if (!loginUserId.equals(requestId)) {
+        Long requestUserId = userUpdateInfoRequest.getId();
+        if (!loginUserId.equals(requestUserId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
         Boolean isUserUpdate = userInfoService.updateUserInfo(userUpdateInfoRequest, request);
@@ -129,8 +129,8 @@ public class UserInfoController {
             throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
         }
         Long loginUserId = userInfoLoginState.getId();
-        Long requestId = userUpdatePasswordRequest.getId();
-        if (!loginUserId.equals(requestId)) {
+        Long requesUsertId = userUpdatePasswordRequest.getId();
+        if (!loginUserId.equals(requesUsertId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
         Boolean isUserUpdatePassword = userInfoService.updateUserInfoPassword(userUpdatePasswordRequest, request);

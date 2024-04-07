@@ -3,6 +3,7 @@ package com.dzy.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.comment.CommentCreateRequest;
+import com.dzy.model.dto.comment.CommentDeleteRequest;
 import com.dzy.model.dto.comment.CommentQueryRequest;
 import com.dzy.model.dto.comment.ReplyCreateRequest;
 import com.dzy.model.entity.Comment;
@@ -50,4 +51,13 @@ public interface CommentService extends IService<Comment> {
      * @return
      */
     CommentVO commentToCommentVO(Comment comment);
+
+    /**
+     * 删除自己的评论
+     *
+     * @param commentDeleteRequest
+     * @param loginUserVO
+     * @return
+     */
+    Boolean deleteMySongComment(CommentDeleteRequest commentDeleteRequest, UserLoginVO loginUserVO);
 }

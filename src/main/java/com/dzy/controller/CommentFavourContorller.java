@@ -50,8 +50,8 @@ public class CommentFavourContorller {
             throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
         }
         Long loginUserId = loginUserVO.getId();
-        Long requestId = commentFavourAddRequest.getUserId();
-        if (!loginUserId.equals(requestId)) {
+        Long requestUserId = commentFavourAddRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
         Boolean isFavourCount = reCommentFavourService.doCommentFavour(commentFavourAddRequest, loginUserVO);

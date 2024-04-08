@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.SongMapper;
+import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
+import com.dzy.model.dto.song.SongReplyCreateRequest;
 import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReSongComment;
 import com.dzy.model.entity.Song;
@@ -16,10 +18,13 @@ import com.dzy.service.CommentService;
 import com.dzy.service.ReSongCommentService;
 import com.dzy.service.SingerService;
 import com.dzy.service.SongService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -80,6 +85,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
     }
 
     /**
+     * Song转SongVO
+     * 不能简单使用属性复制，因为SongVO还有Song中没有的属性
+     *
      * @param song
      * @return
      */
@@ -110,6 +118,135 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         Song song = this.getOne(queryWrapper);
         return getSongVO(song);
     }
+
+
+    /**
+     * 创建歌曲评论
+     *
+     * @param songCommentCreateRequest
+     * @return
+     */
+    //todo 是否和回复评论写一起
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean createComment(SongCommentCreateRequest songCommentCreateRequest) {
+        if (songCommentCreateRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long userId = songCommentCreateRequest.getUserId();
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long songId = songCommentCreateRequest.getSongId();
+        if (songId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //音乐是否存在
+        Song song = this.getById(songId);
+        if (song == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "歌曲不存在");
+        }
+        String content = songCommentCreateRequest.getContent();
+        if (StringUtils.isBlank(content)) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "内容不能为空");
+        }
+        Comment comment = new Comment();
+        comment.setUserId(userId);
+        comment.setContent(content);
+        comment.setFavourCount(0L);
+        comment.setPublishTime(new Date());
+        boolean isSongCommentSave = commentService.save(comment);
+        if (!isSongCommentSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "创建评论失败");
+        }
+        //获取插入用户评论表的主键id
+        Long commentId = comment.getId();
+        //维护关联表
+        ReSongComment reSongComment = new ReSongComment();
+        reSongComment.setSongId(songId);
+        reSongComment.setCommentId(commentId);
+        reSongComment.setCreateUserId(userId);
+        //followerId为-1,replyUserId为-1
+        reSongComment.setReceiverId(-1L);
+        reSongComment.setReplierId(-1L);
+        boolean isReSongCommentSave = reSongCommentService.save(reSongComment);
+        if (!isReSongCommentSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "创建评论失败");
+        }
+        return true;
+    }
+
+    /**
+     * 创建歌曲评论回复
+     *
+     * @param songReplyCreateRequest
+     * @return
+     */
+    //todo 是否和回复评论写一起
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean createReply(SongReplyCreateRequest songReplyCreateRequest) {
+        if (songReplyCreateRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long songId = songReplyCreateRequest.getSongId();
+        if (songId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //音乐是否存在
+        Song song = this.getById(songId);
+        if (song == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "歌曲不存在");
+        }
+        //todo 评论是否存在
+        Long commentId = songReplyCreateRequest.getCommentId();
+        if (commentId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long userId = songReplyCreateRequest.getUserId();
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        String content = songReplyCreateRequest.getContent();
+        if (StringUtils.isBlank(content)) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "内容不能为空");
+        }
+        Long receiverId = songReplyCreateRequest.getReceiverId();
+        if (receiverId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long replierId = songReplyCreateRequest.getReplierId();
+        if (replierId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Comment comment = new Comment();
+        comment.setUserId(userId);
+        comment.setContent(content);
+        comment.setFavourCount(0L);
+        comment.setPublishTime(new Date());
+        boolean isUserCommentSave = commentService.save(comment);
+        if (!isUserCommentSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "创建评论失败");
+        }
+        Long newCommentId = comment.getId();
+        QueryWrapper<ReSongComment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("comment_id", commentId);
+        ReSongComment oldReSongComment = reSongCommentService.getOne(queryWrapper);
+        ReSongComment newReSongComment = new ReSongComment();
+        //todo 这里的songId和通过userCmtId查询的数据的songId是否一样,同理其他字段
+        newReSongComment.setSongId(songId);
+        //todo 有问题?
+        newReSongComment.setCommentId(newCommentId);
+        newReSongComment.setCreateUserId(oldReSongComment.getCreateUserId());
+        newReSongComment.setReceiverId(receiverId);
+        newReSongComment.setReplierId(replierId);
+        boolean isReSongCommentSave = reSongCommentService.save(newReSongComment);
+        if (!isReSongCommentSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "创建评论失败");
+        }
+        return true;
+    }
+
 }
 
 

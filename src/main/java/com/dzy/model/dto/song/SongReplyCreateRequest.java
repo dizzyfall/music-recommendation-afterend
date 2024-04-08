@@ -1,4 +1,4 @@
-package com.dzy.model.dto.comment;
+package com.dzy.model.dto.song;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @Date 2024/4/3  12:49
  */
 @Data
-public class ReplyCreateRequest implements Serializable {
+public class SongReplyCreateRequest implements Serializable {
 
     private static final long serialVersionUID = 8517205018693856605L;
 
@@ -26,7 +26,7 @@ public class ReplyCreateRequest implements Serializable {
     /**
      * 创建评论用户id
      */
-    private Long createUserId;
+    private Long userId;
 
     /**
      * 用户评论内容

@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
-import com.dzy.model.dto.comment.CommentCreateRequest;
 import com.dzy.model.dto.comment.CommentDeleteRequest;
 import com.dzy.model.dto.comment.CommentQueryRequest;
-import com.dzy.model.dto.comment.ReplyCreateRequest;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.CommentService;
@@ -35,70 +33,6 @@ public class CommentController {
 
     @Autowired
     private CommentService commentService;
-
-    /**
-     * 创建歌曲评论
-     *
-     * @param commentCreateRequest
-     * @return
-     */
-    @PostMapping("/create")
-    public BaseResponse<Boolean> songCommentCreate(@RequestBody CommentCreateRequest commentCreateRequest, HttpServletRequest request) {
-        if (commentCreateRequest == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
-        }
-        if (request == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        //是否登录
-        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
-        if (loginUserVO == null) {
-            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
-        }
-        //是否是本人
-        Long loginUserId = loginUserVO.getId();
-        Long requestUserId = commentCreateRequest.getCreateUserId();
-        if (!loginUserId.equals(requestUserId)) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
-        }
-        Boolean isSongCommentCreate = commentService.createComment(commentCreateRequest, loginUserVO);
-        if (!isSongCommentCreate) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建评论失败");
-        }
-        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "创建评论成功");
-    }
-
-    /**
-     * 创建歌曲评论回复
-     *
-     * @param request
-     * @return
-     */
-    @PostMapping("/reply")
-    public BaseResponse<Boolean> songCommentReply(@RequestBody ReplyCreateRequest replyCreateRequest, HttpServletRequest request) {
-        if (replyCreateRequest == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
-        }
-        if (request == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        //是否登录
-        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
-        if (loginUserVO == null) {
-            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
-        }
-        //是否是本人
-        Long loginUserId = loginUserVO.getId();
-        Long requestUserId = replyCreateRequest.getCreateUserId();
-        if (!loginUserId.equals(requestUserId)) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
-        }
-        Boolean isSongCommentReply = commentService.createReply(replyCreateRequest, loginUserVO);
-        if (!isSongCommentReply) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "回复评论失败");
-        }
-        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "回复评论成功");
-    }
 
     /**
      * 分页查询自己的评论
@@ -159,4 +93,5 @@ public class CommentController {
         }
         return ResponseUtil.success(StatusCode.DELETE_SUCCESS, "删除评论成功");
     }
+
 }

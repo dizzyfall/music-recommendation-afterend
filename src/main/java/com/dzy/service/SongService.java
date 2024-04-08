@@ -2,7 +2,9 @@ package com.dzy.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
+import com.dzy.model.dto.song.SongReplyCreateRequest;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.song.SongVO;
@@ -38,4 +40,20 @@ public interface SongService extends IService<Song> {
      * @return
      */
     SongVO getSongInfo(Long songId);
+
+    /**
+     * 创建歌曲评论
+     *
+     * @param songCommentCreateRequest
+     * @return
+     */
+    Boolean createComment(SongCommentCreateRequest songCommentCreateRequest);
+
+    /**
+     * 创建歌曲评论回复
+     *
+     * @param songReplyCreateRequest
+     * @return
+     */
+    Boolean createReply(SongReplyCreateRequest songReplyCreateRequest);
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 歌手返回信息VO
+ * 歌手视图
  *
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
  * @Date 2024/3/10  11:49

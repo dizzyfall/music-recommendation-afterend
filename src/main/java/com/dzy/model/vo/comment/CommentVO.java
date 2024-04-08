@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * 评论视图
+ *
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
  * @Date 2024/4/5  10:09
  */
@@ -13,6 +15,11 @@ import java.util.Date;
 public class CommentVO implements Serializable {
 
     private static final long serialVersionUID = 7939516196351738858L;
+
+    /**
+     * 评论id
+     */
+    private Long id;
 
     /**
      * 歌曲id

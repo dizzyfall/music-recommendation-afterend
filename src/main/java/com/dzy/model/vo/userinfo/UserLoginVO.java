@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 用户返回登录信息VO
+ * 用户返回登录信息视图（脱敏）
  *
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
  * @Date 2024/3/5  23:49

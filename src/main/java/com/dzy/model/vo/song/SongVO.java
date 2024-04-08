@@ -1,23 +1,67 @@
 package com.dzy.model.vo.song;
 
+import com.dzy.constant.StatusCode;
+import com.dzy.exception.BusinessException;
+import com.dzy.model.entity.Song;
+import com.dzy.utils.JsonUtil;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
+ * 歌曲视图
+ *
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
  * @Date 2024/4/3  12:21
  */
 @Data
 public class SongVO implements Serializable {
 
-    private static final long serialVersionUID = 5106304122881221758L;
+    private static final long serialVersionUID = -1039821772081244465L;
 
     /**
      * 歌曲id
      */
-    private Long songId;
+    private Long id;
+
+    /**
+     * 歌曲歌手id列表
+     */
+    private List<String> singerListId;
+
+    /**
+     * 歌曲歌手姓名列表
+     * json字符串
+     */
+    private List<String> singerNameList;
+
+    /**
+     * 歌曲作词者id
+     */
+    private Long writerId;
+
+    /**
+     * 歌曲作曲者id
+     */
+    private Long composerId;
+
+    /**
+     * 歌曲专辑id,歌曲没有专辑默认为-1
+     */
+    private Long albumId;
+
+    /**
+     * 歌曲歌词id
+     */
+    private Long lyricId;
+
+    /**
+     * 歌曲封面保存路径,歌曲有专辑使用专辑图片作为歌曲封面否则使用歌手头像
+     */
+    private String imagePath;
 
     /**
      * 歌曲名
@@ -25,32 +69,51 @@ public class SongVO implements Serializable {
     private String title;
 
     /**
-     * 创建评论用户id
+     * 歌曲简介
      */
-    private Long createUserId;
+    private String description;
 
     /**
-     * 用户评论内容
+     * 歌曲语种
      */
-    private String content;
+    private String lang;
 
     /**
-     * 用户评论点赞数量
+     * 歌曲流派
      */
-    private Long favourCount;
+    private String genre;
 
     /**
-     * 用户评论发布时间
+     * 歌曲收藏数量
+     */
+    private Integer collectCount;
+
+    /**
+     * 歌曲点赞数量
+     */
+    private Integer favourCount;
+
+    /**
+     * 歌曲评论数量
+     */
+    private Integer commentCount;
+
+    /**
+     * 歌曲发行时间
      */
     private Date publishTime;
 
-    /**
-     * 被回复用户id
-     */
-    private Long followerId;
-
-    /**
-     * 回复用户id
-     */
-    private Long replyUserId;
+    public static SongVO objToVO(Song song) {
+        if (song == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        SongVO songVO = new SongVO();
+        try {
+            BeanUtils.copyProperties(song, songVO);
+            songVO.setSingerListId(JsonUtil.convertJsonToList(song.getSingerListId()));
+        } catch (BusinessException e) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
+        }
+        return songVO;
+    }
 }

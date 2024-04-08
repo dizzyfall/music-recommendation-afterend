@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
+import com.dzy.model.vo.song.SongVO;
 
 /**
  * @author DZY
@@ -20,4 +21,21 @@ public interface SongService extends IService<Song> {
      * @return
      */
     Page<CommentVO> listSongCommentByPage(SongCommentQueryRequest songCommentQueryRequest);
+
+    /**
+     * Song转SongVO
+     * 不能简单使用属性复制，因为SongVO还有Song中没有的属性
+     *
+     * @param song
+     * @return
+     */
+    SongVO getSongVO(Song song);
+
+    /**
+     * 查询歌曲详情
+     *
+     * @param songId
+     * @return
+     */
+    SongVO getSongInfo(Long songId);
 }

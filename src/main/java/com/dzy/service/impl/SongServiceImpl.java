@@ -11,8 +11,10 @@ import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReSongComment;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
+import com.dzy.model.vo.song.SongVO;
 import com.dzy.service.CommentService;
 import com.dzy.service.ReSongCommentService;
+import com.dzy.service.SingerService;
 import com.dzy.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
 
     @Autowired
     private ReSongCommentService reSongCommentService;
+
+    @Autowired
+    private SingerService singerService;
 
     /**
      * 分页查询歌曲的评论
@@ -74,6 +79,37 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         return commentVOPage;
     }
 
+    /**
+     * @param song
+     * @return
+     */
+    @Override
+    public SongVO getSongVO(Song song) {
+        //原本属性
+        SongVO songVO = SongVO.objToVO(song);
+        //补充属性
+        String singerListId = song.getSingerListId();
+        List<String> singerNameList = singerService.getSingerNameList(singerListId);
+        songVO.setSingerNameList(singerNameList);
+        return songVO;
+    }
+
+    /**
+     * 查询歌曲详情
+     *
+     * @param songId
+     * @return
+     */
+    @Override
+    public SongVO getSongInfo(Long songId) {
+        if (songId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<Song> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", songId);
+        Song song = this.getOne(queryWrapper);
+        return getSongVO(song);
+    }
 }
 
 

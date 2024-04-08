@@ -12,6 +12,8 @@ import com.dzy.model.dto.singer.SingerTagsQueryRequest;
 import com.dzy.model.entity.Singer;
 import com.dzy.model.vo.singer.SingerVO;
 import com.dzy.service.SingerService;
+import com.dzy.utils.JsonUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -124,6 +126,23 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         Page<SingerVO> singerVOPage = new Page<>(pageCurrent, pageSize, singerPage.getTotal());
         singerVOPage.setRecords(singerVOList);
         return singerVOPage;
+    }
+
+    /**
+     * 根据歌手id（json字符串）获取歌手姓名列表
+     *
+     * @param singerIdList
+     * @return
+     */
+    @Override
+    public List<String> getSingerNameList(String singerIdList) {
+        if (StringUtils.isBlank(singerIdList)) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        List<String> idList = JsonUtil.convertJsonToList(singerIdList);
+        List<Singer> singerList = this.listByIds(idList);
+        List<String> SingerNameList = singerList.stream().map(Singer::getName).collect(Collectors.toList());
+        return SingerNameList;
     }
 }
 

@@ -8,6 +8,8 @@ import com.dzy.model.dto.singer.SingerTagsQueryRequest;
 import com.dzy.model.entity.Singer;
 import com.dzy.model.vo.singer.SingerVO;
 
+import java.util.List;
+
 /**
  * @author DZY
  * @description 针对表【singer(歌手表)】的数据库操作Service
@@ -52,4 +54,12 @@ public interface SingerService extends IService<Singer> {
      * @return
      */
     Page<SingerVO> listSingerByTagsByPage(SingerTagsQueryRequest singerTagsQueryRequest);
+
+    /**
+     * 根据歌手id（json字符串）获取歌手姓名列表
+     *
+     * @param singerIdList
+     * @return
+     */
+    List<String> getSingerNameList(String singerIdList);
 }

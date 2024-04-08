@@ -2,6 +2,7 @@ package com.dzy.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dzy.model.dto.album.AlbumCommentCreateRequest;
 import com.dzy.model.dto.album.AlbumQueryRequest;
 import com.dzy.model.dto.album.AlbumSongQueryRequest;
 import com.dzy.model.entity.Album;
@@ -58,4 +59,11 @@ public interface AlbumService extends IService<Album> {
      */
     List<AlbumSongVO> listSong(AlbumSongQueryRequest albumSongQueryRequest);
 
+    /**
+     * 创建专辑评论
+     *
+     * @param albumCommentCreateRequest
+     * @return
+     */
+    Boolean createComment(AlbumCommentCreateRequest albumCommentCreateRequest);
 }

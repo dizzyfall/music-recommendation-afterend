@@ -9,12 +9,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
+import com.dzy.model.dto.album.AlbumCommentCreateRequest;
 import com.dzy.model.dto.album.AlbumQueryRequest;
 import com.dzy.model.dto.album.AlbumSongQueryRequest;
 import com.dzy.model.vo.album.AlbumInfoVO;
 import com.dzy.model.vo.album.AlbumSongVO;
 import com.dzy.model.vo.album.AlbumVO;
+import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.AlbumService;
+import com.dzy.service.UserInfoService;
 import com.dzy.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -30,6 +34,9 @@ public class AlbumController {
 
     @Autowired
     private AlbumService albumService;
+
+    @Autowired
+    private UserInfoService userInfoService;
 
     /**
      * 分页查询歌手专辑
@@ -75,5 +82,38 @@ public class AlbumController {
         }
         List<AlbumSongVO> albumSongVOList = albumService.listSong(albumSongQueryRequest);
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumSongVOList);
+    }
+
+    /**
+     * 创建专辑评论
+     *
+     * @param albumCommentCreateRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/comment/create")
+    public BaseResponse<Boolean> songCommentCreate(@RequestBody AlbumCommentCreateRequest albumCommentCreateRequest, HttpServletRequest request) {
+        if (albumCommentCreateRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = albumCommentCreateRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        Boolean isAlbumCommentCreate = albumService.createComment(albumCommentCreateRequest);
+        if (!isAlbumCommentCreate) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建评论失败");
+        }
+        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "创建评论成功");
     }
 }

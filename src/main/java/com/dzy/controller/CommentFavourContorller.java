@@ -54,7 +54,7 @@ public class CommentFavourContorller {
         if (!loginUserId.equals(requestUserId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
-        Boolean isFavourCount = reCommentFavourService.doCommentFavour(commentFavourAddRequest, loginUserVO);
+        Boolean isFavourCount = reCommentFavourService.doCommentFavour(commentFavourAddRequest);
         if (!isFavourCount) {
             throw new BusinessException(StatusCode.UPDATE_ERROR);
         }

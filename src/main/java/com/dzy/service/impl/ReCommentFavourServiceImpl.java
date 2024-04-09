@@ -7,7 +7,6 @@ import com.dzy.exception.BusinessException;
 import com.dzy.mapper.ReCommentFavourMapper;
 import com.dzy.model.dto.commentfavour.CommentFavourAddRequest;
 import com.dzy.model.entity.ReCommentFavour;
-import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.CommentService;
 import com.dzy.service.ReCommentFavourService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +29,11 @@ public class ReCommentFavourServiceImpl extends ServiceImpl<ReCommentFavourMappe
      * 点赞/取消点赞
      *
      * @param commentFavourAddRequest
-     * @param loginUserVO
      * @return 点赞数
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean doCommentFavour(CommentFavourAddRequest commentFavourAddRequest, UserLoginVO loginUserVO) {
+    public Boolean doCommentFavour(CommentFavourAddRequest commentFavourAddRequest) {
         //校验
         Long commentId = commentFavourAddRequest.getCommentId();
         if (commentId == null) {

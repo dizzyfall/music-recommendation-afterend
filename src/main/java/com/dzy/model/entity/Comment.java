@@ -2,6 +2,7 @@ package com.dzy.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Date;
  */
 @TableName(value = "comment")
 @Data
+@Component
 public class Comment implements Serializable {
     /**
      * 评论id

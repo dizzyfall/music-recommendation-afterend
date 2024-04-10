@@ -1,17 +1,20 @@
-package com.dzy.model.vo.album;
+package com.dzy.model.vo.song;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
- * 专辑中的歌曲简介视图
+ * 歌曲详情视图
  *
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
- * @Date 2024/4/7  15:05
+ * @Date 2024/4/3  12:21
  */
 @Data
-public class AlbumSongVO {
+public class SongIntroVO implements Serializable {
+
+    private static final long serialVersionUID = -1039821772081244465L;
 
     /**
      * 歌曲名
@@ -23,7 +26,5 @@ public class AlbumSongVO {
      * json字符串
      */
     private List<String> singerNameList;
-
-    //todo 歌曲时长字段
 
 }

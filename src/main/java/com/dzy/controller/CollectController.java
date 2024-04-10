@@ -1,21 +1,28 @@
 package com.dzy.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.collect.CollectAlbumRequest;
+import com.dzy.model.dto.collect.CollectQueryRequest;
 import com.dzy.model.dto.collect.CollectSongRequest;
+import com.dzy.model.vo.collect.CollectCountVO;
+import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
+import com.dzy.service.CollectService;
 import com.dzy.service.ReCollectAlbumService;
 import com.dzy.service.ReCollectSongService;
 import com.dzy.service.UserInfoService;
 import com.dzy.utils.ResponseUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
@@ -34,6 +41,9 @@ public class CollectController {
     @Resource
     private ReCollectAlbumService reCollectAlbumService;
 
+    @Resource
+    private CollectService collectService;
+
     /**
      * 收藏 | 取消收藏 歌曲
      *
@@ -44,7 +54,7 @@ public class CollectController {
     @RequestMapping("/song")
     public BaseResponse<Boolean> collectSong(@RequestBody CollectSongRequest collectSongRequest, HttpServletRequest request) {
         if (collectSongRequest == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         if (request == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -62,7 +72,7 @@ public class CollectController {
         }
         Boolean isCollectSongCreate = reCollectSongService.doCollectSong(collectSongRequest);
         if (!isCollectSongCreate) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "收藏歌曲失败");
+            throw new BusinessException(StatusCode.CREATE_ERROR, "收藏歌曲失败");
         }
         return ResponseUtil.success(StatusCode.CREATE_SUCESS, "收藏歌曲成功");
     }
@@ -77,7 +87,7 @@ public class CollectController {
     @RequestMapping("/album")
     public BaseResponse<Boolean> collectAlbum(@RequestBody CollectAlbumRequest collectAlbumRequest, HttpServletRequest request) {
         if (collectAlbumRequest == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         if (request == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -95,9 +105,74 @@ public class CollectController {
         }
         Boolean isCollectSongCreate = reCollectAlbumService.doCollectAlbum(collectAlbumRequest);
         if (!isCollectSongCreate) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "收藏专辑失败");
+            throw new BusinessException(StatusCode.CREATE_ERROR, "收藏专辑失败");
         }
         return ResponseUtil.success(StatusCode.CREATE_SUCESS, "收藏专辑成功");
     }
+
+    /**
+     * 分页查询收藏的歌曲
+     *
+     * @param collectQueryRequest
+     * @param request
+     * @return
+     */
+    @RequestMapping("/song/list/page")
+    public BaseResponse<List<SongIntroVO>> collectSongRetrieveByPage(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
+        if (collectQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = collectQueryRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        Page<SongIntroVO> songIntroVOPage = collectService.listCollectSongByPage(collectQueryRequest);
+        List<SongIntroVO> songIntroVOList = songIntroVOPage.getRecords();
+        if (CollectionUtils.isEmpty(songIntroVOList)) {
+            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "暂无歌曲");
+        }
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songIntroVOList, "获取收藏歌曲列表成功");
+    }
+
+    /**
+     * 获取收藏的歌曲、专辑、歌单数量
+     *
+     * @param collectQueryRequest
+     * @param request
+     * @return
+     */
+    @RequestMapping("/count")
+    public BaseResponse<CollectCountVO> collectCountRetrieve(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
+        if (collectQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = collectQueryRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        CollectCountVO collectCountVO = collectService.getCollectCount(collectQueryRequest);
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, collectCountVO, "获取收藏数量信息成功");
+    }
+
 
 }

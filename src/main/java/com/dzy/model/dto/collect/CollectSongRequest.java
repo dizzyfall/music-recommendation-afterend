@@ -12,6 +12,7 @@ import java.io.Serializable;
  */
 @Data
 public class CollectSongRequest implements Serializable {
+
     private static final long serialVersionUID = 9132117769324902059L;
 
     private Long userId;

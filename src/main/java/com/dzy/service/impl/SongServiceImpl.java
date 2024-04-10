@@ -13,7 +13,8 @@ import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReSongComment;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
-import com.dzy.model.vo.song.SongVO;
+import com.dzy.model.vo.song.SongDetailVO;
+import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.service.CommentService;
 import com.dzy.service.ReSongCommentService;
 import com.dzy.service.SingerService;
@@ -85,38 +86,75 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
     }
 
     /**
-     * Song转SongVO
+     * Song转SongDetailVO
      * 不能简单使用属性复制，因为SongVO还有Song中没有的属性
      *
      * @param song
      * @return
      */
     @Override
-    public SongVO getSongVO(Song song) {
+    public SongDetailVO getSongDetailVO(Song song) {
         //原本属性
-        SongVO songVO = SongVO.objToVO(song);
+        SongDetailVO songDetailVO = SongDetailVO.objToVO(song);
         //补充属性
         String singerListId = song.getSingerListId();
         List<String> singerNameList = singerService.getSingerNameList(singerListId);
-        songVO.setSingerNameList(singerNameList);
-        return songVO;
+        songDetailVO.setSingerNameList(singerNameList);
+        return songDetailVO;
     }
 
     /**
-     * 查询歌曲详情
+     * 获取歌曲详情
      *
      * @param songId
      * @return
      */
     @Override
-    public SongVO getSongInfo(Long songId) {
+    public SongDetailVO getSongDetail(Long songId) {
         if (songId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         QueryWrapper<Song> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", songId);
         Song song = this.getOne(queryWrapper);
-        return getSongVO(song);
+        return getSongDetailVO(song);
+    }
+
+    /**
+     * 获取歌曲简介
+     *
+     * @param song
+     * @return
+     */
+    //todo 查询优化
+    @Override
+    public SongIntroVO getSongIntro(Song song) {
+        if (song == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        SongDetailVO songDetailVO = getSongDetailVO(song);
+        SongIntroVO songIntroVO = new SongIntroVO();
+        songIntroVO.setTitle(songDetailVO.getTitle());
+        songIntroVO.setSingerNameList(songDetailVO.getSingerNameList());
+        return songIntroVO;
+    }
+
+    /**
+     * 通过歌曲Id获取歌曲简介
+     *
+     * @param songId
+     * @return
+     */
+    @Override
+    public SongIntroVO getSongIntroById(Long songId) {
+        if (songId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        SongDetailVO songDetailVO = getSongDetail(songId);
+        SongIntroVO songIntroVO = new SongIntroVO();
+        songIntroVO.setTitle(songDetailVO.getTitle());
+        songIntroVO.setSingerNameList(songDetailVO.getSingerNameList());
+        return songIntroVO;
     }
 
 

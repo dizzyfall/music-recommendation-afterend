@@ -12,13 +12,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 歌曲视图
+ * 歌曲详情视图
  *
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
  * @Date 2024/4/3  12:21
  */
 @Data
-public class SongVO implements Serializable {
+public class SongDetailVO implements Serializable {
 
     private static final long serialVersionUID = -1039821772081244465L;
 
@@ -103,17 +103,17 @@ public class SongVO implements Serializable {
      */
     private Date publishTime;
 
-    public static SongVO objToVO(Song song) {
+    public static SongDetailVO objToVO(Song song) {
         if (song == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        SongVO songVO = new SongVO();
+        SongDetailVO songDetailVO = new SongDetailVO();
         try {
-            BeanUtils.copyProperties(song, songVO);
-            songVO.setSingerListId(JsonUtil.convertJsonToList(song.getSingerListId()));
+            BeanUtils.copyProperties(song, songDetailVO);
+            songDetailVO.setSingerListId(JsonUtil.convertJsonToList(song.getSingerListId()));
         } catch (BusinessException e) {
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
         }
-        return songVO;
+        return songDetailVO;
     }
 }

@@ -7,7 +7,8 @@ import com.dzy.model.dto.song.SongCommentQueryRequest;
 import com.dzy.model.dto.song.SongReplyCreateRequest;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
-import com.dzy.model.vo.song.SongVO;
+import com.dzy.model.vo.song.SongDetailVO;
+import com.dzy.model.vo.song.SongIntroVO;
 
 /**
  * @author DZY
@@ -25,21 +26,37 @@ public interface SongService extends IService<Song> {
     Page<CommentVO> listSongCommentByPage(SongCommentQueryRequest songCommentQueryRequest);
 
     /**
-     * Song转SongVO
+     * Song转SongDetailVO
      * 不能简单使用属性复制，因为SongVO还有Song中没有的属性
      *
      * @param song
      * @return
      */
-    SongVO getSongVO(Song song);
+    SongDetailVO getSongDetailVO(Song song);
 
     /**
-     * 查询歌曲详情
+     * 获取歌曲详情
      *
      * @param songId
      * @return
      */
-    SongVO getSongInfo(Long songId);
+    SongDetailVO getSongDetail(Long songId);
+
+    /**
+     * 获取歌曲简介
+     *
+     * @param song
+     * @return
+     */
+    SongIntroVO getSongIntro(Song song);
+
+    /**
+     * 通过歌曲Id获取歌曲简介
+     *
+     * @param songId
+     * @return
+     */
+    SongIntroVO getSongIntroById(Long songId);
 
     /**
      * 创建歌曲评论

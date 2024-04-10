@@ -14,9 +14,8 @@ import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReAlbumComment;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.album.AlbumInfoVO;
-import com.dzy.model.vo.album.AlbumSongVO;
 import com.dzy.model.vo.album.AlbumVO;
-import com.dzy.model.vo.song.SongVO;
+import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.service.AlbumService;
 import com.dzy.service.CommentService;
 import com.dzy.service.ReAlbumCommentService;
@@ -115,23 +114,6 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
     }
 
     /**
-     * 歌曲转专辑歌曲简介视图
-     *
-     * @param song
-     * @return
-     */
-    public AlbumSongVO getAlbumSongVO(Song song) {
-        if (song == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        AlbumSongVO albumSongVO = new AlbumSongVO();
-        SongVO songVO = songService.getSongVO(song);
-        albumSongVO.setTitle(songVO.getTitle());
-        albumSongVO.setSingerNameList(songVO.getSingerNameList());
-        return albumSongVO;
-    }
-
-    /**
      * 查询指定专辑详情
      *
      * @param albumSongQueryRequest
@@ -163,7 +145,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
      * @return
      */
     @Override
-    public List<AlbumSongVO> listSong(AlbumSongQueryRequest albumSongQueryRequest) {
+    public List<SongIntroVO> listSong(AlbumSongQueryRequest albumSongQueryRequest) {
         Long singerId = albumSongQueryRequest.getSingerId();
         if (singerId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -182,7 +164,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
         QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();
         songQueryWrapper.eq("album_id", albumId);
         List<Song> songList = songService.list(songQueryWrapper);
-        return songList.stream().map(this::getAlbumSongVO).collect(Collectors.toList());
+        return songList.stream().map(song -> songService.getSongIntro(song)).collect(Collectors.toList());
     }
 
     /**

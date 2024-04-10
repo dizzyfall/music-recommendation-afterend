@@ -13,8 +13,8 @@ import com.dzy.model.dto.album.AlbumCommentCreateRequest;
 import com.dzy.model.dto.album.AlbumQueryRequest;
 import com.dzy.model.dto.album.AlbumSongQueryRequest;
 import com.dzy.model.vo.album.AlbumInfoVO;
-import com.dzy.model.vo.album.AlbumSongVO;
 import com.dzy.model.vo.album.AlbumVO;
+import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.AlbumService;
 import com.dzy.service.UserInfoService;
@@ -76,12 +76,12 @@ public class AlbumController {
      * @return
      */
     @PostMapping("/song")
-    public BaseResponse<List<AlbumSongVO>> albumSongRetrieve(@RequestBody AlbumSongQueryRequest albumSongQueryRequest) {
+    public BaseResponse<List<SongIntroVO>> albumSongRetrieve(@RequestBody AlbumSongQueryRequest albumSongQueryRequest) {
         if (albumSongQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        List<AlbumSongVO> albumSongVOList = albumService.listSong(albumSongQueryRequest);
-        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumSongVOList);
+        List<SongIntroVO> songIntroVOList = albumService.listSong(albumSongQueryRequest);
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songIntroVOList);
     }
 
     /**

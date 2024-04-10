@@ -7,8 +7,8 @@ import com.dzy.model.dto.album.AlbumQueryRequest;
 import com.dzy.model.dto.album.AlbumSongQueryRequest;
 import com.dzy.model.entity.Album;
 import com.dzy.model.vo.album.AlbumInfoVO;
-import com.dzy.model.vo.album.AlbumSongVO;
 import com.dzy.model.vo.album.AlbumVO;
+import com.dzy.model.vo.song.SongIntroVO;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public interface AlbumService extends IService<Album> {
      * @param albumSongQueryRequest
      * @return
      */
-    List<AlbumSongVO> listSong(AlbumSongQueryRequest albumSongQueryRequest);
+    List<SongIntroVO> listSong(AlbumSongQueryRequest albumSongQueryRequest);
 
     /**
      * 创建专辑评论

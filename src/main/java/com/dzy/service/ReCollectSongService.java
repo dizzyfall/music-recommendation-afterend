@@ -1,7 +1,7 @@
 package com.dzy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.dzy.model.dto.collect.CollectSongCreateRequest;
+import com.dzy.model.dto.collect.CollectSongRequest;
 import com.dzy.model.entity.ReCollectSong;
 
 /**
@@ -12,11 +12,11 @@ import com.dzy.model.entity.ReCollectSong;
 public interface ReCollectSongService extends IService<ReCollectSong> {
 
     /**
-     * 收藏歌曲
+     * 收藏 | 取消收藏 歌曲
      *
-     * @param collectSongCreateRequest
+     * @param collectSongRequest
      * @return
      */
-    Boolean createCollectSong(CollectSongCreateRequest collectSongCreateRequest);
+    Boolean doCollectSong(CollectSongRequest collectSongRequest);
 
 }

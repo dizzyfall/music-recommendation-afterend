@@ -5,61 +5,57 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
-import com.dzy.mapper.ReCollectSongMapper;
-import com.dzy.model.dto.collect.CollectSongRequest;
+import com.dzy.mapper.ReCollectAlbumMapper;
+import com.dzy.model.dto.collect.CollectAlbumRequest;
 import com.dzy.model.entity.Collect;
-import com.dzy.model.entity.ReCollectSong;
+import com.dzy.model.entity.ReCollectAlbum;
 import com.dzy.service.CollectService;
-import com.dzy.service.ReCollectSongService;
+import com.dzy.service.ReCollectAlbumService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
 /**
  * @author DZY
- * @description 针对表【re_collect_song(收藏歌曲关联表)】的数据库操作Service实现
- * @createDate 2024-04-09 23:21:12
+ * @description 针对表【re_collect_album(收藏专辑关联表)】的数据库操作Service实现
+ * @createDate 2024-04-10 12:02:35
  */
 @Service
-public class ReCollectSongServiceImpl extends ServiceImpl<ReCollectSongMapper, ReCollectSong>
-        implements ReCollectSongService {
+public class ReCollectAlbumServiceImpl extends ServiceImpl<ReCollectAlbumMapper, ReCollectAlbum>
+        implements ReCollectAlbumService {
 
     @Resource
     private CollectService collectService;
 
     /**
-     * 收藏 | 取消收藏 歌曲
+     * 收藏 | 取消收藏 专辑
      *
-     * @param collectSongRequest
+     * @param collectAlbumRequest
      * @return
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Boolean doCollectSong(CollectSongRequest collectSongRequest) {
-        if (collectSongRequest == null) {
+    public Boolean doCollectAlbum(CollectAlbumRequest collectAlbumRequest) {
+        if (collectAlbumRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        Long userId = collectSongRequest.getUserId();
+        Long userId = collectAlbumRequest.getUserId();
         if (userId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        Long songId = collectSongRequest.getSongId();
-        if (songId == null) {
+        Long albumId = collectAlbumRequest.getAlbumId();
+        if (albumId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         //是否已收藏
-        QueryWrapper<ReCollectSong> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId).eq("song_id", songId);
-        ReCollectSong oldCollectSong = this.getOne(queryWrapper);
-        //已收藏
-        if (oldCollectSong != null) {
-            //移除关联表信息
+        QueryWrapper<ReCollectAlbum> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId).eq("album_id", albumId);
+        ReCollectAlbum oldCollectAlbum = this.getOne(queryWrapper);
+        if (oldCollectAlbum != null) {
             boolean remove = this.remove(queryWrapper);
             if (remove) {
                 //更新收藏表数据
                 UpdateWrapper<Collect> updateWrapper = new UpdateWrapper<>();
-                updateWrapper.eq("user_id", userId).setSql("song_count = song_count - 1");
+                updateWrapper.eq("user_id", userId).setSql("album_count = album_count - 1");
                 boolean isUpdate = collectService.update(updateWrapper);
                 if (!isUpdate) {
                     throw new BusinessException(StatusCode.UPDATE_ERROR, "取消收藏失败");
@@ -70,14 +66,14 @@ public class ReCollectSongServiceImpl extends ServiceImpl<ReCollectSongMapper, R
         } else {
             //没有收藏
             //关联表添加数据
-            ReCollectSong reCollectSong = new ReCollectSong();
-            reCollectSong.setUserId(userId);
-            reCollectSong.setSongId(songId);
-            boolean save = this.save(reCollectSong);
+            ReCollectAlbum reCollectAlbum = new ReCollectAlbum();
+            reCollectAlbum.setUserId(userId);
+            reCollectAlbum.setAlbumId(albumId);
+            boolean save = this.save(reCollectAlbum);
             if (save) {
                 //更新收藏表数据
                 UpdateWrapper<Collect> updateWrapper = new UpdateWrapper<>();
-                updateWrapper.eq("user_id", userId).setSql("song_count = song_count + 1");
+                updateWrapper.eq("user_id", userId).setSql("album_count = album_count + 1");
                 boolean isUpdate = collectService.update(updateWrapper);
                 if (!isUpdate) {
                     throw new BusinessException(StatusCode.UPDATE_ERROR, "收藏成功");

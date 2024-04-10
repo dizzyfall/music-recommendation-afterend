@@ -1,5 +1,6 @@
 package com.dzy.model.vo.album;
 
+import com.dzy.model.vo.song.SongIntroVO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -76,5 +77,5 @@ public class AlbumInfoVO implements Serializable {
     /**
      * 专辑歌曲信息
      */
-    private AlbumSongVO[] songVOList;
+    private SongIntroVO[] songVOList;
 }

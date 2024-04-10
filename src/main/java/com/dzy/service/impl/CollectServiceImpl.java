@@ -7,13 +7,15 @@ import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.CollectMapper;
 import com.dzy.model.dto.collect.CollectQueryRequest;
+import com.dzy.model.entity.Album;
 import com.dzy.model.entity.Collect;
+import com.dzy.model.entity.ReCollectAlbum;
 import com.dzy.model.entity.ReCollectSong;
+import com.dzy.model.vo.album.AlbumVO;
+import com.dzy.model.vo.collect.CollectAlbumVO;
 import com.dzy.model.vo.collect.CollectCountVO;
 import com.dzy.model.vo.song.SongIntroVO;
-import com.dzy.service.CollectService;
-import com.dzy.service.ReCollectSongService;
-import com.dzy.service.SongService;
+import com.dzy.service.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,7 +35,37 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
     private ReCollectSongService reCollectSongService;
 
     @Resource
+    private ReCollectAlbumService reCollectAlbumService;
+
+    @Resource
     private SongService songService;
+
+    @Resource
+    private AlbumService albumService;
+
+    @Resource
+    private SingerService singerService;
+
+    /**
+     * 获取收藏的歌曲、专辑、歌单数量
+     *
+     * @param collectQueryRequest
+     * @return
+     */
+    @Override
+    public CollectCountVO getCollectCount(CollectQueryRequest collectQueryRequest) {
+        if (collectQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long userId = collectQueryRequest.getUserId();
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<Collect> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        Collect collect = this.getOne(queryWrapper);
+        return CollectCountVO.objToVO(collect);
+    }
 
     /**
      * 分页查询收藏的歌曲
@@ -65,13 +97,13 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
     }
 
     /**
-     * 获取收藏的歌曲、专辑、歌单数量
+     * 分页查询收藏的专辑
      *
      * @param collectQueryRequest
      * @return
      */
     @Override
-    public CollectCountVO getCollectCount(CollectQueryRequest collectQueryRequest) {
+    public Page<CollectAlbumVO> listCollectAlbumByPage(CollectQueryRequest collectQueryRequest) {
         if (collectQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -79,10 +111,44 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
         if (userId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        QueryWrapper<Collect> queryWrapper = new QueryWrapper<>();
+        int pageCurrent = collectQueryRequest.getPageCurrent();
+        int pageSize = collectQueryRequest.getPageSize();
+        Page<ReCollectAlbum> page = new Page<>(pageCurrent, pageSize);
+        QueryWrapper<ReCollectAlbum> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
-        Collect collect = this.getOne(queryWrapper);
-        return CollectCountVO.objToVO(collect);
+        Page<ReCollectAlbum> reCollectAlbumPage = reCollectAlbumService.page(page, queryWrapper);
+        List<CollectAlbumVO> collectAlbumVOList = reCollectAlbumPage.getRecords().stream().map(reCollectAlbum -> {
+            Long albumId = reCollectAlbum.getAlbumId();
+            return getCollectAlbumVOById(albumId);
+        }).collect(Collectors.toList());
+        Page<CollectAlbumVO> collectAlbumVOListPage = new Page<>(pageCurrent, pageSize, page.getTotal());
+        return collectAlbumVOListPage.setRecords(collectAlbumVOList);
+
+    }
+
+    //todo 几个视图解释清楚
+
+    /**
+     * 获取收藏的专辑简介视图
+     *
+     * @param albumId
+     * @return
+     */
+    public CollectAlbumVO getCollectAlbumVOById(Long albumId) {
+        if (albumId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Album album = albumService.getById(albumId);
+        if (album == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "无此专辑");
+        }
+        CollectAlbumVO collectAlbumVO = new CollectAlbumVO();
+        //todo 下面方法写到VO里
+        AlbumVO albumVO = albumService.albumToAlbumVO(album);
+        List<String> singerNameList = singerService.getSingerNameList(album.getSingerIdList());
+        collectAlbumVO.setAlbumVO(albumVO);
+        collectAlbumVO.setSingerNameList(singerNameList);
+        return collectAlbumVO;
     }
 
 }

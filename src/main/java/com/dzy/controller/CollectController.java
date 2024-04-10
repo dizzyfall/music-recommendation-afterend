@@ -7,6 +7,7 @@ import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.collect.CollectAlbumRequest;
 import com.dzy.model.dto.collect.CollectQueryRequest;
 import com.dzy.model.dto.collect.CollectSongRequest;
+import com.dzy.model.vo.collect.CollectAlbumVO;
 import com.dzy.model.vo.collect.CollectCountVO;
 import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
@@ -111,6 +112,36 @@ public class CollectController {
     }
 
     /**
+     * 获取收藏的歌曲、专辑、歌单数量
+     *
+     * @param collectQueryRequest
+     * @param request
+     * @return
+     */
+    @RequestMapping("/count")
+    public BaseResponse<CollectCountVO> collectCountRetrieve(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
+        if (collectQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = collectQueryRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        CollectCountVO collectCountVO = collectService.getCollectCount(collectQueryRequest);
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, collectCountVO, "获取收藏数量信息成功");
+    }
+
+    /**
      * 分页查询收藏的歌曲
      *
      * @param collectQueryRequest
@@ -144,15 +175,16 @@ public class CollectController {
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songIntroVOList, "获取收藏歌曲列表成功");
     }
 
+
     /**
-     * 获取收藏的歌曲、专辑、歌单数量
+     * 分页查询收藏的专辑
      *
      * @param collectQueryRequest
      * @param request
      * @return
      */
-    @RequestMapping("/count")
-    public BaseResponse<CollectCountVO> collectCountRetrieve(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
+    @RequestMapping("/album/list/page")
+    public BaseResponse<List<CollectAlbumVO>> collectAlbumRetrieveByPage(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
         if (collectQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -170,8 +202,12 @@ public class CollectController {
         if (!loginUserId.equals(requestUserId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
-        CollectCountVO collectCountVO = collectService.getCollectCount(collectQueryRequest);
-        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, collectCountVO, "获取收藏数量信息成功");
+        Page<CollectAlbumVO> albumVOPage = collectService.listCollectAlbumByPage(collectQueryRequest);
+        List<CollectAlbumVO> albumVOList = albumVOPage.getRecords();
+        if (CollectionUtils.isEmpty(albumVOList)) {
+            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "暂无专辑");
+        }
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumVOList, "获取收藏专辑列表成功");
     }
 
 

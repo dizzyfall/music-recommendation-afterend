@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.collect.CollectQueryRequest;
 import com.dzy.model.entity.Collect;
+import com.dzy.model.vo.collect.CollectAlbumVO;
 import com.dzy.model.vo.collect.CollectCountVO;
 import com.dzy.model.vo.song.SongIntroVO;
 
@@ -15,6 +16,14 @@ import com.dzy.model.vo.song.SongIntroVO;
 public interface CollectService extends IService<Collect> {
 
     /**
+     * 获取收藏的歌曲、专辑、歌单数量
+     *
+     * @param collectQueryRequest
+     * @return
+     */
+    CollectCountVO getCollectCount(CollectQueryRequest collectQueryRequest);
+
+    /**
      * 分页查询收藏的歌曲
      *
      * @param collectQueryRequest
@@ -23,11 +32,10 @@ public interface CollectService extends IService<Collect> {
     Page<SongIntroVO> listCollectSongByPage(CollectQueryRequest collectQueryRequest);
 
     /**
-     * 获取收藏的歌曲、专辑、歌单数量
+     * 分页查询收藏的专辑
      *
      * @param collectQueryRequest
      * @return
      */
-    CollectCountVO getCollectCount(CollectQueryRequest collectQueryRequest);
-
+    Page<CollectAlbumVO> listCollectAlbumByPage(CollectQueryRequest collectQueryRequest);
 }

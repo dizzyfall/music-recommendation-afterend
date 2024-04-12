@@ -110,7 +110,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
      * @return
      */
     @Override
-    public SongDetailVO getSongDetail(Long songId) {
+    public SongDetailVO getSongDetailById(Long songId) {
         if (songId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -150,7 +150,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         if (songId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        SongDetailVO songDetailVO = getSongDetail(songId);
+        SongDetailVO songDetailVO = getSongDetailById(songId);
         SongIntroVO songIntroVO = new SongIntroVO();
         songIntroVO.setTitle(songDetailVO.getTitle());
         songIntroVO.setSingerNameList(songDetailVO.getSingerNameList());

@@ -77,5 +77,5 @@ public class AlbumInfoVO implements Serializable {
     /**
      * 专辑歌曲信息
      */
-    private SongIntroVO[] songVOList;
+    private List<SongIntroVO> songIntroVOList;
 }

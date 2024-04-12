@@ -123,7 +123,6 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
         }).collect(Collectors.toList());
         Page<CollectAlbumVO> collectAlbumVOListPage = new Page<>(pageCurrent, pageSize, page.getTotal());
         return collectAlbumVOListPage.setRecords(collectAlbumVOList);
-
     }
 
     //todo 几个视图解释清楚
@@ -144,7 +143,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
         }
         CollectAlbumVO collectAlbumVO = new CollectAlbumVO();
         //todo 下面方法写到VO里
-        AlbumVO albumVO = albumService.albumToAlbumVO(album);
+        AlbumVO albumVO = AlbumVO.objToVO(album);
         List<String> singerNameList = singerService.getSingerNameList(album.getSingerIdList());
         collectAlbumVO.setAlbumVO(albumVO);
         collectAlbumVO.setSingerNameList(singerNameList);

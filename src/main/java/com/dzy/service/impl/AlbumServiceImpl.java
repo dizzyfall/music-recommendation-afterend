@@ -16,10 +16,7 @@ import com.dzy.model.entity.Song;
 import com.dzy.model.vo.album.AlbumInfoVO;
 import com.dzy.model.vo.album.AlbumVO;
 import com.dzy.model.vo.song.SongIntroVO;
-import com.dzy.service.AlbumService;
-import com.dzy.service.CommentService;
-import com.dzy.service.ReAlbumCommentService;
-import com.dzy.service.SongService;
+import com.dzy.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +46,9 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
     @Resource
     private ReAlbumCommentService reAlbumCommentService;
 
+    @Resource
+    private SingerService singerService;
+
     /**
      * 分页查询歌手专辑
      *
@@ -67,49 +67,31 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
         int pageSize = albumQueryRequest.getPageSize();
         Page<Album> page = new Page<>(pageCurrent, pageSize);
         Page<Album> albumPage = this.page(page, queryWrapper);
-        List<AlbumVO> albumVOList = albumPage.getRecords().stream().map(this::albumToAlbumVO).collect(Collectors.toList());
+        List<AlbumVO> albumVOList = albumPage.getRecords().stream().map(AlbumVO::objToVO).collect(Collectors.toList());
         Page<AlbumVO> albumVOPage = new Page<>(pageCurrent, pageSize, albumPage.getTotal());
         albumVOPage.setRecords(albumVOList);
         return albumVOPage;
     }
 
     /**
-     * Album转AlbumVO
+     * 获取专辑详情视图
      *
      * @param album
      * @return
      */
     @Override
-    public AlbumVO albumToAlbumVO(Album album) {
-        if (album == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        AlbumVO albumVO = new AlbumVO();
-        try {
-            BeanUtils.copyProperties(album, albumVO);
-        } catch (BusinessException e) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
-        }
-        return albumVO;
-    }
-
-    /**
-     * Album转AlbumInfoVO
-     *
-     * @param album
-     * @return
-     */
-    @Override
-    public AlbumInfoVO albumToAlbumInfoVO(Album album) {
+    public AlbumInfoVO getAlbumInfoVO(Album album) {
         if (album == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         AlbumInfoVO albumInfoVO = new AlbumInfoVO();
-        try {
-            BeanUtils.copyProperties(album, albumInfoVO);
-        } catch (BusinessException e) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
-        }
+        BeanUtils.copyProperties(album, albumInfoVO);
+        //补充singerNameList属性
+        List<String> singerNameList = singerService.getSingerNameList(album.getSingerIdList());
+        albumInfoVO.setSingerNameList(singerNameList);
+        //补充songIntroVOList属性
+        List<SongIntroVO> songIntroVOList = listSong(album.getId());
+        albumInfoVO.setSongIntroVOList(songIntroVOList);
         return albumInfoVO;
     }
 
@@ -135,7 +117,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
         if (album == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "歌手无此专辑");
         }
-        return albumToAlbumInfoVO(album);
+        return getAlbumInfoVO(album);
     }
 
     /**
@@ -159,6 +141,23 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
         Album album = this.getOne(queryWrapper);
         if (album == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "歌手无此专辑");
+        }
+        //查询专辑全部歌曲
+        QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();
+        songQueryWrapper.eq("album_id", albumId);
+        List<Song> songList = songService.list(songQueryWrapper);
+        return songList.stream().map(song -> songService.getSongIntro(song)).collect(Collectors.toList());
+    }
+
+    /**
+     * 查询指定专辑所有歌曲
+     *
+     * @param albumId
+     * @return
+     */
+    public List<SongIntroVO> listSong(Long albumId) {
+        if (albumId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         //查询专辑全部歌曲
         QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();

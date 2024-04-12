@@ -28,20 +28,12 @@ public interface AlbumService extends IService<Album> {
     Page<AlbumVO> listAlbumByPage(AlbumQueryRequest albumQueryRequest);
 
     /**
-     * album转albumVO
+     * 获取专辑详情视图
      *
      * @param album
      * @return
      */
-    AlbumVO albumToAlbumVO(Album album);
-
-    /**
-     * Album转AlbumInfoVO
-     *
-     * @param album
-     * @return
-     */
-    AlbumInfoVO albumToAlbumInfoVO(Album album);
+    AlbumInfoVO getAlbumInfoVO(Album album);
 
     /**
      * 查询指定专辑信息

@@ -40,7 +40,7 @@ public interface SongService extends IService<Song> {
      * @param songId
      * @return
      */
-    SongDetailVO getSongDetail(Long songId);
+    SongDetailVO getSongDetailById(Long songId);
 
     /**
      * 获取歌曲简介

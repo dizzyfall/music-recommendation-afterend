@@ -1,6 +1,10 @@
 package com.dzy.model.vo.album;
 
+import com.dzy.constant.StatusCode;
+import com.dzy.exception.BusinessException;
+import com.dzy.model.entity.Album;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -40,5 +44,24 @@ public class AlbumVO implements Serializable {
      * 专辑发行日期
      */
     private Date publishTime;
+
+    /**
+     * Album转AlbumVO
+     *
+     * @param album
+     * @return
+     */
+    public static AlbumVO objToVO(Album album) {
+        if (album == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        AlbumVO albumVO = new AlbumVO();
+        try {
+            BeanUtils.copyProperties(album, albumVO);
+        } catch (BusinessException e) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
+        }
+        return albumVO;
+    }
 
 }

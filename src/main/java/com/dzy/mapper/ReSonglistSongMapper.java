@@ -3,6 +3,9 @@ package com.dzy.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.dzy.model.entity.ReSonglistSong;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author DZY
@@ -12,6 +15,16 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ReSonglistSongMapper extends BaseMapper<ReSonglistSong> {
+
+    /**
+     * 通过歌单id列表批量删除歌单-歌曲关联表数据
+     *
+     * @param creatorId
+     * @param songlistIds
+     * @return
+     */
+    //todo sql语句可能有问题
+    Boolean deleteBatchBySonglistIds(Long creatorId, @Param("SonglistIds") List<Long> songlistIds);
 
 }
 

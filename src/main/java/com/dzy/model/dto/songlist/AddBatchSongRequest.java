@@ -10,7 +10,7 @@ import java.util.List;
  * @Date 2024/4/11  23:23
  */
 @Data
-public class AddSongBatchesRequest implements Serializable {
+public class AddBatchSongRequest implements Serializable {
 
     private static final long serialVersionUID = 801949298449559331L;
 

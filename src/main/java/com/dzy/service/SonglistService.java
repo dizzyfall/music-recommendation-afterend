@@ -1,9 +1,7 @@
 package com.dzy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.dzy.model.dto.songlist.AddSongBatchesRequest;
-import com.dzy.model.dto.songlist.AddSongRequest;
-import com.dzy.model.dto.songlist.SonglistCreateRequest;
+import com.dzy.model.dto.songlist.*;
 import com.dzy.model.entity.Songlist;
 
 /**
@@ -32,9 +30,41 @@ public interface SonglistService extends IService<Songlist> {
     /**
      * 批量添加歌曲到歌单
      *
-     * @param addSongBatchesRequest
+     * @param addBatchSongRequest
      * @return
      */
-    Boolean addSongBatches(AddSongBatchesRequest addSongBatchesRequest);
+    Boolean addBatchSong(AddBatchSongRequest addBatchSongRequest);
+
+    /**
+     * 删除歌单
+     *
+     * @param songlistDeleteRequest
+     * @return
+     */
+    Boolean deleteSonglist(SonglistDeleteRequest songlistDeleteRequest);
+
+    /**
+     * 删除歌单（批量删除）
+     *
+     * @param songlistDeleteBatchRequest
+     * @return
+     */
+    Boolean deleteBatchSonglist(SonglistDeleteBatchRequest songlistDeleteBatchRequest);
+
+    /**
+     * 删除歌曲
+     *
+     * @param deleteSongRequest
+     * @return
+     */
+    Boolean deleteSong(DeleteSongRequest deleteSongRequest);
+
+    /**
+     * 删除歌曲（批量删除）
+     *
+     * @param deleteBatchSongRequest
+     * @return
+     */
+    Boolean deleteBatchSong(DeleteBatchSongRequest deleteBatchSongRequest);
 
 }

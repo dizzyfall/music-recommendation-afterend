@@ -20,4 +20,11 @@
         song_id,create_time,update_time,
         is_delete
     </sql>
+
+    <delete id="deleteBatchBySonglistIds" parameterType="long">
+        delete from re_songlist_song where creator_id =#{creatorId} and songlist_id in
+        <foreach collection="SonglistIds" open="(" close=")" separator="," item="songlist_id">
+            #{songlist_id}
+        </foreach>
+    </delete>
 </mapper>

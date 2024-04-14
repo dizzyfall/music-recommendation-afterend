@@ -20,7 +20,7 @@ public class SonglistIntroVO implements Serializable {
     /**
      * 歌单创建者姓名
      */
-    private Long creatorName;
+    private String creatorName;
 
     /**
      * 歌单封面保存路径
@@ -42,6 +42,14 @@ public class SonglistIntroVO implements Serializable {
      */
     private Long playCount;
 
+    /**
+     * Songlist转SonglistIntroVO
+     * SonglistIntroVO的属性只含有Songlist原本的属性
+     *
+     * @param songlist
+     * @return com.dzy.model.vo.songlist.SonglistIntroVO
+     * @date 2024/4/14  11:34
+     */
     public static SonglistIntroVO objToVO(Songlist songlist) {
         if (songlist == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -54,4 +62,5 @@ public class SonglistIntroVO implements Serializable {
         }
         return songlistIntroVO;
     }
+
 }

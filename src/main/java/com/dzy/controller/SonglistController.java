@@ -261,4 +261,40 @@ public class SonglistController {
         return ResponseUtil.success(StatusCode.CREATE_SUCESS, "批量删除歌曲成功");
     }
 
+
+    /**
+     * 创建歌单评论
+     *
+     * @param songlistCommentCreateRequest
+     * @param request
+     * @return com.dzy.common.BaseResponse<java.lang.Boolean>
+     * @date 2024/4/13  23:42
+     */
+    @PostMapping("/create_comment")
+    public BaseResponse<Boolean> songCommentCreate(@RequestBody SonglistCommentCreateRequest songlistCommentCreateRequest, HttpServletRequest request) {
+        if (songlistCommentCreateRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = songlistCommentCreateRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        Boolean isSongCommentCreate = songlistService.createComment(songlistCommentCreateRequest);
+        if (!isSongCommentCreate) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建歌单评论失败");
+        }
+        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "创建歌单评论成功");
+    }
+
+
 }

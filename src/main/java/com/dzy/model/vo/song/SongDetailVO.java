@@ -103,6 +103,14 @@ public class SongDetailVO implements Serializable {
      */
     private Date publishTime;
 
+    /**
+     * Song转SongDetailVO
+     * SongDetailVO的属性只含有Song原本的属性
+     *
+     * @param song
+     * @return com.dzy.model.vo.song.SongDetailVO
+     * @date 2024/4/14  11:31
+     */
     public static SongDetailVO objToVO(Song song) {
         if (song == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -110,10 +118,12 @@ public class SongDetailVO implements Serializable {
         SongDetailVO songDetailVO = new SongDetailVO();
         try {
             BeanUtils.copyProperties(song, songDetailVO);
+            //歌手id列表json字符串转List集合对象
             songDetailVO.setSingerListId(JsonUtil.convertJsonToList(song.getSingerListId()));
         } catch (BusinessException e) {
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
         }
         return songDetailVO;
     }
+
 }

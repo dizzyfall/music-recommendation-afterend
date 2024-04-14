@@ -8,12 +8,9 @@ import com.dzy.exception.BusinessException;
 import com.dzy.mapper.ReSonglistSongMapper;
 import com.dzy.mapper.SonglistMapper;
 import com.dzy.model.dto.songlist.*;
-import com.dzy.model.entity.ReSonglistSong;
-import com.dzy.model.entity.Song;
-import com.dzy.model.entity.Songlist;
-import com.dzy.service.ReSonglistSongService;
-import com.dzy.service.SongService;
-import com.dzy.service.SonglistService;
+import com.dzy.model.entity.*;
+import com.dzy.model.vo.songlist.SonglistIntroVO;
+import com.dzy.service.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -41,6 +38,15 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
 
     @Resource
     private SongService songService;
+
+    @Resource
+    private CommentService commentService;
+
+    @Resource
+    private ReSonglistCommentService reSonglistCommentService;
+
+    @Resource
+    private UserInfoService userInfoService;
 
     /**
      * 创建歌单
@@ -335,6 +341,91 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
             throw new BusinessException(StatusCode.UPDATE_ERROR, "更新歌单歌曲数量失败");
         }
         return true;
+    }
+
+    /**
+     * 创建歌单评论
+     *
+     * @param songlistCommentCreateRequest
+     * @return java.lang.Boolean
+     * @date 2024/4/13  23:25
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean createComment(SonglistCommentCreateRequest songlistCommentCreateRequest) {
+        if (songlistCommentCreateRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long userId = songlistCommentCreateRequest.getUserId();
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long songlistId = songlistCommentCreateRequest.getSonglistId();
+        if (songlistId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //歌单是否存在
+        Songlist songlist = this.getById(songlistId);
+        if (songlist == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "歌单不存在");
+        }
+        String content = songlistCommentCreateRequest.getContent();
+        if (StringUtils.isBlank(content)) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "内容不能为空");
+        }
+        //创建评论
+        Comment comment = new Comment();
+        comment.setUserId(userId);
+        comment.setContent(content);
+        comment.setFavourCount(0L);
+        comment.setPublishTime(new Date());
+        boolean isSonglistCommentSave = commentService.save(comment);
+        if (!isSonglistCommentSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "评论表创建评论失败");
+        }
+        //获取插入comment表数据的主键
+        Long commentId = comment.getId();
+        //songlist-comment关联表添加数据
+        ReSonglistComment reSonglistComment = new ReSonglistComment();
+        reSonglistComment.setUserId(userId);
+        reSonglistComment.setSonglistId(songlistId);
+        reSonglistComment.setCommentId(commentId);
+        boolean isReSonglistCommentSave = reSonglistCommentService.save(reSonglistComment);
+        if (!isReSonglistCommentSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "创建songlist-comment关联表数据失败");
+        }
+        //更新歌单表数据
+        UpdateWrapper<Songlist> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", songlistId).setSql("comment_count = comment_count + 1");
+        boolean isSonglistupdate = this.update(updateWrapper);
+        if (!isSonglistupdate) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR, "更新歌单评论数量失败");
+        }
+        return true;
+    }
+
+    /**
+     * 根据歌单id获取歌单简介视图
+     *
+     * @param songlistId
+     * @return com.dzy.model.vo.songlist.SonglistIntroVO
+     * @date 2024/4/14  11:13
+     */
+    @Override
+    public SonglistIntroVO getSonglistIntroVOById(Long songlistId) {
+        if (songlistId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Songlist songlist = this.getById(songlistId);
+        if (songlist == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        SonglistIntroVO songlistIntroVO = SonglistIntroVO.objToVO(songlist);
+        //获取创建者姓名
+        UserInfo userInfo = userInfoService.getById(songlist.getCreatorId());
+        String nickname = userInfo.getNickname();
+        songlistIntroVO.setCreatorName(nickname);
+        return songlistIntroVO;
     }
 
 }

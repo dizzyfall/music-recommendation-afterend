@@ -93,6 +93,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
      * @return
      */
     @Override
+    //todo 这要不要写在SongDetailVO里？
     public SongDetailVO getSongDetailVO(Song song) {
         //原本属性
         SongDetailVO songDetailVO = SongDetailVO.objToVO(song);

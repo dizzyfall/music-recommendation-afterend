@@ -3,6 +3,7 @@ package com.dzy.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.songlist.*;
 import com.dzy.model.entity.Songlist;
+import com.dzy.model.vo.songlist.SonglistIntroVO;
 
 /**
  * @author DZY
@@ -66,5 +67,23 @@ public interface SonglistService extends IService<Songlist> {
      * @return
      */
     Boolean deleteBatchSong(DeleteBatchSongRequest deleteBatchSongRequest);
+
+    /**
+     * 创建歌单评论
+     *
+     * @param songlistCommentCreateRequest
+     * @return java.lang.Boolean
+     * @date 2024/4/13  23:42
+     */
+    Boolean createComment(SonglistCommentCreateRequest songlistCommentCreateRequest);
+
+    /**
+     * 根据歌单id获取歌单简介视图
+     *
+     * @param songlistId
+     * @return com.dzy.model.vo.songlist.SonglistIntroVO
+     * @date 2024/4/14  11:14
+     */
+    SonglistIntroVO getSonglistIntroVOById(Long songlistId);
 
 }

@@ -37,4 +37,5 @@ public class CollectCountVO implements Serializable {
         }
         return collectCountVO;
     }
+
 }

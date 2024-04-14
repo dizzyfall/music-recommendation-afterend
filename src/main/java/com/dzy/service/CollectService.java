@@ -7,6 +7,7 @@ import com.dzy.model.entity.Collect;
 import com.dzy.model.vo.collect.CollectAlbumVO;
 import com.dzy.model.vo.collect.CollectCountVO;
 import com.dzy.model.vo.song.SongIntroVO;
+import com.dzy.model.vo.songlist.SonglistIntroVO;
 
 /**
  * @author DZY
@@ -38,4 +39,14 @@ public interface CollectService extends IService<Collect> {
      * @return
      */
     Page<CollectAlbumVO> listCollectAlbumByPage(CollectQueryRequest collectQueryRequest);
+
+    /**
+     * 分页查询收藏的歌单
+     *
+     * @param collectQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.songlist.SonglistIntroVO>
+     * @date 2024/4/14  10:35
+     */
+    Page<SonglistIntroVO> listCollectSonglistByPage(CollectQueryRequest collectQueryRequest);
+
 }

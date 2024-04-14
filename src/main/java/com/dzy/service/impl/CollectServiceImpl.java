@@ -7,14 +7,12 @@ import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.CollectMapper;
 import com.dzy.model.dto.collect.CollectQueryRequest;
-import com.dzy.model.entity.Album;
-import com.dzy.model.entity.Collect;
-import com.dzy.model.entity.ReCollectAlbum;
-import com.dzy.model.entity.ReCollectSong;
+import com.dzy.model.entity.*;
 import com.dzy.model.vo.album.AlbumVO;
 import com.dzy.model.vo.collect.CollectAlbumVO;
 import com.dzy.model.vo.collect.CollectCountVO;
 import com.dzy.model.vo.song.SongIntroVO;
+import com.dzy.model.vo.songlist.SonglistIntroVO;
 import com.dzy.service.*;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +43,12 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
 
     @Resource
     private SingerService singerService;
+
+    @Resource
+    private SonglistService songlistService;
+
+    @Resource
+    private ReCollectSonglistService reCollectSonglistService;
 
     /**
      * 获取收藏的歌曲、专辑、歌单数量
@@ -123,6 +127,36 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
         }).collect(Collectors.toList());
         Page<CollectAlbumVO> collectAlbumVOListPage = new Page<>(pageCurrent, pageSize, page.getTotal());
         return collectAlbumVOListPage.setRecords(collectAlbumVOList);
+    }
+
+    /**
+     * 分页查询收藏的歌单
+     *
+     * @param collectQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.songlist.SonglistIntroVO>
+     * @date 2024/4/14  10:35
+     */
+    @Override
+    public Page<SonglistIntroVO> listCollectSonglistByPage(CollectQueryRequest collectQueryRequest) {
+        if (collectQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long userId = collectQueryRequest.getUserId();
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        int pageCurrent = collectQueryRequest.getPageCurrent();
+        int pageSize = collectQueryRequest.getPageSize();
+        Page<ReCollectSonglist> page = new Page<>(pageCurrent, pageSize);
+        QueryWrapper<ReCollectSonglist> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        Page<ReCollectSonglist> reCollectSonglistPage = reCollectSonglistService.page(page, queryWrapper);
+        List<SonglistIntroVO> songlistIntroVOList = reCollectSonglistPage.getRecords().stream().map(reCollectSonglist -> {
+            Long songlistId = reCollectSonglist.getSonglistId();
+            return songlistService.getSonglistIntroVOById(songlistId);
+        }).collect(Collectors.toList());
+        Page<SonglistIntroVO> songlistIntroVOPage = new Page<>(pageCurrent, pageSize, page.getTotal());
+        return songlistIntroVOPage.setRecords(songlistIntroVOList);
     }
 
     //todo 几个视图解释清楚

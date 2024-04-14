@@ -7,14 +7,13 @@ import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.collect.CollectAlbumRequest;
 import com.dzy.model.dto.collect.CollectQueryRequest;
 import com.dzy.model.dto.collect.CollectSongRequest;
+import com.dzy.model.dto.collect.CollectSonglistRequest;
 import com.dzy.model.vo.collect.CollectAlbumVO;
 import com.dzy.model.vo.collect.CollectCountVO;
 import com.dzy.model.vo.song.SongIntroVO;
+import com.dzy.model.vo.songlist.SonglistIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
-import com.dzy.service.CollectService;
-import com.dzy.service.ReCollectAlbumService;
-import com.dzy.service.ReCollectSongService;
-import com.dzy.service.UserInfoService;
+import com.dzy.service.*;
 import com.dzy.utils.ResponseUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +44,9 @@ public class CollectController {
     @Resource
     private CollectService collectService;
 
+    @Resource
+    private ReCollectSonglistService reCollectSonglistService;
+
     /**
      * 收藏 | 取消收藏 歌曲
      *
@@ -71,8 +73,8 @@ public class CollectController {
         if (!loginUserId.equals(requestUserId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
-        Boolean isCollectSongCreate = reCollectSongService.doCollectSong(collectSongRequest);
-        if (!isCollectSongCreate) {
+        Boolean isCollectSong = reCollectSongService.doCollectSong(collectSongRequest);
+        if (!isCollectSong) {
             throw new BusinessException(StatusCode.CREATE_ERROR, "收藏歌曲失败");
         }
         return ResponseUtil.success(StatusCode.CREATE_SUCESS, "收藏歌曲成功");
@@ -104,11 +106,45 @@ public class CollectController {
         if (!loginUserId.equals(requestUserId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
-        Boolean isCollectSongCreate = reCollectAlbumService.doCollectAlbum(collectAlbumRequest);
-        if (!isCollectSongCreate) {
+        Boolean isCollectAlbum = reCollectAlbumService.doCollectAlbum(collectAlbumRequest);
+        if (!isCollectAlbum) {
             throw new BusinessException(StatusCode.CREATE_ERROR, "收藏专辑失败");
         }
         return ResponseUtil.success(StatusCode.CREATE_SUCESS, "收藏专辑成功");
+    }
+
+    /**
+     * 收藏 | 取消收藏 歌单
+     *
+     * @param collectSonglistRequest
+     * @param request
+     * @return com.dzy.common.BaseResponse<java.lang.Boolean>
+     * @date 2024/4/14  9:04
+     */
+    @RequestMapping("/songlist")
+    public BaseResponse<Boolean> collectSonglist(@RequestBody CollectSonglistRequest collectSonglistRequest, HttpServletRequest request) {
+        if (collectSonglistRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = collectSonglistRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        Boolean isCollectSonglist = reCollectSonglistService.doCollectSonglist(collectSonglistRequest);
+        if (!isCollectSonglist) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "收藏歌单失败");
+        }
+        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "收藏歌单成功");
     }
 
     /**
@@ -175,7 +211,6 @@ public class CollectController {
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songIntroVOList, "获取收藏歌曲列表成功");
     }
 
-
     /**
      * 分页查询收藏的专辑
      *
@@ -210,5 +245,39 @@ public class CollectController {
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumVOList, "获取收藏专辑列表成功");
     }
 
+    /**
+     * 分页查询收藏的歌单
+     *
+     * @param collectQueryRequest
+     * @param request
+     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.collect.CollectAlbumVO>>
+     * @date 2024/4/14  10:18
+     */
+    @RequestMapping("/songlist/list/page")
+    public BaseResponse<List<SonglistIntroVO>> collectSonglistRetrieveByPage(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
+        if (collectQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = collectQueryRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        Page<SonglistIntroVO> songlistIntroVOPage = collectService.listCollectSonglistByPage(collectQueryRequest);
+        List<SonglistIntroVO> songlistIntroVOList = songlistIntroVOPage.getRecords();
+        if (CollectionUtils.isEmpty(songlistIntroVOList)) {
+            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "暂无歌单");
+        }
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songlistIntroVOList, "获取收藏歌单列表成功");
+    }
 
 }

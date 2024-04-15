@@ -3,6 +3,7 @@ package com.dzy.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.userinfo.*;
 import com.dzy.model.entity.UserInfo;
+import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -109,5 +110,24 @@ public interface UserInfoService extends IService<UserInfo> {
      * @param request
      * @return
      */
-    public Boolean isLogin(UserLoginVO loginUser, HttpServletRequest request);
+    Boolean isLogin(UserLoginVO loginUser, HttpServletRequest request);
+
+    /**
+     * 获取用户信息简介
+     *
+     * @param userInfo
+     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
+     * @date 2024/4/15  11:04
+     */
+    UserInfoIntroVO getUserInfoIntroVO(UserInfo userInfo);
+
+    /**
+     * 通过用户Id获取用户信息简介
+     *
+     * @param userId
+     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
+     * @date 2024/4/15  11:40
+     */
+    UserInfoIntroVO getUserInfoIntroVOById(Long userId);
+
 }

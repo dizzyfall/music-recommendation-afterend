@@ -7,7 +7,9 @@ import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.UserInfoMapper;
 import com.dzy.model.dto.userinfo.*;
+import com.dzy.model.entity.UserImage;
 import com.dzy.model.entity.UserInfo;
+import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserImageService;
 import com.dzy.service.UserInfoService;
@@ -429,6 +431,43 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     public Boolean isLogin(UserLoginVO loginUser, HttpServletRequest request) {
         return null;
     }
+
+    /**
+     * 获取用户信息简介
+     *
+     * @param userInfo
+     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
+     * @date 2024/4/15  11:05
+     */
+    @Override
+    public UserInfoIntroVO getUserInfoIntroVO(UserInfo userInfo) {
+        if (userInfo == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        UserInfoIntroVO userInfoIntroVO = UserInfoIntroVO.objToVO(userInfo);
+        //补充属性
+        //todo 用户头像会默认创建
+        UserImage userImage = userImageService.getById(userInfo.getImageId());
+        userInfoIntroVO.setImagePath(userImage.getAvatarPath());
+        return userInfoIntroVO;
+    }
+
+    /**
+     * 通过用户Id获取用户信息简介
+     *
+     * @param userId
+     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
+     * @date 2024/4/15  11:39
+     */
+    @Override
+    public UserInfoIntroVO getUserInfoIntroVOById(Long userId) {
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        UserInfo userInfo = this.getById(userId);
+        return getUserInfoIntroVO(userInfo);
+    }
+
 }
 
 

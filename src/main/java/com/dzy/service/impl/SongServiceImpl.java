@@ -15,8 +15,10 @@ import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.song.SongDetailVO;
 import com.dzy.model.vo.song.SongIntroVO;
-import com.dzy.model.vo.userinfo.UserInfoIntroVO;
-import com.dzy.service.*;
+import com.dzy.service.CommentService;
+import com.dzy.service.ReSongCommentService;
+import com.dzy.service.SingerService;
+import com.dzy.service.SongService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,56 +51,6 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
     @Autowired
     private SingerService singerService;
 
-    @Resource
-    private UserInfoService userInfoService;
-
-    /**
-     * 分页查询歌曲的评论
-     *
-     * @param songCommentQueryRequest
-     * @return
-     */
-    @Override
-    public Page<CommentVO> listSongCommentByPage(SongCommentQueryRequest songCommentQueryRequest) {
-        if (songCommentQueryRequest == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        Long songId = songCommentQueryRequest.getSongId();
-        if (songId == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        QueryWrapper<ReSongComment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("song_id", songId).select("comment_id");
-        //获取评论id列表
-        List<Long> commentIdList = reSongCommentService.list(queryWrapper).stream().map(ReSongComment::getCommentId).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(commentIdList)) {
-            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "暂无评论");
-        }
-        //构造评论条件查询器
-        QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
-        commentQueryWrapper.in("id", commentIdList);
-        //分页对象
-        int pageCurrent = songCommentQueryRequest.getPageCurrent();
-        int pageSize = songCommentQueryRequest.getPageSize();
-        Page<Comment> page = new Page<>(pageCurrent, pageSize);
-        Page<Comment> commentPage = commentService.page(page, commentQueryWrapper);
-        List<CommentVO> commentVOList = commentPage.getRecords().stream().map(comment -> {
-            CommentVO commentVO = new CommentVO();
-            Long userId = comment.getUserId();
-            UserInfoIntroVO userInfoIntroVO = userInfoService.getUserInfoIntroVOById(userId);
-            commentVO.setUserInfoIntroVO(userInfoIntroVO);
-            commentVO.setContent(comment.getContent());
-            commentVO.setFavourCount(comment.getFavourCount());
-            //todo 回复数暂时没有实现
-            //commentVO.setReplyCount();
-            commentVO.setPublishTime(new Date());
-            return commentVO;
-        }).collect(Collectors.toList());
-        Page<CommentVO> commentVOPage = new Page<>(pageCurrent, pageSize, commentPage.getTotal());
-        commentVOPage.setRecords(commentVOList);
-        return commentVOPage;
-    }
-
     /**
      * Song转SongDetailVO
      * 不能简单使用属性复制，因为SongVO还有Song中没有的属性
@@ -107,7 +59,6 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
      * @return
      */
     @Override
-    //todo 这要不要写在SongDetailVO里？
     public SongDetailVO getSongDetailVO(Song song) {
         //原本属性
         SongDetailVO songDetailVO = SongDetailVO.objToVO(song);
@@ -227,6 +178,42 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
             throw new BusinessException(StatusCode.CREATE_ERROR, "创建评论失败");
         }
         return true;
+    }
+
+    /**
+     * 分页查询歌曲的评论
+     *
+     * @param songCommentQueryRequest
+     * @return
+     */
+    @Override
+    public Page<CommentVO> listSongCommentByPage(SongCommentQueryRequest songCommentQueryRequest) {
+        if (songCommentQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long songId = songCommentQueryRequest.getSongId();
+        if (songId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<ReSongComment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("song_id", songId).select("comment_id");
+        //获取评论id列表
+        List<Long> commentIdList = reSongCommentService.list(queryWrapper).stream().map(ReSongComment::getCommentId).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(commentIdList)) {
+            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "暂无评论");
+        }
+        //构造评论条件查询器
+        QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
+        commentQueryWrapper.in("id", commentIdList);
+        //分页对象
+        int pageCurrent = songCommentQueryRequest.getPageCurrent();
+        int pageSize = songCommentQueryRequest.getPageSize();
+        Page<Comment> page = new Page<>(pageCurrent, pageSize);
+        Page<Comment> commentPage = commentService.page(page, commentQueryWrapper);
+        List<CommentVO> commentVOList = commentPage.getRecords().stream().map(comment -> commentService.getCommentVO(comment)).collect(Collectors.toList());
+        Page<CommentVO> commentVOPage = new Page<>(pageCurrent, pageSize, commentPage.getTotal());
+        commentVOPage.setRecords(commentVOList);
+        return commentVOPage;
     }
 
     /**

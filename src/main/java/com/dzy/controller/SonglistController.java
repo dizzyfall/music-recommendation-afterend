@@ -1,9 +1,11 @@
 package com.dzy.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.songlist.*;
+import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.SonglistService;
 import com.dzy.service.UserInfoService;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
@@ -296,5 +299,20 @@ public class SonglistController {
         return ResponseUtil.success(StatusCode.CREATE_SUCESS, "创建歌单评论成功");
     }
 
-
+    /**
+     * 分页查询歌单的评论
+     *
+     * @param songlistCommentQueryRequest
+     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.comment.CommentVO>>
+     * @date 2024/4/15  11:54
+     */
+    @PostMapping("/comment/list/page")
+    public BaseResponse<List<CommentVO>> albumCommentListRetrieveByPage(@RequestBody SonglistCommentQueryRequest songlistCommentQueryRequest) {
+        if (songlistCommentQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Page<CommentVO> songlistCommentVOPage = songlistService.listSonglistCommentByPage(songlistCommentQueryRequest);
+        List<CommentVO> songlistCommentVOList = songlistCommentVOPage.getRecords();
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songlistCommentVOList, "获取歌单评论成功");
+    }
 }

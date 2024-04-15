@@ -1,8 +1,10 @@
 package com.dzy.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.songlist.*;
 import com.dzy.model.entity.Songlist;
+import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.songlist.SonglistIntroVO;
 
 /**
@@ -85,5 +87,14 @@ public interface SonglistService extends IService<Songlist> {
      * @date 2024/4/14  11:14
      */
     SonglistIntroVO getSonglistIntroVOById(Long songlistId);
+
+    /**
+     * 分页查询歌单的评论
+     *
+     * @param songlistCommentQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.comment.CommentVO>
+     * @date 2024/4/15  12:07
+     */
+    Page<CommentVO> listSonglistCommentByPage(SonglistCommentQueryRequest songlistCommentQueryRequest);
 
 }

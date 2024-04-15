@@ -2,6 +2,7 @@ package com.dzy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
@@ -9,7 +10,9 @@ import com.dzy.mapper.ReSonglistSongMapper;
 import com.dzy.mapper.SonglistMapper;
 import com.dzy.model.dto.songlist.*;
 import com.dzy.model.entity.*;
+import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.songlist.SonglistIntroVO;
+import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.service.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +23,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author DZY
@@ -426,6 +430,54 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
         String nickname = userInfo.getNickname();
         songlistIntroVO.setCreatorName(nickname);
         return songlistIntroVO;
+    }
+
+    /**
+     * 分页查询歌单的评论
+     *
+     * @param songlistCommentQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.comment.CommentVO>
+     * @date 2024/4/15  12:08
+     */
+    @Override
+    public Page<CommentVO> listSonglistCommentByPage(SonglistCommentQueryRequest songlistCommentQueryRequest) {
+        if (songlistCommentQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long songlistId = songlistCommentQueryRequest.getSonglistId();
+        if (songlistId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<ReSonglistComment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("songlist_id", songlistId).select("comment_id");
+        //获取评论id列表
+        List<Long> commentIdList = reSonglistCommentService.list(queryWrapper).stream().map(ReSonglistComment::getCommentId).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(commentIdList)) {
+            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "暂无评论");
+        }
+        //构造评论条件查询器
+        QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
+        commentQueryWrapper.in("id", commentIdList);
+        //分页对象
+        int pageCurrent = songlistCommentQueryRequest.getPageCurrent();
+        int pageSize = songlistCommentQueryRequest.getPageSize();
+        Page<Comment> page = new Page<>(pageCurrent, pageSize);
+        Page<Comment> commentPage = commentService.page(page, commentQueryWrapper);
+        List<CommentVO> commentVOList = commentPage.getRecords().stream().map(comment -> {
+            CommentVO commentVO = new CommentVO();
+            Long userId = comment.getUserId();
+            UserInfoIntroVO userInfoIntroVO = userInfoService.getUserInfoIntroVOById(userId);
+            commentVO.setUserInfoIntroVO(userInfoIntroVO);
+            commentVO.setContent(comment.getContent());
+            commentVO.setFavourCount(comment.getFavourCount());
+            //todo 回复数暂时没有实现
+            //commentVO.setReplyCount();
+            commentVO.setPublishTime(new Date());
+            return commentVO;
+        }).collect(Collectors.toList());
+        Page<CommentVO> commentVOPage = new Page<>(pageCurrent, pageSize, commentPage.getTotal());
+        commentVOPage.setRecords(commentVOList);
+        return commentVOPage;
     }
 
 }

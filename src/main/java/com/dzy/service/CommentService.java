@@ -25,12 +25,13 @@ public interface CommentService extends IService<Comment> {
     Page<CommentVO> listMyCommentByPage(CommentQueryRequest commentQueryRequest, UserLoginVO loginUserVO);
 
     /**
-     * Comment转CommentVO对象
+     * 获取CommentVO视图对象
      *
      * @param comment
-     * @return
+     * @return com.dzy.model.vo.comment.CommentVO
+     * @date 2024/4/15  21:36
      */
-    CommentVO commentToCommentVO(Comment comment);
+    CommentVO getCommentVO(Comment comment);
 
     /**
      * 删除自己的评论

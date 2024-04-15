@@ -11,14 +11,16 @@ import com.dzy.model.dto.comment.CommentQueryRequest;
 import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReSongComment;
 import com.dzy.model.vo.comment.CommentVO;
+import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.CommentService;
 import com.dzy.service.ReSongCommentService;
-import org.springframework.beans.BeanUtils;
+import com.dzy.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
 
     @Autowired
     private ReSongCommentService reSongCommentService;
+
+    @Resource
+    private UserInfoService userInfoService;
 
     /**
      * 分页查询自己的评论
@@ -50,7 +55,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
         int pageSize = commentQueryRequest.getPageSize();
         Page<Comment> page = new Page<>(pageCurrent, pageSize);
         Page<Comment> commentPage = this.page(page, queryWrapper);
-        List<CommentVO> commentVOList = commentPage.getRecords().stream().map(this::commentToCommentVO).collect(Collectors.toList());
+        List<CommentVO> commentVOList = commentPage.getRecords().stream().map(this::getCommentVO).collect(Collectors.toList());
         //新分页对象
         Page<CommentVO> commentVOPage = new Page<>(pageCurrent, pageSize, commentPage.getTotal());
         commentVOPage.setRecords(commentVOList);
@@ -58,23 +63,25 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
     }
 
     /**
-     * Comment转CommentVO对象
+     * 获取CommentVO视图对象
      *
      * @param comment
-     * @return
+     * @return com.dzy.model.vo.comment.CommentVO
+     * @date 2024/4/15  21:44
      */
     @Override
-    //todo 有问题的，引用类型时
-    public CommentVO commentToCommentVO(Comment comment) {
+    public CommentVO getCommentVO(Comment comment) {
         if (comment == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         CommentVO commentVO = new CommentVO();
-        try {
-            BeanUtils.copyProperties(comment, commentVO);
-        } catch (BusinessException e) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
-        }
+        UserInfoIntroVO userInfoIntroVO = userInfoService.getUserInfoIntroVOById(comment.getUserId());
+        commentVO.setUserInfoIntroVO(userInfoIntroVO);
+        commentVO.setContent(comment.getContent());
+        commentVO.setFavourCount(comment.getFavourCount());
+        //todo 回复数暂时没有实现
+        //commentVO.setReplyCount();
+        commentVO.setPublishTime(comment.getPublishTime());
         return commentVO;
     }
 

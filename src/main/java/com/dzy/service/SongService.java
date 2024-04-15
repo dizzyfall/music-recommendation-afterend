@@ -18,14 +18,6 @@ import com.dzy.model.vo.song.SongIntroVO;
 public interface SongService extends IService<Song> {
 
     /**
-     * 分页查询歌曲的评论
-     *
-     * @param songCommentQueryRequest
-     * @return
-     */
-    Page<CommentVO> listSongCommentByPage(SongCommentQueryRequest songCommentQueryRequest);
-
-    /**
      * Song转SongDetailVO
      * 不能简单使用属性复制，因为SongVO还有Song中没有的属性
      *
@@ -65,6 +57,14 @@ public interface SongService extends IService<Song> {
      * @return
      */
     Boolean createComment(SongCommentCreateRequest songCommentCreateRequest);
+
+    /**
+     * 分页查询歌曲的评论
+     *
+     * @param songCommentQueryRequest
+     * @return
+     */
+    Page<CommentVO> listSongCommentByPage(SongCommentQueryRequest songCommentQueryRequest);
 
     /**
      * 创建歌曲评论回复

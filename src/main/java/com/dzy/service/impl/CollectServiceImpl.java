@@ -36,19 +36,19 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
     private ReCollectAlbumService reCollectAlbumService;
 
     @Resource
+    private ReCollectSonglistService reCollectSonglistService;
+
+    @Resource
     private SongService songService;
 
     @Resource
     private AlbumService albumService;
 
     @Resource
-    private SingerService singerService;
-
-    @Resource
     private SonglistService songlistService;
 
     @Resource
-    private ReCollectSonglistService reCollectSonglistService;
+    private SingerService singerService;
 
     /**
      * 获取收藏的歌曲、专辑、歌单数量

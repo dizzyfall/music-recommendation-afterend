@@ -1,5 +1,6 @@
 package com.dzy.model.vo.comment;
 
+import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,45 +18,9 @@ public class CommentVO implements Serializable {
     private static final long serialVersionUID = 7939516196351738858L;
 
     /**
-     * 评论id
+     * 用户信息简介
      */
-    private Long id;
-
-    /**
-     * 歌曲id
-     */
-    private Long songId;
-
-    /**
-     * 用户id
-     */
-    private Long userId;
-
-    /**
-     * 用户图片id
-     */
-    private Long image_id;
-
-
-    /**
-     * 用户头像保存路径
-     */
-    private String avatarPath;
-
-    /**
-     * 用户昵称
-     */
-    private String nickname;
-
-    /**
-     * 用户性别 0:男 1:女 2:其他
-     */
-    private Integer sex;
-
-    /**
-     * 用户所属地
-     */
-    private String region;
+    private UserInfoIntroVO userInfoIntroVO;
 
     /**
      * 用户评论内容

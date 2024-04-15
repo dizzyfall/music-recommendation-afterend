@@ -36,22 +36,6 @@ public class SongController {
     private UserInfoService userInfoService;
 
     /**
-     * 分页查询歌曲的评论
-     *
-     * @param songCommentQueryRequest
-     * @return
-     */
-    @PostMapping("/comment/list/page")
-    public BaseResponse<List<CommentVO>> songCommentListRetrieveByPage(@RequestBody SongCommentQueryRequest songCommentQueryRequest) {
-        if (songCommentQueryRequest == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        Page<CommentVO> songCommentVOPage = songService.listSongCommentByPage(songCommentQueryRequest);
-        List<CommentVO> songCommentVOList = songCommentVOPage.getRecords();
-        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songCommentVOList, "获取歌曲评论成功");
-    }
-
-    /**
      * 创建歌曲评论
      *
      * @param songCommentCreateRequest
@@ -113,6 +97,22 @@ public class SongController {
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "回复评论失败");
         }
         return ResponseUtil.success(StatusCode.CREATE_SUCESS, "回复评论成功");
+    }
+
+    /**
+     * 分页查询歌曲的评论
+     *
+     * @param songCommentQueryRequest
+     * @return
+     */
+    @PostMapping("/comment/list/page")
+    public BaseResponse<List<CommentVO>> songCommentListRetrieveByPage(@RequestBody SongCommentQueryRequest songCommentQueryRequest) {
+        if (songCommentQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Page<CommentVO> songCommentVOPage = songService.listSongCommentByPage(songCommentQueryRequest);
+        List<CommentVO> songCommentVOList = songCommentVOPage.getRecords();
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songCommentVOList, "获取歌曲评论成功");
     }
 
 }

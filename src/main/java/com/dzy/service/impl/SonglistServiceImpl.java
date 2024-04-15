@@ -12,7 +12,6 @@ import com.dzy.model.dto.songlist.*;
 import com.dzy.model.entity.*;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.songlist.SonglistIntroVO;
-import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.service.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -463,18 +462,7 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
         int pageSize = songlistCommentQueryRequest.getPageSize();
         Page<Comment> page = new Page<>(pageCurrent, pageSize);
         Page<Comment> commentPage = commentService.page(page, commentQueryWrapper);
-        List<CommentVO> commentVOList = commentPage.getRecords().stream().map(comment -> {
-            CommentVO commentVO = new CommentVO();
-            Long userId = comment.getUserId();
-            UserInfoIntroVO userInfoIntroVO = userInfoService.getUserInfoIntroVOById(userId);
-            commentVO.setUserInfoIntroVO(userInfoIntroVO);
-            commentVO.setContent(comment.getContent());
-            commentVO.setFavourCount(comment.getFavourCount());
-            //todo 回复数暂时没有实现
-            //commentVO.setReplyCount();
-            commentVO.setPublishTime(new Date());
-            return commentVO;
-        }).collect(Collectors.toList());
+        List<CommentVO> commentVOList = commentPage.getRecords().stream().map(comment -> commentService.getCommentVO(comment)).collect(Collectors.toList());
         Page<CommentVO> commentVOPage = new Page<>(pageCurrent, pageSize, commentPage.getTotal());
         commentVOPage.setRecords(commentVOList);
         return commentVOPage;

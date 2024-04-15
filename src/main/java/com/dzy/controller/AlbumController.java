@@ -10,10 +10,12 @@ import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.album.AlbumCommentCreateRequest;
+import com.dzy.model.dto.album.AlbumCommentQueryRequest;
 import com.dzy.model.dto.album.AlbumQueryRequest;
 import com.dzy.model.dto.album.AlbumSongQueryRequest;
 import com.dzy.model.vo.album.AlbumInfoVO;
 import com.dzy.model.vo.album.AlbumVO;
+import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.AlbumService;
@@ -116,4 +118,22 @@ public class AlbumController {
         }
         return ResponseUtil.success(StatusCode.CREATE_SUCESS, "创建评论成功");
     }
+
+    /**
+     * 分页查询专辑的评论
+     *
+     * @param albumCommentQueryRequest
+     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.comment.CommentVO>>
+     * @date 2024/4/15  9:35
+     */
+    @PostMapping("/comment/list/page")
+    public BaseResponse<List<CommentVO>> albumCommentListRetrieveByPage(@RequestBody AlbumCommentQueryRequest albumCommentQueryRequest) {
+        if (albumCommentQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Page<CommentVO> albumCommentVOPage = albumService.listAlbumCommentByPage(albumCommentQueryRequest);
+        List<CommentVO> albumCommentVOList = albumCommentVOPage.getRecords();
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumCommentVOList, "获取专辑评论成功");
+    }
+
 }

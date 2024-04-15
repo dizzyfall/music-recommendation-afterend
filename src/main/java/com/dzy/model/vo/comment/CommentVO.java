@@ -1,7 +1,11 @@
 package com.dzy.model.vo.comment;
 
+import com.dzy.constant.StatusCode;
+import com.dzy.exception.BusinessException;
+import com.dzy.model.entity.Comment;
 import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -41,5 +45,18 @@ public class CommentVO implements Serializable {
      * 用户评论发布时间
      */
     private Date publishTime;
+
+    public static CommentVO objToVO(Comment comment) {
+        if (comment == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        CommentVO commentVO = new CommentVO();
+        try {
+            BeanUtils.copyProperties(comment, commentVO);
+        } catch (BusinessException e) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
+        }
+        return commentVO;
+    }
 
 }

@@ -16,6 +16,7 @@ import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.*;
 import com.dzy.utils.ResponseUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,7 +55,7 @@ public class CollectController {
      * @param request
      * @return
      */
-    @RequestMapping("/song")
+    @PostMapping("/song")
     public BaseResponse<Boolean> collectSong(@RequestBody CollectSongRequest collectSongRequest, HttpServletRequest request) {
         if (collectSongRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -87,7 +88,7 @@ public class CollectController {
      * @param request
      * @return
      */
-    @RequestMapping("/album")
+    @PostMapping("/album")
     public BaseResponse<Boolean> collectAlbum(@RequestBody CollectAlbumRequest collectAlbumRequest, HttpServletRequest request) {
         if (collectAlbumRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -121,7 +122,7 @@ public class CollectController {
      * @return com.dzy.common.BaseResponse<java.lang.Boolean>
      * @date 2024/4/14  9:04
      */
-    @RequestMapping("/songlist")
+    @PostMapping("/songlist")
     public BaseResponse<Boolean> collectSonglist(@RequestBody CollectSonglistRequest collectSonglistRequest, HttpServletRequest request) {
         if (collectSonglistRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -154,7 +155,7 @@ public class CollectController {
      * @param request
      * @return
      */
-    @RequestMapping("/count")
+    @PostMapping("/count")
     public BaseResponse<CollectCountVO> collectCountRetrieve(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
         if (collectQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -184,7 +185,7 @@ public class CollectController {
      * @param request
      * @return
      */
-    @RequestMapping("/song/list/page")
+    @PostMapping("/song/list/page")
     public BaseResponse<List<SongIntroVO>> collectSongRetrieveByPage(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
         if (collectQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -218,7 +219,7 @@ public class CollectController {
      * @param request
      * @return
      */
-    @RequestMapping("/album/list/page")
+    @PostMapping("/album/list/page")
     public BaseResponse<List<CollectAlbumVO>> collectAlbumRetrieveByPage(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
         if (collectQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -253,7 +254,7 @@ public class CollectController {
      * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.collect.CollectAlbumVO>>
      * @date 2024/4/14  10:18
      */
-    @RequestMapping("/songlist/list/page")
+    @PostMapping("/songlist/list/page")
     public BaseResponse<List<SonglistIntroVO>> collectSonglistRetrieveByPage(@RequestBody CollectQueryRequest collectQueryRequest, HttpServletRequest request) {
         if (collectQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);

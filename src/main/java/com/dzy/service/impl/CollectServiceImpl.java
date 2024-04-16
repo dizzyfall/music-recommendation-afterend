@@ -96,7 +96,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
             Long songId = reCollectSong.getSongId();
             return songService.getSongIntroById(songId);
         }).collect(Collectors.toList());
-        Page<SongIntroVO> songIntroVOPage = new Page<>(pageCurrent, pageSize, page.getTotal());
+        Page<SongIntroVO> songIntroVOPage = new Page<>(pageCurrent, pageSize, reCollectSongPage.getTotal());
         return songIntroVOPage.setRecords(songIntroVOList);
     }
 
@@ -125,7 +125,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
             Long albumId = reCollectAlbum.getAlbumId();
             return getCollectAlbumVOById(albumId);
         }).collect(Collectors.toList());
-        Page<CollectAlbumVO> collectAlbumVOListPage = new Page<>(pageCurrent, pageSize, page.getTotal());
+        Page<CollectAlbumVO> collectAlbumVOListPage = new Page<>(pageCurrent, pageSize, reCollectAlbumPage.getTotal());
         return collectAlbumVOListPage.setRecords(collectAlbumVOList);
     }
 
@@ -155,7 +155,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
             Long songlistId = reCollectSonglist.getSonglistId();
             return songlistService.getSonglistIntroVOById(songlistId);
         }).collect(Collectors.toList());
-        Page<SonglistIntroVO> songlistIntroVOPage = new Page<>(pageCurrent, pageSize, page.getTotal());
+        Page<SonglistIntroVO> songlistIntroVOPage = new Page<>(pageCurrent, pageSize, reCollectSonglistPage.getTotal());
         return songlistIntroVOPage.setRecords(songlistIntroVOList);
     }
 

@@ -120,9 +120,9 @@ public class SongController {
     /**
      * 分页查询歌曲指定评论的回复
      *
-     * @param songReplyQueryRequest
-     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.reply.ReplyVO>>
      * @date 2024/4/16  14:58
+     * @param songReplyQueryRequest
+     * @return com.dzy.common.BaseResponse<java.util.List<com.dzy.model.vo.reply.ReplyVO>>
      */
     @PostMapping("/reply/list/page")
     public BaseResponse<List<ReplyVO>> songReplyListRetrieveByPage(@RequestBody SongReplyQueryRequest songReplyQueryRequest) {

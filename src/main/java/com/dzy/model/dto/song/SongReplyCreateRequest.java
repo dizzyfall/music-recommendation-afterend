@@ -14,9 +14,9 @@ public class SongReplyCreateRequest implements Serializable {
     private static final long serialVersionUID = 8517205018693856605L;
 
     /**
-     * 歌曲id
+     * 用户id(创建回复者id)
      */
-    private Long songId;
+    private Long userId;
 
     /**
      * 评论id
@@ -24,23 +24,18 @@ public class SongReplyCreateRequest implements Serializable {
     private Long commentId;
 
     /**
-     * 创建评论用户id
-     */
-    private Long userId;
-
-    /**
-     * 用户评论内容
-     */
-    private String content;
-
-    /**
-     * 接受回复用户id
+     * 接收回复者id
      */
     private Long receiverId;
 
     /**
-     * 回复用户id
+     * 回复内容
      */
-    private Long replierId;
+    private String content;
+
+    /**
+     * 评论类型
+     */
+    private String commentType;
 
 }

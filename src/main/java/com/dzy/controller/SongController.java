@@ -7,7 +7,9 @@ import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
 import com.dzy.model.dto.song.SongReplyCreateRequest;
+import com.dzy.model.dto.song.SongReplyQueryRequest;
 import com.dzy.model.vo.comment.CommentVO;
+import com.dzy.model.vo.reply.ReplyVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.SongService;
 import com.dzy.service.UserInfoService;
@@ -94,9 +96,9 @@ public class SongController {
         }
         Boolean isSongCommentReply = songService.createReply(songReplyCreateRequest);
         if (!isSongCommentReply) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "回复评论失败");
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建回复评论失败");
         }
-        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "回复评论成功");
+        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "创建回复评论成功");
     }
 
     /**
@@ -113,6 +115,23 @@ public class SongController {
         Page<CommentVO> songCommentVOPage = songService.listSongCommentByPage(songCommentQueryRequest);
         List<CommentVO> songCommentVOList = songCommentVOPage.getRecords();
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songCommentVOList, "获取歌曲评论成功");
+    }
+
+    /**
+     * 分页查询歌曲指定评论的回复
+     *
+     * @param songReplyQueryRequest
+     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.reply.ReplyVO>>
+     * @date 2024/4/16  14:58
+     */
+    @PostMapping("/reply/list/page")
+    public BaseResponse<List<ReplyVO>> songReplyListRetrieveByPage(@RequestBody SongReplyQueryRequest songReplyQueryRequest) {
+        if (songReplyQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Page<ReplyVO> songReplyVOPage = songService.listSongReplyByPage(songReplyQueryRequest);
+        List<ReplyVO> songReplyVOList = songReplyVOPage.getRecords();
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songReplyVOList, "获取歌曲评论的回复列表成功");
     }
 
 }

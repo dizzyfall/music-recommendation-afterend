@@ -1,4 +1,4 @@
-package com.dzy.model.dto.song;
+package com.dzy.model.dto.reply;
 
 import com.dzy.common.ReplyPageRequest;
 import lombok.Data;
@@ -12,9 +12,9 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SongReplyQueryRequest extends ReplyPageRequest implements Serializable {
+public class ReplyQueryRequest extends ReplyPageRequest implements Serializable {
 
-    private static final long serialVersionUID = -9071829285089595519L;
+    private static final long serialVersionUID = 6578566654338913782L;
 
     /**
      * 评论id

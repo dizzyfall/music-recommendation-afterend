@@ -52,6 +52,9 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
     @Resource
     private SingerService singerService;
 
+    @Resource
+    private ReplyService replyService;
+
 
     /**
      * 分页查询歌手专辑

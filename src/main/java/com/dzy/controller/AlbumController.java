@@ -13,12 +13,16 @@ import com.dzy.model.dto.album.AlbumCommentCreateRequest;
 import com.dzy.model.dto.album.AlbumCommentQueryRequest;
 import com.dzy.model.dto.album.AlbumQueryRequest;
 import com.dzy.model.dto.album.AlbumSongQueryRequest;
+import com.dzy.model.dto.reply.ReplyCreateRequest;
+import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.vo.album.AlbumInfoVO;
 import com.dzy.model.vo.album.AlbumVO;
 import com.dzy.model.vo.comment.CommentVO;
+import com.dzy.model.vo.reply.ReplyVO;
 import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.AlbumService;
+import com.dzy.service.ReplyService;
 import com.dzy.service.UserInfoService;
 import com.dzy.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -39,6 +44,9 @@ public class AlbumController {
 
     @Autowired
     private UserInfoService userInfoService;
+
+    @Resource
+    private ReplyService replyService;
 
     /**
      * 分页查询歌手专辑
@@ -94,7 +102,7 @@ public class AlbumController {
      * @return
      */
     @PostMapping("/comment/create")
-    public BaseResponse<Boolean> songCommentCreate(@RequestBody AlbumCommentCreateRequest albumCommentCreateRequest, HttpServletRequest request) {
+    public BaseResponse<Boolean> albumCommentCreate(@RequestBody AlbumCommentCreateRequest albumCommentCreateRequest, HttpServletRequest request) {
         if (albumCommentCreateRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
         }
@@ -134,6 +142,57 @@ public class AlbumController {
         Page<CommentVO> albumCommentVOPage = albumService.listAlbumCommentByPage(albumCommentQueryRequest);
         List<CommentVO> albumCommentVOList = albumCommentVOPage.getRecords();
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumCommentVOList, "获取专辑评论成功");
+    }
+
+    /**
+     * 创建专辑评论回复
+     *
+     * @param replyCreateRequest
+     * @param request
+     * @return com.dzy.common.BaseResponse<java.lang.Boolean>
+     * @date 2024/4/16  21:42
+     */
+    @PostMapping("/reply/create")
+    public BaseResponse<Boolean> albumReplyCreate(@RequestBody ReplyCreateRequest replyCreateRequest, HttpServletRequest request) {
+        if (replyCreateRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = replyCreateRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        Boolean isAlbumReplyCreate = replyService.createReply(replyCreateRequest);
+        if (!isAlbumReplyCreate) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建回复失败");
+        }
+        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "创建回复成功");
+    }
+
+    /**
+     * 分页查询歌曲指定评论的回复
+     *
+     * @param replyQueryRequest
+     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.reply.ReplyVO>>
+     * @date 2024/4/16  22:33
+     */
+    @PostMapping("/reply/list/page")
+    public BaseResponse<List<ReplyVO>> ablumReplyListRetrieveByPage(@RequestBody ReplyQueryRequest replyQueryRequest) {
+        if (replyQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Page<ReplyVO> albumReplyVOPage = replyService.listReplyByPage(replyQueryRequest);
+        List<ReplyVO> albumReplyVOList = albumReplyVOPage.getRecords();
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumReplyVOList, "获取专辑评论的回复列表成功");
     }
 
 }

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -100,10 +101,20 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply>
         if (StringUtils.isBlank(content)) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "内容不能为空");
         }
-        //todo 判断要回复的人存在存不在这个歌曲评论里面
         Long receiverId = replyCreateRequest.getReceiverId();
         if (receiverId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //获取指定评论的回复用户
+        QueryWrapper<Reply> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("comment_id", commentId);
+        List<Reply> replyList = this.list(queryWrapper);
+        Set<Long> replyIdSet = replyList.stream().map(Reply::getUserId).collect(Collectors.toSet());
+        //添加评论创建用户
+        replyIdSet.add(comment.getUserId());
+        //判断要回复的人存在存不在这个评论里面
+        if (!replyIdSet.contains(receiverId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "回复的用户不存在");
         }
         String commentType = replyCreateRequest.getCommentType();
         if (StringUtils.isBlank(commentType)) {

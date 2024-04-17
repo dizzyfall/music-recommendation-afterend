@@ -75,7 +75,7 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
         //获取上传图片类型
         UserImageUploadEnum userImageUploadEnum = UserImageUploadEnum.getEnumByValue(type);
         if (userImageUploadEnum == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户图片上传类型错误");
         }
         type = userImageUploadEnum.getValue();
         //校验图片
@@ -181,6 +181,7 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
         userInfoMapper.updateById(newUserInfo);
         return imageName;
     }
+
 }
 
 

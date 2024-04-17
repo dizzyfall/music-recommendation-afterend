@@ -3,20 +3,15 @@ package com.dzy.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dzy.constant.CommentConstant;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.SongMapper;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
-import com.dzy.model.dto.song.SongReplyCreateRequest;
-import com.dzy.model.dto.song.SongReplyQueryRequest;
 import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReSongComment;
-import com.dzy.model.entity.Reply;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
-import com.dzy.model.vo.reply.ReplyVO;
 import com.dzy.model.vo.song.SongDetailVO;
 import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.service.*;
@@ -51,9 +46,6 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
 
     @Resource
     private UserInfoService userInfoService;
-
-    @Resource
-    private ReSongReplyService reSongReplyService;
 
     @Resource
     private ReplyService replyService;
@@ -217,108 +209,6 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         Page<CommentVO> commentVOPage = new Page<>(pageCurrent, pageSize, commentPage.getTotal());
         commentVOPage.setRecords(commentVOList);
         return commentVOPage;
-    }
-
-    /**
-     * 创建歌曲评论回复
-     *
-     * @param songReplyCreateRequest
-     * @return
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Boolean createReply(SongReplyCreateRequest songReplyCreateRequest) {
-        if (songReplyCreateRequest == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        Long userId = songReplyCreateRequest.getUserId();
-        if (userId == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        //评论是否存在
-        Long commentId = songReplyCreateRequest.getCommentId();
-        if (commentId == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        Comment comment = commentService.getById(commentId);
-        if (comment == null) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "评论不存在");
-        }
-        String content = songReplyCreateRequest.getContent();
-        if (StringUtils.isBlank(content)) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "内容不能为空");
-        }
-        //todo 判断要回复的人存在存不在这个歌曲评论里面
-        Long receiverId = songReplyCreateRequest.getReceiverId();
-        if (receiverId == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        String commentType = songReplyCreateRequest.getCommentType();
-        if (StringUtils.isBlank(commentType)) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        //评论类型是否符合
-        if (!commentType.equals(CommentConstant.SONG_TYPE)) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "回复的评论不是歌曲类型");
-        }
-        Reply reply = new Reply();
-        reply.setUserId(userId);
-        reply.setCommentId(commentId);
-        reply.setReceiverId(receiverId);
-        reply.setContent(content);
-        reply.setPublishTime(new Date());
-        reply.setCommentType(commentType);
-        boolean isSongReplySave = replyService.save(reply);
-        if (!isSongReplySave) {
-            throw new BusinessException(StatusCode.CREATE_ERROR, "创建回复失败");
-        }
-//        //获取插入回复表的id
-//        Long replyId = reply.getId();
-//        //更新关联表数据
-//        //通过评论id和评论类型获取歌曲id
-//        QueryWrapper<ReSongComment> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.eq("comment_id",commentId);
-//        ReSongComment reSongComment = reSongCommentService.getOne(queryWrapper);
-//        Long songId = reSongComment.getSongId();
-//        //更新关联表数据
-//        ReSongReply reSongReply = new ReSongReply();
-//        reSongReply.setUserId(userId);
-//        reSongReply.setSongId(songId);
-//        reSongReply.setCommentId(commentId);
-//        reSongReply.setReplyId(replyId);
-//        boolean isReSongReplySave = reSongReplyService.save(reSongReply);
-//        if (!isReSongReplySave) {
-//            throw new BusinessException(StatusCode.CREATE_ERROR, "创建回复失败");
-//        }
-        return true;
-    }
-
-    /**
-     * 分页查询歌曲指定评论的回复
-     *
-     * @param songReplyQueryRequest
-     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.reply.ReplyVO>
-     * @date 2024/4/16  15:17
-     */
-    @Override
-    public Page<ReplyVO> listSongReplyByPage(SongReplyQueryRequest songReplyQueryRequest) {
-        if (songReplyQueryRequest == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        Long commentId = songReplyQueryRequest.getCommentId();
-        if (commentId == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        QueryWrapper<Reply> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("comment_id", commentId).orderByAsc("publish_time");
-        int pageCurrent = songReplyQueryRequest.getPageCurrent();
-        int pageSize = songReplyQueryRequest.getPageSize();
-        Page<Reply> page = new Page<>(pageCurrent, pageSize);
-        Page<Reply> replyPage = replyService.page(page, queryWrapper);
-        List<ReplyVO> replyVOList = replyPage.getRecords().stream().map(reply -> replyService.getReplyVO(reply)).collect(Collectors.toList());
-        Page<ReplyVO> replyVOPage = new Page<>(pageCurrent, pageSize, replyPage.getTotal());
-        replyVOPage.setRecords(replyVOList);
-        return replyVOPage;
     }
 
 }

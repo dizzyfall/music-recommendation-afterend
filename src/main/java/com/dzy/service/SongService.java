@@ -4,11 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
-import com.dzy.model.dto.song.SongReplyCreateRequest;
-import com.dzy.model.dto.song.SongReplyQueryRequest;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
-import com.dzy.model.vo.reply.ReplyVO;
 import com.dzy.model.vo.song.SongDetailVO;
 import com.dzy.model.vo.song.SongIntroVO;
 
@@ -67,22 +64,5 @@ public interface SongService extends IService<Song> {
      * @return
      */
     Page<CommentVO> listSongCommentByPage(SongCommentQueryRequest songCommentQueryRequest);
-
-    /**
-     * 创建歌曲评论回复
-     *
-     * @param songReplyCreateRequest
-     * @return
-     */
-    Boolean createReply(SongReplyCreateRequest songReplyCreateRequest);
-
-    /**
-     * 分页查询歌曲指定评论的回复
-     *
-     * @param songReplyQueryRequest
-     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.reply.ReplyVO>
-     * @date 2024/4/16  14:58
-     */
-    Page<ReplyVO> listSongReplyByPage(SongReplyQueryRequest songReplyQueryRequest);
 
 }

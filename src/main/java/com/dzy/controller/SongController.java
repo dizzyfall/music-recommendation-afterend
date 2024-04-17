@@ -4,13 +4,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
+import com.dzy.model.dto.reply.ReplyCreateRequest;
+import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
-import com.dzy.model.dto.song.SongReplyCreateRequest;
-import com.dzy.model.dto.song.SongReplyQueryRequest;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.reply.ReplyVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
+import com.dzy.service.ReplyService;
 import com.dzy.service.SongService;
 import com.dzy.service.UserInfoService;
 import com.dzy.utils.ResponseUtil;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -36,6 +38,9 @@ public class SongController {
 
     @Autowired
     private UserInfoService userInfoService;
+
+    @Resource
+    private ReplyService replyService;
 
     /**
      * 创建歌曲评论
@@ -70,38 +75,6 @@ public class SongController {
     }
 
     /**
-     * 创建歌曲评论回复
-     *
-     * @param request
-     * @return
-     */
-    @PostMapping("/comment/reply")
-    public BaseResponse<Boolean> songCommentReply(@RequestBody SongReplyCreateRequest songReplyCreateRequest, HttpServletRequest request) {
-        if (songReplyCreateRequest == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
-        }
-        if (request == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        //是否登录
-        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
-        if (loginUserVO == null) {
-            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
-        }
-        //是否是本人
-        Long loginUserId = loginUserVO.getId();
-        Long requestUserId = songReplyCreateRequest.getUserId();
-        if (!loginUserId.equals(requestUserId)) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
-        }
-        Boolean isSongCommentReply = songService.createReply(songReplyCreateRequest);
-        if (!isSongCommentReply) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建回复评论失败");
-        }
-        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "创建回复评论成功");
-    }
-
-    /**
      * 分页查询歌曲的评论
      *
      * @param songCommentQueryRequest
@@ -118,18 +91,52 @@ public class SongController {
     }
 
     /**
-     * 分页查询歌曲指定评论的回复
+     * 创建歌曲评论回复
      *
+     * @param replyCreateRequest
+     * @param request
+     * @return com.dzy.common.BaseResponse<java.lang.Boolean>
      * @date 2024/4/16  14:58
-     * @param songReplyQueryRequest
-     * @return com.dzy.common.BaseResponse<java.util.List<com.dzy.model.vo.reply.ReplyVO>>
      */
-    @PostMapping("/reply/list/page")
-    public BaseResponse<List<ReplyVO>> songReplyListRetrieveByPage(@RequestBody SongReplyQueryRequest songReplyQueryRequest) {
-        if (songReplyQueryRequest == null) {
+    @PostMapping("/reply/create")
+    public BaseResponse<Boolean> songReplyCreate(@RequestBody ReplyCreateRequest replyCreateRequest, HttpServletRequest request) {
+        if (replyCreateRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "创建请求参数为空");
+        }
+        if (request == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        Page<ReplyVO> songReplyVOPage = songService.listSongReplyByPage(songReplyQueryRequest);
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = replyCreateRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        Boolean isSongReplyCreate = replyService.createReply(replyCreateRequest);
+        if (!isSongReplyCreate) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建回复失败");
+        }
+        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "创建回复成功");
+    }
+
+    /**
+     * 分页查询歌曲指定评论的回复
+     *
+     * @param replyQueryRequest
+     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.reply.ReplyVO>>
+     * @date 2024/4/16  23:03
+     */
+    @PostMapping("/reply/list/page")
+    public BaseResponse<List<ReplyVO>> songReplyListRetrieveByPage(@RequestBody ReplyQueryRequest replyQueryRequest) {
+        if (replyQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Page<ReplyVO> songReplyVOPage = replyService.listReplyByPage(replyQueryRequest);
         List<ReplyVO> songReplyVOList = songReplyVOPage.getRecords();
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songReplyVOList, "获取歌曲评论的回复列表成功");
     }

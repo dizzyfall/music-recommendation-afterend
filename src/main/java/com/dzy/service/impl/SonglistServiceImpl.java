@@ -51,6 +51,9 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
     @Resource
     private UserInfoService userInfoService;
 
+    @Resource
+    private ReplyService replyService;
+
     /**
      * 创建歌单
      * 空歌单（没有歌曲）

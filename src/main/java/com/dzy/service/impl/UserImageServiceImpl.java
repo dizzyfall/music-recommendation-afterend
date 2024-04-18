@@ -52,7 +52,6 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
      * @return
      */
     //todo 使用对象对象存储
-    //todo 返回可访问地址
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String uploadImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO) {
@@ -68,7 +67,6 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
      * @return
      */
     //todo 使用对象对象存储
-    //todo 返回可访问地址
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String uploadImageByType(MultipartFile multipartFile, String type, UserLoginVO loginUserVO) {

@@ -16,6 +16,7 @@ import com.dzy.service.UserInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,6 +53,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      * @return 是否加入数据库
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean registerUser(UserRegisterRequest userRegisterRequest) {
         String account = userRegisterRequest.getAccount();
         String password = userRegisterRequest.getPassword();
@@ -105,9 +107,16 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         UserInfo userInfo = new UserInfo();
         userInfo.setAccount(account);
         userInfo.setPassword(encryptPassword);
-        boolean insertResult = this.save(userInfo);
-        if (!insertResult) {
+        boolean isUserInfoSave = this.save(userInfo);
+        if (!isUserInfoSave) {
             throw new BusinessException(StatusCode.DATABASE_ERROR, "用户注册数据没有加入数据库");
+        }
+        //获取用户id
+        Long userId = userInfo.getId();
+        //上传默认头像、背景
+        Boolean isDefaultImageSave = userImageService.uploadDefaultImage(userId);
+        if (!isDefaultImageSave) {
+            throw new BusinessException(StatusCode.DATABASE_ERROR, "用户图像数据没有加入数据库");
         }
         return true;
     }
@@ -402,20 +411,19 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      *
      * @param multipartFile
      * @param userUpdateImageRequest
-     * @param loginUserVO
      * @return
      */
     @Override
-    public Boolean updateUserImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO) {
+    public Boolean updateUserImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest) {
         //获取更新图片类型
         String type = userUpdateImageRequest.getType();
         if (StringUtils.isBlank(type)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR);
         }
         //更新添加图片
-        String imageName = userImageService.uploadImageByType(multipartFile, type, loginUserVO);
-        if (StringUtils.isBlank(imageName)) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "图片名称为空");
+        Boolean isUserImageUpdate = userImageService.updateUserImage(multipartFile, userUpdateImageRequest);
+        if (!isUserImageUpdate) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR, "图片更新失败");
         }
         return true;
     }

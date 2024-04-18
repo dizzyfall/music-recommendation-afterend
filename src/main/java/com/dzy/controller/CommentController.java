@@ -58,7 +58,7 @@ public class CommentController {
         if (!loginUserId.equals(requestUserId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
-        Page<CommentVO> commentVOPage = commentService.listMyCommentByPage(commentQueryRequest, loginUserVO);
+        Page<CommentVO> commentVOPage = commentService.listMyCommentByPage(commentQueryRequest);
         List<CommentVO> commentVOList = commentVOPage.getRecords();
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, commentVOList, "获取用户评论成功");
     }
@@ -70,8 +70,8 @@ public class CommentController {
      * @param request
      * @return
      */
-    @PostMapping("/my/comment/delete")
-    public BaseResponse<Boolean> songCommentDelete(@RequestBody CommentDeleteRequest commentDeleteRequest, HttpServletRequest request) {
+    @PostMapping("/my/delete")
+    public BaseResponse<Boolean> myCommentDelete(@RequestBody CommentDeleteRequest commentDeleteRequest, HttpServletRequest request) {
         if (commentDeleteRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "删除请求参数为空");
         }
@@ -87,8 +87,8 @@ public class CommentController {
         if (!loginUserId.equals(requestUserId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
-        Boolean isDeleteMySongComment = commentService.deleteMySongComment(commentDeleteRequest, loginUserVO);
-        if (!isDeleteMySongComment) {
+        Boolean isDeleteMyComment = commentService.deleteMyComment(commentDeleteRequest);
+        if (!isDeleteMyComment) {
             throw new BusinessException(StatusCode.DELETE_ERROR);
         }
         return ResponseUtil.success(StatusCode.DELETE_SUCCESS, "删除评论成功");

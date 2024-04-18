@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.comment.CommentDeleteRequest;
 import com.dzy.model.dto.comment.CommentQueryRequest;
 import com.dzy.model.entity.Comment;
+import com.dzy.model.enums.CommentTypeEum;
 import com.dzy.model.vo.comment.CommentVO;
-import com.dzy.model.vo.userinfo.UserLoginVO;
 
 /**
  * @author DZY
@@ -19,10 +19,9 @@ public interface CommentService extends IService<Comment> {
      * 分页查询自己的评论
      *
      * @param commentQueryRequest
-     * @param loginUserVO
      * @return
      */
-    Page<CommentVO> listMyCommentByPage(CommentQueryRequest commentQueryRequest, UserLoginVO loginUserVO);
+    Page<CommentVO> listMyCommentByPage(CommentQueryRequest commentQueryRequest);
 
     /**
      * 获取CommentVO视图对象
@@ -37,9 +36,27 @@ public interface CommentService extends IService<Comment> {
      * 删除自己的评论
      *
      * @param commentDeleteRequest
-     * @param loginUserVO
      * @return
      */
-    Boolean deleteMySongComment(CommentDeleteRequest commentDeleteRequest, UserLoginVO loginUserVO);
+    Boolean deleteMyComment(CommentDeleteRequest commentDeleteRequest);
+
+    /**
+     * 根据评论id获取评论类型
+     *
+     * @param commentId
+     * @return com.dzy.model.enums.CommentTypeEum
+     * @date 2024/4/18  12:32
+     */
+    CommentTypeEum getCommentTypeById(Long commentId);
+
+    /**
+     * 根据评论类型删除对应评论表数据
+     *
+     * @param commentTypeEum
+     * @param commentId
+     * @return java.lang.Boolean
+     * @date 2024/4/18  12:32
+     */
+    Boolean deleteCommentByCommentTypeEum(CommentTypeEum commentTypeEum, Long commentId);
 
 }

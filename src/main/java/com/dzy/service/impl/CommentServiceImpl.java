@@ -9,14 +9,13 @@ import com.dzy.mapper.CommentMapper;
 import com.dzy.model.dto.comment.CommentDeleteRequest;
 import com.dzy.model.dto.comment.CommentQueryRequest;
 import com.dzy.model.entity.Comment;
+import com.dzy.model.entity.ReAlbumComment;
 import com.dzy.model.entity.ReSongComment;
+import com.dzy.model.entity.ReSonglistComment;
+import com.dzy.model.enums.CommentTypeEum;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.userinfo.UserInfoIntroVO;
-import com.dzy.model.vo.userinfo.UserLoginVO;
-import com.dzy.service.CommentService;
-import com.dzy.service.ReSongCommentService;
-import com.dzy.service.UserInfoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dzy.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +32,14 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
         implements CommentService {
 
-    @Autowired
+    @Resource
     private ReSongCommentService reSongCommentService;
+
+    @Resource
+    private ReAlbumCommentService reAlbumCommentService;
+
+    @Resource
+    private ReSonglistCommentService reSonglistCommentService;
 
     @Resource
     private UserInfoService userInfoService;
@@ -43,11 +48,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
      * 分页查询自己的评论
      *
      * @param commentQueryRequest
-     * @param loginUserVO
      * @return
      */
     @Override
-    public Page<CommentVO> listMyCommentByPage(CommentQueryRequest commentQueryRequest, UserLoginVO loginUserVO) {
+    public Page<CommentVO> listMyCommentByPage(CommentQueryRequest commentQueryRequest) {
         Long userId = commentQueryRequest.getUserId();
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
@@ -74,14 +78,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
         if (comment == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        CommentVO commentVO = new CommentVO();
+        CommentVO commentVO = CommentVO.objToVO(comment);
         UserInfoIntroVO userInfoIntroVO = userInfoService.getUserInfoIntroVOById(comment.getUserId());
         commentVO.setUserInfoIntroVO(userInfoIntroVO);
-        commentVO.setContent(comment.getContent());
-        commentVO.setFavourCount(comment.getFavourCount());
-        //todo 回复数暂时没有实现
-        //commentVO.setReplyCount();
-        commentVO.setPublishTime(comment.getPublishTime());
         return commentVO;
     }
 
@@ -89,12 +88,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
      * 删除自己的评论
      *
      * @param commentDeleteRequest
-     * @param loginUserVO
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean deleteMySongComment(CommentDeleteRequest commentDeleteRequest, UserLoginVO loginUserVO) {
+    public Boolean deleteMyComment(CommentDeleteRequest commentDeleteRequest) {
         Long userId = commentDeleteRequest.getUserId();
         if (userId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -104,25 +102,92 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         //自己评论是否存在
-        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", commentId).eq("user_id", userId);
-        Comment comment = this.getOne(queryWrapper);
+        Comment comment = this.getById(commentId);
         if (comment == null) {
-            throw new BusinessException(StatusCode.PARAMS_ERROR);
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "评论不存在");
         }
-        //删除自己评论歌曲的评论，而不是回复他人的评论
-        //TODO 删除回复他人的评论之后实现
-        QueryWrapper<ReSongComment> deleteQueryWrapper = new QueryWrapper<>();
-        deleteQueryWrapper.eq("comment_id", commentId);
-        //删关联表数据
-        boolean isRemoveRe = reSongCommentService.remove(deleteQueryWrapper);
-        if (!isRemoveRe) {
+        //删除自己的歌曲评论,回复保留
+        CommentTypeEum commentTypeEum = getCommentTypeById(commentId);
+        Boolean isDeleteComment = deleteCommentByCommentTypeEum(commentTypeEum, commentId);
+        if (!isDeleteComment) {
             throw new BusinessException(StatusCode.DELETE_ERROR);
         }
         //删除评论表数据
         boolean isRemove = this.removeById(commentId);
         if (!isRemove) {
             throw new BusinessException(StatusCode.DELETE_ERROR);
+        }
+        return true;
+    }
+
+    /**
+     * 根据评论id获取评论类型
+     *
+     * @param commentId
+     * @return com.dzy.model.enums.CommentTypeEum
+     * @date 2024/4/18  12:20
+     */
+    @Override
+    public CommentTypeEum getCommentTypeById(Long commentId) {
+        QueryWrapper<ReSongComment> reSongCommentQueryWrapper = new QueryWrapper<>();
+        reSongCommentQueryWrapper.eq("comment_id", commentId);
+        ReSongComment reSongCommentOne = reSongCommentService.getOne(reSongCommentQueryWrapper);
+        if (reSongCommentOne != null) {
+            return CommentTypeEum.SONG_TYPE;
+        }
+        QueryWrapper<ReAlbumComment> reAlbumCommentQueryWrapper = new QueryWrapper<>();
+        reAlbumCommentQueryWrapper.eq("comment_id", commentId);
+        ReAlbumComment reAlbumCommentOne = reAlbumCommentService.getOne(reAlbumCommentQueryWrapper);
+        if (reAlbumCommentOne != null) {
+            return CommentTypeEum.ALBUM_TYPE;
+        }
+        QueryWrapper<ReSonglistComment> reSonglistCommentQueryWrapper = new QueryWrapper<>();
+        reSonglistCommentQueryWrapper.eq("comment_id", commentId);
+        ReSonglistComment reSonglistCommentOne = reSonglistCommentService.getOne(reSonglistCommentQueryWrapper);
+        if (reSonglistCommentOne != null) {
+            return CommentTypeEum.SONGLIST_TYPE;
+        }
+        return null;
+    }
+
+    /**
+     * 根据评论类型删除对应评论表数据
+     *
+     * @param commentTypeEum
+     * @param commentId
+     * @return java.lang.Boolean
+     * @date 2024/4/18  12:30
+     */
+    @Override
+    public Boolean deleteCommentByCommentTypeEum(CommentTypeEum commentTypeEum, Long commentId) {
+        if (commentTypeEum == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "评论不存在");
+        }
+        //评论是歌曲类型
+        if ("song".equals(commentTypeEum.getValue())) {
+            QueryWrapper<ReSongComment> deleteQueryWrapper = new QueryWrapper<>();
+            deleteQueryWrapper.eq("comment_id", commentId);
+            //删关联表数据
+            boolean isRemoveReSongComment = reSongCommentService.remove(deleteQueryWrapper);
+            if (!isRemoveReSongComment) {
+                throw new BusinessException(StatusCode.DELETE_ERROR);
+            }
+        } else if ("album".equals(commentTypeEum.getValue())) {
+            QueryWrapper<ReAlbumComment> deleteQueryWrapper = new QueryWrapper<>();
+            deleteQueryWrapper.eq("comment_id", commentId);
+            //删关联表数据
+            boolean isRemoveReAlbumComment = reAlbumCommentService.remove(deleteQueryWrapper);
+            if (!isRemoveReAlbumComment) {
+                throw new BusinessException(StatusCode.DELETE_ERROR);
+            }
+        } else if ("songlist".equals(commentTypeEum.getValue())) {
+            QueryWrapper<ReSonglistComment> deleteQueryWrapper = new QueryWrapper<>();
+            deleteQueryWrapper.eq("comment_id", commentId);
+            //删关联表数据
+            boolean isRemoveReSonglistComment = reSonglistCommentService.remove(deleteQueryWrapper);
+            if (!isRemoveReSonglistComment) {
+                throw new BusinessException(StatusCode.DELETE_ERROR);
+            }
         }
         return true;
     }

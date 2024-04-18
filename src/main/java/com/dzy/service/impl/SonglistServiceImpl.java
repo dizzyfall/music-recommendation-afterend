@@ -231,11 +231,15 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         //删除关联表数据
-        Boolean isDelete = reSonglistSongMapper.deleteBatchBySonglistIds(userId, songlistIdList);
+        //Boolean isDelete = reSonglistSongMapper.deleteBatchBySonglistIds(userId, songlistIdList);
+        QueryWrapper<ReSonglistSong> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("songlist_id", songlistIdList);
+        List<Long> reSonglistSongIdList = reSonglistSongService.list(queryWrapper).stream().map(ReSonglistSong::getId).collect(Collectors.toList());
+        boolean isDelete = this.removeBatchByIds(reSonglistSongIdList);
         if (!isDelete) {
             throw new BusinessException(StatusCode.DELETE_ERROR);
         }
-        //删除歌单数据
+        //删除歌单表数据
         boolean isSonglistRemove = this.removeBatchByIds(songlistIdList);
         if (!isSonglistRemove) {
             throw new BusinessException(StatusCode.DELETE_ERROR);
@@ -330,7 +334,6 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
         if (songlist == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "歌单不存在");
         }
-        //todo remove有问题
         //删除关联表数据
         QueryWrapper<ReSonglistSong> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("creator_id", userId).eq("songlist_id", songlistId).in("song_id", songIdList);
@@ -339,7 +342,6 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
             throw new BusinessException(StatusCode.DELETE_ERROR, "批量删除songlist-song关联表数据失败");
         }
         //更新歌单表数据
-        //todo songIdList有问题？
         UpdateWrapper<Songlist> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("creator_id", userId).eq("id", songlistId).setSql("song_count = song_count - " + songIdList.size());
         boolean isSonglistupdate = this.update(updateWrapper);

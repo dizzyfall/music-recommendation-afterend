@@ -159,10 +159,8 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
         return songlistIntroVOPage.setRecords(songlistIntroVOList);
     }
 
-    //todo 几个视图解释清楚
-
     /**
-     * 获取收藏的专辑简介视图
+     * 通过专辑id获取收藏的专辑简介视图
      *
      * @param albumId
      * @return
@@ -175,8 +173,21 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
         if (album == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "无此专辑");
         }
+        return getCollectAlbumVO(album);
+    }
+
+    /**
+     * 获取收藏的专辑简介视图
+     *
+     * @param album
+     * @return com.dzy.model.vo.collect.CollectAlbumVO
+     * @date 2024/4/17  18:17
+     */
+    public CollectAlbumVO getCollectAlbumVO(Album album) {
+        if (album == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
         CollectAlbumVO collectAlbumVO = new CollectAlbumVO();
-        //todo 下面方法写到VO里
         AlbumVO albumVO = AlbumVO.objToVO(album);
         List<String> singerNameList = singerService.getSingerNameList(album.getSingerIdList());
         collectAlbumVO.setAlbumVO(albumVO);

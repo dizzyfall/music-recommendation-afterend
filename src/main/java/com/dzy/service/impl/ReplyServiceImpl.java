@@ -1,6 +1,7 @@
 package com.dzy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
@@ -84,38 +85,43 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply>
         if (replyCreateRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
+        //创建回复用户id是否为空
         Long userId = replyCreateRequest.getUserId();
         if (userId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        //评论是否存在
+        //创建回复所在的当前评论是否为空（创建的回复隶属于哪一个评论）
         Long commentId = replyCreateRequest.getCommentId();
         if (commentId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
+        //创建回复所在的当前评论是否存在
         Comment comment = commentService.getById(commentId);
         if (comment == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "评论不存在");
         }
-        String content = replyCreateRequest.getContent();
-        if (StringUtils.isBlank(content)) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "内容不能为空");
-        }
+        //接受回复用户id是否为空
         Long receiverId = replyCreateRequest.getReceiverId();
         if (receiverId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        //获取指定评论的回复用户
+        //获取当前评论下回复用户id
         QueryWrapper<Reply> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("comment_id", commentId);
         List<Reply> replyList = this.list(queryWrapper);
         Set<Long> replyIdSet = replyList.stream().map(Reply::getUserId).collect(Collectors.toSet());
         //添加评论创建用户
         replyIdSet.add(comment.getUserId());
-        //判断要回复的人存在存不在这个评论里面
+        //接收回复的用户是否在这个评论里面
         if (!replyIdSet.contains(receiverId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "回复的用户不存在");
         }
+        //评论内容是否为空
+        String content = replyCreateRequest.getContent();
+        if (StringUtils.isBlank(content)) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "内容不能为空");
+        }
+        //评论类型是否为空
         String commentType = replyCreateRequest.getCommentType();
         if (StringUtils.isBlank(commentType)) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -127,12 +133,20 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply>
         reply.setUserId(userId);
         reply.setCommentId(commentId);
         reply.setReceiverId(receiverId);
-        reply.setContent(content);
-        reply.setPublishTime(new Date());
         reply.setCommentType(commentType);
-        boolean isSongReplySave = this.save(reply);
-        if (!isSongReplySave) {
+        reply.setContent(content);
+        reply.setFavourCount(0L);
+        reply.setPublishTime(new Date());
+        boolean isReplySave = this.save(reply);
+        if (!isReplySave) {
             throw new BusinessException(StatusCode.CREATE_ERROR, "创建回复失败");
+        }
+        //更新评论表回复数
+        UpdateWrapper<Comment> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", commentId).setSql("reply_count = reply_count + 1");
+        boolean isCommentUpdate = commentService.update(updateWrapper);
+        if (!isCommentUpdate) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR, "评论回复数更新失败");
         }
         return true;
     }

@@ -72,16 +72,18 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
      * 获取歌曲详情
      *
      * @param songId
-     * @return
+     * @return com.dzy.model.vo.song.SongDetailVO
+     * @date 2024/4/17  18:23
      */
     @Override
     public SongDetailVO getSongDetailById(Long songId) {
         if (songId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        QueryWrapper<Song> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", songId);
-        Song song = this.getOne(queryWrapper);
+        Song song = this.getById(songId);
+        if (song == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "无此歌曲");
+        }
         return getSongDetailVO(song);
     }
 
@@ -91,7 +93,6 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
      * @param song
      * @return
      */
-    //todo 查询优化
     @Override
     public SongIntroVO getSongIntro(Song song) {
         if (song == null) {
@@ -115,13 +116,12 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         if (songId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        SongDetailVO songDetailVO = getSongDetailById(songId);
-        SongIntroVO songIntroVO = new SongIntroVO();
-        songIntroVO.setTitle(songDetailVO.getTitle());
-        songIntroVO.setSingerNameList(songDetailVO.getSingerNameList());
-        return songIntroVO;
+        Song song = this.getById(songId);
+        if (song == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "无此歌曲");
+        }
+        return getSongIntro(song);
     }
-
 
     /**
      * 创建歌曲评论

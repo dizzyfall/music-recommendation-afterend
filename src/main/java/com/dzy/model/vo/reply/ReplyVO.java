@@ -35,6 +35,11 @@ public class ReplyVO implements Serializable {
     private String content;
 
     /**
+     * 点赞数
+     */
+    private Long favourCount;
+
+    /**
      * 发布时间
      */
     private Date publishTime;

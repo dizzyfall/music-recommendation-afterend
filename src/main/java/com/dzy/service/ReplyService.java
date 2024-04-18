@@ -2,6 +2,8 @@ package com.dzy.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dzy.model.dto.reply.MyReplyDeleteRequest;
+import com.dzy.model.dto.reply.MyReplyQueryRequest;
 import com.dzy.model.dto.reply.ReplyCreateRequest;
 import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.entity.Reply;
@@ -40,5 +42,23 @@ public interface ReplyService extends IService<Reply> {
      * @date 2024/4/16  22:55
      */
     Page<ReplyVO> listReplyByPage(ReplyQueryRequest replyQueryRequest);
+
+    /**
+     * 分页查询自己的回复
+     *
+     * @param myReplyQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.reply.ReplyVO>
+     * @date 2024/4/18  10:55
+     */
+    Page<ReplyVO> listMyReplyByPage(MyReplyQueryRequest myReplyQueryRequest);
+
+    /**
+     * 删除自己的回复
+     *
+     * @param myReplyDeleteRequest
+     * @return java.lang.Boolean
+     * @date 2024/4/18  11:08
+     */
+    Boolean deleteMyReply(MyReplyDeleteRequest myReplyDeleteRequest);
 
 }

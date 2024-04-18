@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.ReplyMapper;
+import com.dzy.model.dto.reply.MyReplyDeleteRequest;
+import com.dzy.model.dto.reply.MyReplyQueryRequest;
 import com.dzy.model.dto.reply.ReplyCreateRequest;
 import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.entity.*;
@@ -177,6 +179,72 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply>
         Page<ReplyVO> replyVOPage = new Page<>(pageCurrent, pageSize, replyPage.getTotal());
         replyVOPage.setRecords(replyVOList);
         return replyVOPage;
+    }
+
+    /**
+     * 分页查询自己的回复
+     *
+     * @param myReplyQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.reply.ReplyVO>
+     * @date 2024/4/18  10:55
+     */
+    @Override
+    public Page<ReplyVO> listMyReplyByPage(MyReplyQueryRequest myReplyQueryRequest) {
+        Long userId = myReplyQueryRequest.getUserId();
+        QueryWrapper<Reply> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        int pageCurrent = myReplyQueryRequest.getPageCurrent();
+        int pageSize = myReplyQueryRequest.getPageSize();
+        Page<Reply> page = new Page<>(pageCurrent, pageSize);
+        Page<Reply> replyPage = this.page(page, queryWrapper);
+        List<ReplyVO> replyVOList = replyPage.getRecords().stream().map(this::getReplyVO).collect(Collectors.toList());
+        //新分页对象
+        Page<ReplyVO> replyVOPage = new Page<>(pageCurrent, pageSize, replyPage.getTotal());
+        replyVOPage.setRecords(replyVOList);
+        return replyVOPage;
+    }
+
+    /**
+     * 删除自己的回复
+     *
+     * @param myReplyDeleteRequest
+     * @return java.lang.Boolean
+     * @date 2024/4/18  11:08
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean deleteMyReply(MyReplyDeleteRequest myReplyDeleteRequest) {
+        Long userId = myReplyDeleteRequest.getUserId();
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long replyId = myReplyDeleteRequest.getReplyId();
+        if (replyId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //自己回复是否存在
+        QueryWrapper<Reply> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", replyId).eq("user_id", userId);
+        Reply reply = this.getOne(queryWrapper);
+        if (reply == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR);
+        }
+        //todo 在自己管理的回复列表没有此回复，而在这个回复的评论下，此回复内容因变为“已删除”
+        // 实现方式就是reply表取消逻辑删除，在删除回复时，更新内容，同时将逻辑字段设为1，
+        // 在查询自己回复需要添加逻辑字段，在查询所有回复时就不添加加逻辑字段（全部查出来）
+        //删除自己的回复
+        boolean isReplyRemove = this.removeById(reply.getId());
+        if (!isReplyRemove) {
+            throw new BusinessException(StatusCode.DELETE_ERROR);
+        }
+        //更新评论表回复数
+        UpdateWrapper<Comment> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", reply.getCommentId()).setSql("reply_count = reply_count - 1");
+        boolean isCommentUpdate = commentService.update(updateWrapper);
+        if (!isCommentUpdate) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR, "评论回复数更新失败");
+        }
+        return true;
     }
 
     /**

@@ -109,8 +109,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         if (!insertResult) {
             throw new BusinessException(StatusCode.DATABASE_ERROR, "用户注册数据没有加入数据库");
         }
-        // TODO: 2024/3/8 返回的可以是用用户id,且可以将查询用户id方法封装
-        return insertResult;
+        return true;
     }
 
     /**

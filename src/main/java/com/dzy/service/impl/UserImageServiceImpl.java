@@ -2,6 +2,7 @@ package com.dzy.service.impl;
 
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
@@ -11,22 +12,21 @@ import com.dzy.model.dto.userinfo.UserUpdateImageRequest;
 import com.dzy.model.entity.UserImage;
 import com.dzy.model.entity.UserInfo;
 import com.dzy.model.enums.UserImageUploadEnum;
-import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserImageService;
 import com.dzy.service.UserInfoService;
-import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static com.dzy.constant.FileConstant.IMAGE_MAXSIZE;
-import static com.dzy.constant.FileConstant.PROJECT_PATH;
+import static com.dzy.constant.FileConstant.*;
 
 /**
  * @author DZY
@@ -44,32 +44,55 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
     private UserInfoMapper userInfoMapper;
 
     /**
-     * 上传图片
+     * 更新用户图片
      *
      * @param multipartFile
      * @param userUpdateImageRequest
-     * @param loginUserVO
      * @return
      */
-    //todo 使用对象对象存储
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String uploadImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO) {
+    public Boolean updateUserImage(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest) {
+        if (userUpdateImageRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
         String type = userUpdateImageRequest.getType();
-        return uploadImageByType(multipartFile, type, loginUserVO);
+        if (StringUtils.isBlank(type)) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long userId = userUpdateImageRequest.getUserId();
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否需要删除本地图片文件
+        QueryWrapper<UserImage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        UserImage userImage = this.getOne(queryWrapper);
+        if (userImage != null) {
+            //删除本地图片文件
+            Boolean isDeleteUserImageFile = deleteUserImageFile(userId, type);
+            if (!isDeleteUserImageFile) {
+                throw new BusinessException(StatusCode.DELETE_ERROR, "删除用户图片失败");
+            }
+        }
+        //上传图片文件
+        String imageName = uploadImageByType(multipartFile, type, userId);
+        if (StringUtils.isBlank(imageName)) {
+            throw new BusinessException(StatusCode.UPLOAD_IMAGE_ERROR);
+        }
+        //更新用户图片表数据
+        updateImageToDB(type, imageName, userImage.getId(), userId);
+        return true;
     }
 
     /**
      * 上传图片
-     * 重写
      *
      * @param multipartFile
      * @return
      */
-    //todo 使用对象对象存储
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public String uploadImageByType(MultipartFile multipartFile, String type, UserLoginVO loginUserVO) {
+    //todo 使用对象存储
+    public String uploadImageByType(MultipartFile multipartFile, String type, Long userId) {
         //获取上传图片类型
         UserImageUploadEnum userImageUploadEnum = UserImageUploadEnum.getEnumByValue(type);
         if (userImageUploadEnum == null) {
@@ -78,12 +101,10 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
         type = userImageUploadEnum.getValue();
         //校验图片
         validImage(multipartFile, userImageUploadEnum);
-        //获取登录用户信息
-        Long loginUserId = loginUserVO.getId();
         //创建图片目录
         //todo 存入服务器后端项目中
         //todo linux文件分隔符是'/'
-        String imageContent = String.format("%s\\%s\\%s", PROJECT_PATH, type, loginUserId);
+        String imageContent = String.format("%s\\%s\\%s", PROJECT_PATH, type, userId);
         File content = new File(imageContent);
         if (!content.isDirectory() && !content.exists()) {
             boolean isExistDir = content.mkdirs();
@@ -105,7 +126,7 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
             log.error("image upload error, imagepath = " + imagePath, e);
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "上传失败");
         }
-        return saveImage(type, imageName, loginUserId);
+        return imageName;
     }
 
     /**
@@ -133,26 +154,20 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
     }
 
     /**
-     * 将图片名称加入数据库
+     * 更新图片到数据库
      *
      * @param type
      * @param imageName
-     * @param loginUserId
-     * @return
+     * @param imageId
+     * @param userId
+     * @return java.lang.Boolean
+     * @date 2024/4/18  15:03
      */
-    @Transactional(rollbackFor = Exception.class)
-    public String saveImage(String type, String imageName, Long loginUserId) {
-        //根据用户Id获取数据
-        QueryWrapper<UserImage> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", loginUserId);
-        UserImage userImage = this.getOne(queryWrapper);
+    public Boolean updateImageToDB(String type, String imageName, Long imageId, Long userId) {
         //设置图片信息
-        //如果没有加入用户图片
-        if (ObjectUtils.isEmpty(userImage)) {
-            //设置用户id
-            userImage = new UserImage();
-            userImage.setUserId(loginUserId);
-        }
+        UserImage userImage = new UserImage();
+        userImage.setId(imageId);
+        userImage.setUserId(userId);
         //如果是头像
         if (type.equals("user_avatar")) {
             //头像名称写入数据库
@@ -163,21 +178,149 @@ public class UserImageServiceImpl extends ServiceImpl<UserImageMapper, UserImage
             //背景名称写入数据库
             userImage.setBackgroundPath(imageName);
         }
-        boolean res = this.saveOrUpdate(userImage);
-        if (!res) {
-            throw new BusinessException(StatusCode.DATABASE_ERROR, "图片加入数据库错误");
+        boolean isUpdateUserImage = this.updateById(userImage);
+        if (!isUpdateUserImage) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR, "更新图片失败");
         }
-        //获取登录用户
-        UserInfo oldUserInfo = userInfoMapper.selectById(loginUserId);
-        UserInfo newUserInfo = new UserInfo();
-        BeanUtils.copyProperties(oldUserInfo, newUserInfo);
-        //获取新保存的用户图片
-        UserImage newUserImage = this.getOne(queryWrapper);
-        Long newUserImageId = newUserImage.getId();
-        //设置user_info表的imageId字段
-        newUserInfo.setImageId(newUserImageId);
-        userInfoMapper.updateById(newUserInfo);
-        return imageName;
+        return true;
+    }
+
+    /**
+     * 根据图片id和对应图片类型删除上传的图片文件
+     *
+     * @param userId
+     * @param type
+     * @return java.lang.Boolean
+     * @date 2024/4/18  17:58
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean deleteUserImageFile(Long userId, String type) {
+        String imagePath = getImagePath(userId, type);
+        File imageFile = new File(imagePath);
+        boolean isImageFileDelete = imageFile.delete();
+        if (!isImageFileDelete) {
+            throw new BusinessException(StatusCode.DELETE_ERROR, "删除用户图片失败,图片类型为：" + type);
+        }
+        return true;
+    }
+
+    /**
+     * 根据用户id和图片类型获取图片绝对路径
+     *
+     * @param userId
+     * @param type
+     * @return java.lang.String
+     * @date 2024/4/18  20:00
+     */
+    public String getImagePath(Long userId, String type) {
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //获取图片id
+        Long imageId = userInfoService.getById(userId).getImageId();
+        UserImage userImage = this.getById(imageId);
+        String imageName;
+        if (type.equals("user_avatar")) {
+            imageName = userImage.getAvatarPath();
+        } else if (type.equals("user_background")) {
+            imageName = userImage.getBackgroundPath();
+        } else {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "图片类型错误");
+        }
+        String imageContent = String.format("%s\\%s\\%s", PROJECT_PATH, type, userId);
+        return String.format("%s\\%s", imageContent, imageName);
+    }
+
+    /**
+     * 上传默认头像
+     *
+     * @param userId
+     * @return void
+     * @date 2024/4/18  23:42
+     */
+    public void uploadDefaultAvatar(Long userId) {
+        String imageContent = String.format("%s\\%s\\%s", PROJECT_PATH, "user_avatar", userId);
+        File content = new File(imageContent);
+        if (!content.isDirectory() && !content.exists()) {
+            boolean isExistDir = content.mkdirs();
+            if (!isExistDir) {
+                throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建文件夹失败");
+            }
+        }
+        //获取头像
+        File defaultAvatar = new File(DEFAULT_AVATAR_ABSOLUTE_PATH);
+        //上传头像
+        File avatarContent = new File(imageContent);
+        try {
+            FileUtils.copyFileToDirectory(defaultAvatar, avatarContent);
+        } catch (IOException e) {
+            log.error("default avatar upload error", e);
+            throw new BusinessException(StatusCode.UPLOAD_IMAGE_ERROR);
+        }
+    }
+
+    /**
+     * 上传默认背景
+     *
+     * @param userId
+     * @return void
+     * @date 2024/4/18  23:42
+     */
+    public void uploadDefaultBackground(Long userId) {
+        String imageContent = String.format("%s\\%s\\%s", PROJECT_PATH, "user_background", userId);
+        File content = new File(imageContent);
+        if (!content.isDirectory() && !content.exists()) {
+            boolean isExistDir = content.mkdirs();
+            if (!isExistDir) {
+                throw new BusinessException(StatusCode.SYSTEM_ERROR, "创建文件夹失败");
+            }
+        }
+        //获取头像
+        File defaultBackground = new File(DEFAULT_BACKGROUND_ABSOLUTE_PATH);
+        //上传头像
+        File backgroundContent = new File(imageContent);
+        try {
+            FileUtils.copyFileToDirectory(defaultBackground, backgroundContent);
+        } catch (IOException e) {
+            log.error("default background upload error", e);
+            throw new BusinessException(StatusCode.UPLOAD_IMAGE_ERROR);
+        }
+    }
+
+    /**
+     * 上传用户默认图像、背景
+     *
+     * @param userId
+     * @return java.lang.Boolean
+     * @date 2024/4/18  23:41
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean uploadDefaultImage(Long userId) {
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        UserInfo userInfo = userInfoService.getById(userId);
+        if (userInfo == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR);
+        }
+        uploadDefaultAvatar(userId);
+        uploadDefaultBackground(userId);
+        UserImage userImage = new UserImage();
+        userImage.setUserId(userId);
+        userImage.setAvatarPath(DEFAULT_AVATAR_NAME);
+        userImage.setBackgroundPath(DEFAULT_BACKGROUND_NAME);
+        boolean isImageSave = this.save(userImage);
+        if (!isImageSave) {
+            throw new BusinessException(StatusCode.UPLOAD_IMAGE_ERROR);
+        }
+        Long imageId = userImage.getId();
+        UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", userId).set("image_id", imageId);
+        boolean isUserInfoUpdate = userInfoService.update(updateWrapper);
+        if (!isUserInfoUpdate) {
+            throw new BusinessException(StatusCode.UPDATE_ERROR);
+        }
+        return true;
     }
 
 }

@@ -23,7 +23,6 @@ public interface ReSonglistSongMapper extends BaseMapper<ReSonglistSong> {
      * @param songlistIds
      * @return
      */
-    //todo sql语句可能有问题
     Boolean deleteBatchBySonglistIds(Long creatorId, @Param("SonglistIds") List<Long> songlistIds);
 
 }

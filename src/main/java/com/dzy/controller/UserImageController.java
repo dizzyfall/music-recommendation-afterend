@@ -8,7 +8,6 @@ import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserImageService;
 import com.dzy.service.UserInfoService;
 import com.dzy.utils.ResponseUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,8 +48,8 @@ public class UserImageController {
         if (loginUserVO == null) {
             throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
         }
-        String imagePath = userImageService.uploadImageByType(multipartFile, userUpdateImageRequest, loginUserVO);
-        if (StringUtils.isBlank(imagePath)) {
+        Boolean isUserImageUpdate = userImageService.updateUserImage(multipartFile, userUpdateImageRequest);
+        if (!isUserImageUpdate) {
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "上传失败");
         }
         return ResponseUtil.success(StatusCode.CREATE_SUCESS);

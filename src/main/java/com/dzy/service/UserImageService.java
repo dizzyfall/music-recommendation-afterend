@@ -3,7 +3,6 @@ package com.dzy.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.userinfo.UserUpdateImageRequest;
 import com.dzy.model.entity.UserImage;
-import com.dzy.model.vo.userinfo.UserLoginVO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -13,8 +12,23 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface UserImageService extends IService<UserImage> {
 
-    String uploadImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO);
+    /**
+     * 更新用户图片
+     *
+     * @param multipartFile
+     * @param userUpdateImageRequest
+     * @return java.lang.Boolean
+     * @date 2024/4/18  23:43
+     */
+    Boolean updateUserImage(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest);
 
-    String uploadImageByType(MultipartFile multipartFile, String type, UserLoginVO loginUserVO);
+    /**
+     * 上传用户默认图像、背景
+     *
+     * @param userId
+     * @return java.lang.Boolean
+     * @date 2024/4/18  23:35
+     */
+    Boolean uploadDefaultImage(Long userId);
 
 }

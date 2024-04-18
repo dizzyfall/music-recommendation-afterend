@@ -20,13 +20,13 @@ public enum StatusCode {
     DATAS_NULL_ERROR("40001", "请求数据为空", ""),
     PARAMS_ERROR("40002", "请求参数错误", ""),
     PARAMS_NULL_ERROR("40003", "请求参数为空", ""),
-
     NO_LOGIN_ERROR("40100", "未登录错误", ""),
     AUTHORITY_ERROR("40101", "无权限", ""),
 
     LOGIN_ERROR("40301", "登录失败", ""),
     REGISTER_ERROR("40302", "注册失败", ""),
     STATE_DELETE_ERROR("40303", "删除状态失败", ""),
+    UPLOAD_IMAGE_ERROR("40304", "上传图片失败", ""),
     CREATE_ERROR("40305", "创建失败", ""),
     DELETE_ERROR("40306", "删除失败", ""),
     UPDATE_ERROR("40307", "更新失败", ""),

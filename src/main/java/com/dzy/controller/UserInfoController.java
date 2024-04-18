@@ -171,7 +171,7 @@ public class UserInfoController {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
         //更新数据
-        Boolean isUserUpdateImage = userInfoService.updateUserImageByType(multipartFile, userUpdateImageRequest, loginUserVO);
+        Boolean isUserUpdateImage = userInfoService.updateUserImageByType(multipartFile, userUpdateImageRequest);
         if (!isUserUpdateImage) {
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "更新图片失败");
         }

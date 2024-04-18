@@ -24,4 +24,5 @@ public interface UserInfoConstant {
     Integer ADMIN_ROLE = 1;
 
     String SALT = "pTfIsPSkhLS4";
+
 }

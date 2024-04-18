@@ -98,10 +98,9 @@ public interface UserInfoService extends IService<UserInfo> {
      *
      * @param multipartFile
      * @param userUpdateImageRequest
-     * @param loginUserVO
      * @return
      */
-    Boolean updateUserImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest, UserLoginVO loginUserVO);
+    Boolean updateUserImageByType(MultipartFile multipartFile, UserUpdateImageRequest userUpdateImageRequest);
 
     /**
      * 用户是否登录，用户信息是否一致

@@ -65,7 +65,7 @@ public interface UserInfoService extends IService<UserInfo> {
      * @param userInfo 用户信息
      * @return UserLoginVO
      */
-    UserLoginVO userInfoToUserLoginVO(UserInfo userInfo);
+    UserLoginVO getUserLoginVO(UserInfo userInfo);
 
     /**
      * 用户退出登录

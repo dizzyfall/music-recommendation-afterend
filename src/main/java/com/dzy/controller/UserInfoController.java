@@ -129,8 +129,8 @@ public class UserInfoController {
             throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
         }
         Long loginUserId = userInfoLoginState.getId();
-        Long requesUsertId = userUpdatePasswordRequest.getId();
-        if (!loginUserId.equals(requesUsertId)) {
+        Long requestUsertId = userUpdatePasswordRequest.getId();
+        if (!loginUserId.equals(requestUsertId)) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
         }
         Boolean isUserUpdatePassword = userInfoService.updateUserInfoPassword(userUpdatePasswordRequest, request);
@@ -176,6 +176,24 @@ public class UserInfoController {
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "更新图片失败");
         }
         return ResponseUtil.success(StatusCode.UPDATE_SUCESS);
+    }
+
+    /**
+     * 获取用户登录信息
+     *
+     * @param request
+     * @return com.dzy.common.BaseResponse<com.dzy.model.vo.userinfo.UserLoginVO>
+     * @date 2024/4/21  15:12
+     */
+    public BaseResponse<UserLoginVO> getUserLoginState(HttpServletRequest request) {
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        UserLoginVO userInfoLoginState = userInfoService.getUserInfoLoginState(request);
+        if (userInfoLoginState == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        return ResponseUtil.success(StatusCode.STATE_SUCCESS, userInfoLoginState, "获取用户登录态成功");
     }
 
 }

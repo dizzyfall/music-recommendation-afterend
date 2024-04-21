@@ -25,7 +25,7 @@ public class UserInfoIntroVO implements Serializable {
     /**
      * 头像路径
      */
-    private String imagePath;
+    private String avatarPath;
 
     /**
      * 用户所属地

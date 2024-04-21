@@ -169,7 +169,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
             throw new BusinessException(StatusCode.PARAMS_ERROR, "账号不存在或密码错误");
         }
         //用户脱敏
-        UserLoginVO userLoginVO = userInfoToUserLoginVO(userInfo);
+        UserLoginVO userLoginVO = getUserLoginVO(userInfo);
         //记录用户登录态
         setUserInfoLoginState(userLoginVO, request);
         return userLoginVO;
@@ -232,16 +232,14 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      * @return UserLoginVO
      */
     @Override
-    public UserLoginVO userInfoToUserLoginVO(UserInfo userInfo) {
+    public UserLoginVO getUserLoginVO(UserInfo userInfo) {
         if (userInfo == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        UserLoginVO userLoginVO = new UserLoginVO();
-        try {
-            BeanUtils.copyProperties(userInfo, userLoginVO);
-        } catch (BusinessException e) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
-        }
+        UserLoginVO userLoginVO = UserLoginVO.objToVO(userInfo);
+        //补充属性
+        UserImage userImage = userImageService.getById(userInfo.getImageId());
+        userLoginVO.setAvatarPath(userImage.getAvatarPath());
         return userLoginVO;
     }
 
@@ -341,7 +339,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         //获取更新后的用户信息
         UserInfo updateUserInfo = this.getById(loginUserId);
         //用户数据脱敏
-        UserLoginVO newUserLoginVO = userInfoToUserLoginVO(updateUserInfo);
+        UserLoginVO newUserLoginVO = getUserLoginVO(updateUserInfo);
         //更新用户登录态
         return setUserInfoLoginState(newUserLoginVO, request);
     }
@@ -401,7 +399,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         //获取更新后的用户信息
         UserInfo newUserInfo = this.getById(loginUserId);
         //用户数据脱敏
-        UserLoginVO newUserLoginVO = userInfoToUserLoginVO(newUserInfo);
+        UserLoginVO newUserLoginVO = getUserLoginVO(newUserInfo);
         //更新用户登录态
         return setUserInfoLoginState(newUserLoginVO, request);
     }
@@ -453,9 +451,8 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         }
         UserInfoIntroVO userInfoIntroVO = UserInfoIntroVO.objToVO(userInfo);
         //补充属性
-        //todo 用户头像会默认创建
         UserImage userImage = userImageService.getById(userInfo.getImageId());
-        userInfoIntroVO.setImagePath(userImage.getAvatarPath());
+        userInfoIntroVO.setAvatarPath(userImage.getAvatarPath());
         return userInfoIntroVO;
     }
 

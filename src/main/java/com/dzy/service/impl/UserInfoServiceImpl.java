@@ -7,10 +7,12 @@ import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.UserInfoMapper;
 import com.dzy.model.dto.userinfo.*;
+import com.dzy.model.entity.UserAuthority;
 import com.dzy.model.entity.UserImage;
 import com.dzy.model.entity.UserInfo;
 import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
+import com.dzy.service.UserAuthorityService;
 import com.dzy.service.UserImageService;
 import com.dzy.service.UserInfoService;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +47,114 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
     @Resource
     private UserImageService userImageService;
+
+    @Resource
+    private UserAuthorityService userAuthorityService;
+
+    /**
+     * 用户信息脱敏，将userInfo转为UserLoginVO
+     *
+     * @param userInfo 用户信息
+     * @return UserLoginVO
+     */
+    @Override
+    public UserLoginVO getUserLoginVO(UserInfo userInfo) {
+        if (userInfo == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        UserLoginVO userLoginVO = UserLoginVO.objToVO(userInfo);
+        //补充属性
+        UserImage userImage = userImageService.getById(userInfo.getImageId());
+        userLoginVO.setAvatarPath(userImage.getAvatarPath());
+        UserAuthority userAuthority = userAuthorityService.getUserAuthorityById(userInfo.getId());
+        userLoginVO.setUserRole(userAuthority.getUserRole());
+        return userLoginVO;
+    }
+
+    /**
+     * 获取用户信息简介
+     *
+     * @param userInfo
+     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
+     * @date 2024/4/15  11:05
+     */
+    @Override
+    public UserInfoIntroVO getUserInfoIntroVO(UserInfo userInfo) {
+        if (userInfo == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        UserInfoIntroVO userInfoIntroVO = UserInfoIntroVO.objToVO(userInfo);
+        //补充属性
+        UserImage userImage = userImageService.getById(userInfo.getImageId());
+        userInfoIntroVO.setAvatarPath(userImage.getAvatarPath());
+        return userInfoIntroVO;
+    }
+
+    /**
+     * 通过用户Id获取用户信息简介
+     *
+     * @param userId
+     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
+     * @date 2024/4/15  11:39
+     */
+    @Override
+    public UserInfoIntroVO getUserInfoIntroVOById(Long userId) {
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        UserInfo userInfo = this.getById(userId);
+        return getUserInfoIntroVO(userInfo);
+    }
+
+    /**
+     * 获取用户登录态
+     *
+     * @param request 请求域
+     * @return UserInfo
+     */
+    @Override
+    public UserLoginVO getUserInfoLoginState(HttpServletRequest request) {
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
+        }
+        Object userInfoObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (userInfoObj == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        return (UserLoginVO) userInfoObj;
+    }
+
+    /**
+     * 设置用户登录态
+     *
+     * @param userLoginVO 用户脱敏信息
+     * @return Boolean
+     */
+    @Override
+    public Boolean setUserInfoLoginState(UserLoginVO userLoginVO, HttpServletRequest request) {
+        if (userLoginVO == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
+        }
+        request.getSession().setAttribute(USER_LOGIN_STATE, userLoginVO);
+        return getUserInfoLoginState(request).equals(userLoginVO);
+    }
+
+    /**
+     * 移除用户登录态
+     *
+     * @param request 请求域
+     */
+    @Override
+    public Boolean removeUserInfoLoginState(HttpServletRequest request) {
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
+        }
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return request.getSession().getAttribute(USER_LOGIN_STATE) == null;
+    }
 
     /**
      * 用户注册
@@ -103,20 +213,27 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         }
         //密码加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + password).getBytes());
-        //用户数据加入数据库
+        //加入用户信息表
         UserInfo userInfo = new UserInfo();
         userInfo.setAccount(account);
         userInfo.setPassword(encryptPassword);
         boolean isUserInfoSave = this.save(userInfo);
         if (!isUserInfoSave) {
-            throw new BusinessException(StatusCode.DATABASE_ERROR, "用户注册数据没有加入数据库");
+            throw new BusinessException(StatusCode.CREATE_ERROR, "用户注册数据没有加入数据库");
         }
         //获取用户id
         Long userId = userInfo.getId();
         //上传默认头像、背景
         Boolean isDefaultImageSave = userImageService.uploadDefaultImage(userId);
         if (!isDefaultImageSave) {
-            throw new BusinessException(StatusCode.DATABASE_ERROR, "用户图像数据没有加入数据库");
+            throw new BusinessException(StatusCode.CREATE_ERROR, "用户图像数据没有加入数据库");
+        }
+        //加入用户权限表
+        UserAuthority userAuthority = new UserAuthority();
+        userAuthority.setUserId(userId);
+        boolean isUserAuthoritySave = userAuthorityService.save(userAuthority);
+        if (!isUserAuthoritySave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "用户权限数据没有加入数据库");
         }
         return true;
     }
@@ -172,74 +289,6 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         UserLoginVO userLoginVO = getUserLoginVO(userInfo);
         //记录用户登录态
         setUserInfoLoginState(userLoginVO, request);
-        return userLoginVO;
-    }
-
-    /**
-     * 获取用户登录态
-     *
-     * @param request 请求域
-     * @return UserInfo
-     */
-    @Override
-    public UserLoginVO getUserInfoLoginState(HttpServletRequest request) {
-        if (request == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
-        }
-        Object userInfoObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        if (userInfoObj == null) {
-            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
-        }
-        return (UserLoginVO) userInfoObj;
-    }
-
-    /**
-     * 设置用户登录态
-     *
-     * @param userLoginVO 用户脱敏信息
-     * @return Boolean
-     */
-    @Override
-    public Boolean setUserInfoLoginState(UserLoginVO userLoginVO, HttpServletRequest request) {
-        if (userLoginVO == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        if (request == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
-        }
-        request.getSession().setAttribute(USER_LOGIN_STATE, userLoginVO);
-        return getUserInfoLoginState(request).equals(userLoginVO);
-    }
-
-    /**
-     * 移除用户登录态
-     *
-     * @param request 请求域
-     */
-    @Override
-    public Boolean removeUserInfoLoginState(HttpServletRequest request) {
-        if (request == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "请求域为空");
-        }
-        request.getSession().removeAttribute(USER_LOGIN_STATE);
-        return request.getSession().getAttribute(USER_LOGIN_STATE) == null;
-    }
-
-    /**
-     * 用户信息脱敏，将userInfo转为UserLoginVO
-     *
-     * @param userInfo 用户信息
-     * @return UserLoginVO
-     */
-    @Override
-    public UserLoginVO getUserLoginVO(UserInfo userInfo) {
-        if (userInfo == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        UserLoginVO userLoginVO = UserLoginVO.objToVO(userInfo);
-        //补充属性
-        UserImage userImage = userImageService.getById(userInfo.getImageId());
-        userLoginVO.setAvatarPath(userImage.getAvatarPath());
         return userLoginVO;
     }
 
@@ -435,41 +484,6 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
      */
     public Boolean isLogin(UserLoginVO loginUser, HttpServletRequest request) {
         return null;
-    }
-
-    /**
-     * 获取用户信息简介
-     *
-     * @param userInfo
-     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
-     * @date 2024/4/15  11:05
-     */
-    @Override
-    public UserInfoIntroVO getUserInfoIntroVO(UserInfo userInfo) {
-        if (userInfo == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        UserInfoIntroVO userInfoIntroVO = UserInfoIntroVO.objToVO(userInfo);
-        //补充属性
-        UserImage userImage = userImageService.getById(userInfo.getImageId());
-        userInfoIntroVO.setAvatarPath(userImage.getAvatarPath());
-        return userInfoIntroVO;
-    }
-
-    /**
-     * 通过用户Id获取用户信息简介
-     *
-     * @param userId
-     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
-     * @date 2024/4/15  11:39
-     */
-    @Override
-    public UserInfoIntroVO getUserInfoIntroVOById(Long userId) {
-        if (userId == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
-        UserInfo userInfo = this.getById(userId);
-        return getUserInfoIntroVO(userInfo);
     }
 
 }

@@ -19,21 +19,30 @@ import javax.servlet.http.HttpServletRequest;
 public interface UserInfoService extends IService<UserInfo> {
 
     /**
-     * 用户注册
+     * 用户信息脱敏，将userInfo转为UserLoginVO
      *
-     * @param userRegisterRequest 注册请求的参数
-     * @return Boolean
+     * @param userInfo 用户信息
+     * @return UserLoginVO
      */
-    Boolean registerUser(UserRegisterRequest userRegisterRequest);
+    UserLoginVO getUserLoginVO(UserInfo userInfo);
 
     /**
-     * 用户登录
+     * 获取用户信息简介
      *
-     * @param userLoginRequest 登录请求的参数
-     * @param request          请求域
-     * @return Boolean
+     * @param userInfo
+     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
+     * @date 2024/4/15  11:04
      */
-    UserLoginVO loginUser(UserLoginRequest userLoginRequest, HttpServletRequest request);
+    UserInfoIntroVO getUserInfoIntroVO(UserInfo userInfo);
+
+    /**
+     * 通过用户Id获取用户信息简介
+     *
+     * @param userId
+     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
+     * @date 2024/4/15  11:40
+     */
+    UserInfoIntroVO getUserInfoIntroVOById(Long userId);
 
     /**
      * 获取用户登录态
@@ -60,12 +69,21 @@ public interface UserInfoService extends IService<UserInfo> {
     Boolean removeUserInfoLoginState(HttpServletRequest request);
 
     /**
-     * 用户信息脱敏，将userInfo转为UserLoginVO
+     * 用户注册
      *
-     * @param userInfo 用户信息
-     * @return UserLoginVO
+     * @param userRegisterRequest 注册请求的参数
+     * @return Boolean
      */
-    UserLoginVO getUserLoginVO(UserInfo userInfo);
+    Boolean registerUser(UserRegisterRequest userRegisterRequest);
+
+    /**
+     * 用户登录
+     *
+     * @param userLoginRequest 登录请求的参数
+     * @param request          请求域
+     * @return Boolean
+     */
+    UserLoginVO loginUser(UserLoginRequest userLoginRequest, HttpServletRequest request);
 
     /**
      * 用户退出登录
@@ -110,23 +128,5 @@ public interface UserInfoService extends IService<UserInfo> {
      * @return
      */
     Boolean isLogin(UserLoginVO loginUser, HttpServletRequest request);
-
-    /**
-     * 获取用户信息简介
-     *
-     * @param userInfo
-     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
-     * @date 2024/4/15  11:04
-     */
-    UserInfoIntroVO getUserInfoIntroVO(UserInfo userInfo);
-
-    /**
-     * 通过用户Id获取用户信息简介
-     *
-     * @param userId
-     * @return com.dzy.model.vo.userinfo.UserInfoIntroVO
-     * @date 2024/4/15  11:40
-     */
-    UserInfoIntroVO getUserInfoIntroVOById(Long userId);
 
 }

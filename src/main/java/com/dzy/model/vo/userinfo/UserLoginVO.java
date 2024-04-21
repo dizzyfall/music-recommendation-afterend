@@ -36,6 +36,11 @@ public class UserLoginVO implements Serializable {
     private String avatarPath;
 
     /**
+     * 用户权限
+     */
+    private Integer userRole;
+
+    /**
      * 用户简介
      */
     private String description;

@@ -1,6 +1,10 @@
 package com.dzy.model.vo.userinfo;
 
+import com.dzy.constant.StatusCode;
+import com.dzy.exception.BusinessException;
+import com.dzy.model.entity.UserInfo;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -22,39 +26,19 @@ public class UserLoginVO implements Serializable {
     private Long id;
 
     /**
-     * 用户图片id
-     */
-    private Long imageId;
-
-    /**
      * 用户昵称
      */
     private String nickname;
 
     /**
+     * 头像路径
+     */
+    private String avatarPath;
+
+    /**
      * 用户简介
      */
     private String description;
-
-    /**
-     * 用户关注数量
-     */
-    private Integer attentionCount;
-
-    /**
-     * 用户粉丝数量
-     */
-    private Integer fanCount;
-
-    /**
-     * 用户好友数量
-     */
-    private Integer friendCount;
-
-    /**
-     * 用户访客数量
-     */
-    private Integer visitorCount;
 
     /**
      * 用户创建时间
@@ -65,4 +49,18 @@ public class UserLoginVO implements Serializable {
      * 用户更新时间
      */
     private Date updateTime;
+
+    public static UserLoginVO objToVO(UserInfo userInfo) {
+        if (userInfo == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        UserLoginVO userLoginVO = new UserLoginVO();
+        try {
+            BeanUtils.copyProperties(userInfo, userLoginVO);
+        } catch (BusinessException e) {
+            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
+        }
+        return userLoginVO;
+    }
+
 }

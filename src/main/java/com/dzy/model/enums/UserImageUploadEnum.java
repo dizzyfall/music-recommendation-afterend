@@ -20,14 +20,6 @@ public enum UserImageUploadEnum {
         this.value = value;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
     public static UserImageUploadEnum getEnumByValue(String value) {
         if (StringUtils.isBlank(value)) {
             return null;
@@ -38,6 +30,14 @@ public enum UserImageUploadEnum {
             }
         }
         return null;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
     }
 
 }

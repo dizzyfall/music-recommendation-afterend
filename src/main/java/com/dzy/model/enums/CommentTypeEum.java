@@ -21,14 +21,6 @@ public enum CommentTypeEum {
         this.value = value;
     }
 
-    public String getCommentType() {
-        return commentType;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
     public static CommentTypeEum getEnumByValue(String value) {
         if (StringUtils.isBlank(value)) {
             return null;
@@ -39,6 +31,14 @@ public enum CommentTypeEum {
             }
         }
         return null;
+    }
+
+    public String getCommentType() {
+        return commentType;
+    }
+
+    public String getValue() {
+        return value;
     }
 
 }

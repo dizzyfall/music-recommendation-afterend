@@ -185,6 +185,7 @@ public class UserInfoController {
      * @return com.dzy.common.BaseResponse<com.dzy.model.vo.userinfo.UserLoginVO>
      * @date 2024/4/21  15:12
      */
+    @GetMapping("/get_loginstate")
     public BaseResponse<UserLoginVO> getUserLoginState(HttpServletRequest request) {
         if (request == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);

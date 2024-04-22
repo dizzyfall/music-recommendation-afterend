@@ -66,7 +66,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         //补充属性
         UserImage userImage = userImageService.getById(userInfo.getImageId());
         userLoginVO.setAvatarPath(userImage.getAvatarPath());
-        UserAuthority userAuthority = userAuthorityService.getUserAuthorityById(userInfo.getId());
+        UserAuthority userAuthority = userAuthorityService.getUserAuthority(userInfo.getId());
         userLoginVO.setUserRole(userAuthority.getUserRole());
         return userLoginVO;
     }

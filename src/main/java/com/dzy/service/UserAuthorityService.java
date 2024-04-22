@@ -17,6 +17,6 @@ public interface UserAuthorityService extends IService<UserAuthority> {
      * @return com.dzy.model.entity.UserAuthority
      * @date 2024/4/21  17:05
      */
-    UserAuthority getUserAuthorityById(Long userId);
+    UserAuthority getUserAuthority(Long userId);
 
 }

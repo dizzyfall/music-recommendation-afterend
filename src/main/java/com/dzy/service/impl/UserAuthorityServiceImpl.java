@@ -1,5 +1,6 @@
 package com.dzy.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.mapper.UserAuthorityMapper;
 import com.dzy.model.entity.UserAuthority;
@@ -29,8 +30,10 @@ public class UserAuthorityServiceImpl extends ServiceImpl<UserAuthorityMapper, U
      * @date 2024/4/21  17:06
      */
     @Override
-    public UserAuthority getUserAuthorityById(Long userId) {
-        return this.getById(userId);
+    public UserAuthority getUserAuthority(Long userId) {
+        QueryWrapper<UserAuthority> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        return this.getOne(queryWrapper);
     }
 
 }

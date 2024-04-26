@@ -7,11 +7,13 @@ import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.UserInfoMapper;
 import com.dzy.model.dto.userinfo.*;
+import com.dzy.model.entity.Collect;
 import com.dzy.model.entity.UserAuthority;
 import com.dzy.model.entity.UserImage;
 import com.dzy.model.entity.UserInfo;
 import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
+import com.dzy.service.CollectService;
 import com.dzy.service.UserAuthorityService;
 import com.dzy.service.UserImageService;
 import com.dzy.service.UserInfoService;
@@ -50,6 +52,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
     @Resource
     private UserAuthorityService userAuthorityService;
+
+    @Resource
+    private CollectService collectService;
 
     /**
      * 用户信息脱敏，将userInfo转为UserLoginVO
@@ -234,6 +239,13 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         boolean isUserAuthoritySave = userAuthorityService.save(userAuthority);
         if (!isUserAuthoritySave) {
             throw new BusinessException(StatusCode.CREATE_ERROR, "用户权限数据没有加入数据库");
+        }
+        //初始化收藏表数据
+        Collect collect = new Collect();
+        collect.setUserId(userId);
+        boolean isCollectSave = collectService.save(collect);
+        if (!isCollectSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "用户收藏数据没有加入数据库");
         }
         return true;
     }

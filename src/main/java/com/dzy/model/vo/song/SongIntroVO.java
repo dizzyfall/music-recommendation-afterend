@@ -3,7 +3,6 @@ package com.dzy.model.vo.song;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 歌曲详情视图
@@ -17,14 +16,18 @@ public class SongIntroVO implements Serializable {
     private static final long serialVersionUID = -1039821772081244465L;
 
     /**
+     * 歌曲id
+     */
+    private Long songId;
+
+    /**
      * 歌曲名
      */
     private String title;
 
     /**
-     * 歌曲歌手姓名列表
-     * json字符串
+     * 歌曲歌手姓名字符串（前端展示）
      */
-    private List<String> singerNameList;
+    private String singerNameStr;
 
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
@@ -16,6 +17,11 @@ import java.io.Serializable;
 public class SonglistIntroVO implements Serializable {
 
     private static final long serialVersionUID = -5233970639828760074L;
+
+    /**
+     * 歌单Id
+     */
+    private Long songlistId;
 
     /**
      * 歌单创建者姓名
@@ -41,6 +47,11 @@ public class SonglistIntroVO implements Serializable {
      * 播放量
      */
     private Long playCount;
+
+    /**
+     * 歌单发行时间
+     */
+    private Date publishTime;
 
     /**
      * Songlist转SonglistIntroVO

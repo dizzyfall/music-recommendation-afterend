@@ -433,6 +433,8 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
         UserInfo userInfo = userInfoService.getById(songlist.getCreatorId());
         String nickname = userInfo.getNickname();
         songlistIntroVO.setCreatorName(nickname);
+        //歌单Id
+        songlistIntroVO.setSonglistId(songlistId);
         return songlistIntroVO;
     }
 

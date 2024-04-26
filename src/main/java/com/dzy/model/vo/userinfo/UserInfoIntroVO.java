@@ -9,6 +9,8 @@ import org.springframework.beans.BeanUtils;
 import java.io.Serializable;
 
 /**
+ * 用户简介信息，用于评论、回复
+ *
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
  * @Date 2024/4/15  10:50
  */

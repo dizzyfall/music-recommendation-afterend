@@ -46,6 +46,42 @@ public class UserLoginVO implements Serializable {
     private String description;
 
     /**
+     * 用户性别 0:男 1:女 2:其他
+     */
+    private Integer sex;
+
+    /**
+     * 用户所属地
+     */
+    private String region;
+
+    /**
+     * 用户生日
+     */
+    private Date birthday;
+
+    /**
+     * 用户关注数量
+     */
+    private Integer attentionCount;
+
+    /**
+     * 用户粉丝数量
+     */
+    private Integer fanCount;
+
+    /**
+     * 用户好友数量
+     */
+    private Integer friendCount;
+
+    /**
+     * 用户访客数量
+     */
+
+    private Integer visitorCount;
+
+    /**
      * 用户创建时间
      */
     private Date createTime;

@@ -17,6 +17,7 @@ import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.service.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +65,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         //补充属性
         String singerListId = song.getSingerListId();
         List<String> singerNameList = singerService.getSingerNameList(singerListId);
+        String singerNameStr = singerService.getSingerNameStr(singerListId);
         songDetailVO.setSingerNameList(singerNameList);
+        songDetailVO.setSingerNameStr(singerNameStr);
         return songDetailVO;
     }
 
@@ -100,8 +103,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         }
         SongDetailVO songDetailVO = getSongDetailVO(song);
         SongIntroVO songIntroVO = new SongIntroVO();
-        songIntroVO.setTitle(songDetailVO.getTitle());
-        songIntroVO.setSingerNameList(songDetailVO.getSingerNameList());
+        BeanUtils.copyProperties(songDetailVO, songIntroVO);
+        songIntroVO.setSongId(songDetailVO.getId());
         return songIntroVO;
     }
 

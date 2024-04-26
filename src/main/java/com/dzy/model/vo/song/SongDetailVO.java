@@ -39,6 +39,11 @@ public class SongDetailVO implements Serializable {
     private List<String> singerNameList;
 
     /**
+     * 歌曲歌手姓名字符串（前端展示）
+     */
+    private String singerNameStr;
+
+    /**
      * 歌曲作词者id
      */
     private Long writerId;

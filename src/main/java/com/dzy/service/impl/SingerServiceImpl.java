@@ -144,6 +144,20 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         List<String> SingerNameList = singerList.stream().map(Singer::getName).collect(Collectors.toList());
         return SingerNameList;
     }
+
+    /**
+     * 通过歌手姓名列表转换为前端直接使用的歌手姓名字符串（xxx/xxx/xxx）
+     *
+     * @param singerIdList
+     * @return java.lang.String
+     * @date 2024/4/26  17:32
+     */
+    @Override
+    public String getSingerNameStr(String singerIdList) {
+        List<String> singerNameList = getSingerNameList(singerIdList);
+        return StringUtils.join(singerNameList, "/");
+    }
+
 }
 
 

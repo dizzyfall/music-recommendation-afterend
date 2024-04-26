@@ -4,7 +4,6 @@ import com.dzy.model.vo.album.AlbumVO;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 专辑简介视图
@@ -20,8 +19,8 @@ public class CollectAlbumVO implements Serializable {
     private AlbumVO albumVO;
 
     /**
-     * 歌手姓名列表
+     * 歌曲歌手姓名字符串（前端展示）
      */
-    private List<String> singerNameList;
+    private String singerNameStr;
 
 }

@@ -62,4 +62,14 @@ public interface SingerService extends IService<Singer> {
      * @return
      */
     List<String> getSingerNameList(String singerIdList);
+
+    /**
+     * 通过歌手姓名列表转换为前端直接使用的歌手姓名字符串
+     *
+     * @param singerIdList
+     * @return java.lang.String
+     * @date 2024/4/26  17:31
+     */
+    String getSingerNameStr(String singerIdList);
+
 }

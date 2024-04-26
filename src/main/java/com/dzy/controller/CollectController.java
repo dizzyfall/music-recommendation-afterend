@@ -78,7 +78,7 @@ public class CollectController {
         if (!isCollectSong) {
             throw new BusinessException(StatusCode.CREATE_ERROR, "收藏歌曲失败");
         }
-        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "收藏歌曲成功");
+        return ResponseUtil.success(StatusCode.CREATE_SUCESS, "收藏或取消收藏歌曲成功");
     }
 
     /**

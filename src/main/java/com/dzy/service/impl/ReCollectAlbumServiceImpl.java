@@ -7,8 +7,10 @@ import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.ReCollectAlbumMapper;
 import com.dzy.model.dto.collect.CollectAlbumRequest;
+import com.dzy.model.entity.Album;
 import com.dzy.model.entity.Collect;
 import com.dzy.model.entity.ReCollectAlbum;
+import com.dzy.service.AlbumService;
 import com.dzy.service.CollectService;
 import com.dzy.service.ReCollectAlbumService;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class ReCollectAlbumServiceImpl extends ServiceImpl<ReCollectAlbumMapper,
 
     @Resource
     private CollectService collectService;
+
+    @Resource
+    private AlbumService albumService;
 
     /**
      * 收藏 | 取消收藏 专辑
@@ -45,6 +50,11 @@ public class ReCollectAlbumServiceImpl extends ServiceImpl<ReCollectAlbumMapper,
         Long albumId = collectAlbumRequest.getAlbumId();
         if (albumId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //专辑是否存在
+        Album album = albumService.getById(albumId);
+        if (album == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "专辑不存在");
         }
         //是否已收藏
         QueryWrapper<ReCollectAlbum> queryWrapper = new QueryWrapper<>();

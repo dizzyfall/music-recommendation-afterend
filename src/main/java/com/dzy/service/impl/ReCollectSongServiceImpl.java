@@ -9,8 +9,10 @@ import com.dzy.mapper.ReCollectSongMapper;
 import com.dzy.model.dto.collect.CollectSongRequest;
 import com.dzy.model.entity.Collect;
 import com.dzy.model.entity.ReCollectSong;
+import com.dzy.model.entity.Song;
 import com.dzy.service.CollectService;
 import com.dzy.service.ReCollectSongService;
+import com.dzy.service.SongService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,9 @@ public class ReCollectSongServiceImpl extends ServiceImpl<ReCollectSongMapper, R
 
     @Resource
     private CollectService collectService;
+
+    @Resource
+    private SongService songService;
 
     /**
      * 收藏 | 取消收藏 歌曲
@@ -47,6 +52,11 @@ public class ReCollectSongServiceImpl extends ServiceImpl<ReCollectSongMapper, R
         Long songId = collectSongRequest.getSongId();
         if (songId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //歌曲是否存在
+        Song song = songService.getById(songId);
+        if (song == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "歌曲不存在");
         }
         //是否已收藏
         QueryWrapper<ReCollectSong> queryWrapper = new QueryWrapper<>();
@@ -80,7 +90,7 @@ public class ReCollectSongServiceImpl extends ServiceImpl<ReCollectSongMapper, R
                 updateWrapper.eq("user_id", userId).setSql("song_count = song_count + 1");
                 boolean isUpdate = collectService.update(updateWrapper);
                 if (!isUpdate) {
-                    throw new BusinessException(StatusCode.UPDATE_ERROR, "收藏成功");
+                    throw new BusinessException(StatusCode.UPDATE_ERROR, "收藏失败");
                 }
             } else {
                 throw new BusinessException(StatusCode.SYSTEM_ERROR);

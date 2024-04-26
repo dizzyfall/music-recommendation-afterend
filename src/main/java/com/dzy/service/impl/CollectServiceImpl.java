@@ -189,9 +189,9 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
         }
         CollectAlbumVO collectAlbumVO = new CollectAlbumVO();
         AlbumVO albumVO = AlbumVO.objToVO(album);
-        List<String> singerNameList = singerService.getSingerNameList(album.getSingerIdList());
         collectAlbumVO.setAlbumVO(albumVO);
-        collectAlbumVO.setSingerNameList(singerNameList);
+        String singerNameStr = singerService.getSingerNameStr(album.getSingerIdList());
+        collectAlbumVO.setSingerNameStr(singerNameStr);
         return collectAlbumVO;
     }
 

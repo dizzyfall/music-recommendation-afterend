@@ -9,8 +9,10 @@ import com.dzy.mapper.ReCollectSonglistMapper;
 import com.dzy.model.dto.collect.CollectSonglistRequest;
 import com.dzy.model.entity.Collect;
 import com.dzy.model.entity.ReCollectSonglist;
+import com.dzy.model.entity.Songlist;
 import com.dzy.service.CollectService;
 import com.dzy.service.ReCollectSonglistService;
+import com.dzy.service.SonglistService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,9 @@ public class ReCollectSonglistServiceImpl extends ServiceImpl<ReCollectSonglistM
 
     @Resource
     private CollectService collectService;
+
+    @Resource
+    private SonglistService songlistService;
 
     /**
      * 收藏 | 取消收藏 歌单
@@ -48,6 +53,11 @@ public class ReCollectSonglistServiceImpl extends ServiceImpl<ReCollectSonglistM
         Long songlistId = collectSonglistRequest.getSonglistId();
         if (songlistId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //歌单是否存在
+        Songlist songlist = songlistService.getById(songlistId);
+        if (songlist == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "歌单不存在");
         }
         //是否已收藏
         QueryWrapper<ReCollectSonglist> queryWrapper = new QueryWrapper<>();

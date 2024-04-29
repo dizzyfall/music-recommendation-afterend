@@ -7,7 +7,7 @@
     <resultMap id="BaseResultMap" type="com.dzy.model.entity.Singer">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="avatarPath" column="avatar_path" jdbcType="VARCHAR"/>
-        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="singerName" column="singer_name" jdbcType="VARCHAR"/>
         <result property="alias" column="alias" jdbcType="VARCHAR"/>
         <result property="spell" column="spell" jdbcType="VARCHAR"/>
         <result property="description" column="description" jdbcType="VARCHAR"/>
@@ -24,7 +24,7 @@
 
     <sql id="Base_Column_List">
         id
-        ,avatar_path,name,
+        ,avatar_path,singer_name,
         alias,spell,description,
         area,genre,sex,
         song_count,album_count,fan_count,

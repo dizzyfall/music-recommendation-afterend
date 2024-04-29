@@ -3,13 +3,13 @@ package com.dzy.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dzy.common.PageRequest;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.SingerMapper;
 import com.dzy.model.dto.singer.SingerSearchTextQueryRequest;
 import com.dzy.model.dto.singer.SingerTagsQueryRequest;
 import com.dzy.model.entity.Singer;
+import com.dzy.model.enums.SingerTagEnum;
 import com.dzy.model.vo.singer.SingerVO;
 import com.dzy.service.SingerService;
 import com.dzy.utils.JsonUtil;
@@ -33,13 +33,17 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
      * 查询所有的歌手
      * 按热度排序
      *
-     * @param pageRequest
-     * @return
+     * @param singerTagsQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.singer.SingerVO>
+     * @date 2024/4/27  15:15
      */
     @Override
-    public Page<SingerVO> listAllSingerPage(PageRequest pageRequest) {
-        int pageCurrent = pageRequest.getPageCurrent();
-        int pageSize = pageRequest.getPageSize();
+    public Page<SingerVO> listAllSingerPage(SingerTagsQueryRequest singerTagsQueryRequest) {
+        if (singerTagsQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        int pageCurrent = singerTagsQueryRequest.getPageCurrent();
+        int pageSize = singerTagsQueryRequest.getPageSize();
         Page<Singer> page = new Page<>(pageCurrent, pageSize);
         Page<Singer> singerPage = this.page(page);
         List<SingerVO> singerVOList = singerPage.getRecords().stream().map(this::singerToSingerVO).collect(Collectors.toList());
@@ -87,34 +91,47 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
     }
 
     /**
+     * 根据歌手标签获取查询条件构造器
+     *
+     * @param singerTagsQueryRequest
+     * @return com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<com.dzy.model.entity.Singer>
+     * @date 2024/4/27  16:03
+     */
+    public QueryWrapper<Singer> getSingerTagQueryWrapper(SingerTagsQueryRequest singerTagsQueryRequest) {
+        if (singerTagsQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<Singer> singerTagQueryWrapper = new QueryWrapper<>();
+        Integer area = singerTagsQueryRequest.getArea();
+        if (area != null && !area.equals(SingerTagEnum.ALL.getSingerTagId())) {
+            singerTagQueryWrapper.eq("area", area);
+        }
+        Integer sex = singerTagsQueryRequest.getSex();
+        if (sex != null && !sex.equals(SingerTagEnum.ALL.getSingerTagId())) {
+            singerTagQueryWrapper.eq("sex", sex);
+        }
+        Integer genre = singerTagsQueryRequest.getGenre();
+        if (genre != null && !genre.equals(SingerTagEnum.ALL.getSingerTagId())) {
+            singerTagQueryWrapper.eq("genre", genre);
+        }
+        return singerTagQueryWrapper;
+    }
+
+    /**
      * 分页
-     * 按标签查询歌手
+     * 按标签查询歌手（包含‘全部’标签）
      * 标签为固定标签：地区、性别、类型
      *
      * @param singerTagsQueryRequest
-     * @return
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.singer.SingerVO>
+     * @date 2024/4/27  15:14
      */
     @Override
     public Page<SingerVO> listSingerByTagsByPage(SingerTagsQueryRequest singerTagsQueryRequest) {
         if (singerTagsQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        QueryWrapper<Singer> queryWrapper = new QueryWrapper<>();
-        //歌手地区
-        Integer area = singerTagsQueryRequest.getArea();
-        if (area != null) {
-            queryWrapper.eq("singer_area", area);
-        }
-        //歌手性别
-        Integer sex = singerTagsQueryRequest.getSex();
-        if (sex != null) {
-            queryWrapper.eq("singer_sex", sex);
-        }
-        //歌手类型
-        Integer genre = singerTagsQueryRequest.getGenre();
-        if (genre != null) {
-            queryWrapper.eq("singer_genre", genre);
-        }
+        QueryWrapper<Singer> queryWrapper = getSingerTagQueryWrapper(singerTagsQueryRequest);
         //查询歌手
         int pageCurrent = singerTagsQueryRequest.getPageCurrent();
         int pageSize = singerTagsQueryRequest.getPageSize();
@@ -141,7 +158,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         }
         List<String> idList = JsonUtil.convertJsonToList(singerIdList);
         List<Singer> singerList = this.listByIds(idList);
-        List<String> SingerNameList = singerList.stream().map(Singer::getName).collect(Collectors.toList());
+        List<String> SingerNameList = singerList.stream().map(Singer::getSingerName).collect(Collectors.toList());
         return SingerNameList;
     }
 

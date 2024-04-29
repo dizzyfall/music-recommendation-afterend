@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
  * @Date 2024/4/17  9:48
  */
-public enum CommentTypeEum {
+public enum CommentTypeEnum {
     SONG_TYPE("歌曲", "song"),
 
     ALBUM_TYPE("专辑", "album"),
@@ -16,18 +16,18 @@ public enum CommentTypeEum {
     private final String commentType;
     private final String value;
 
-    CommentTypeEum(String commentType, String value) {
+    CommentTypeEnum(String commentType, String value) {
         this.commentType = commentType;
         this.value = value;
     }
 
-    public static CommentTypeEum getEnumByValue(String value) {
+    public static CommentTypeEnum getEnumByValue(String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         }
-        for (CommentTypeEum commentTypeEum : CommentTypeEum.values()) {
-            if (value.equals(commentTypeEum.getValue())) {
-                return commentTypeEum;
+        for (CommentTypeEnum commentTypeEnum : CommentTypeEnum.values()) {
+            if (value.equals(commentTypeEnum.getValue())) {
+                return commentTypeEnum;
             }
         }
         return null;

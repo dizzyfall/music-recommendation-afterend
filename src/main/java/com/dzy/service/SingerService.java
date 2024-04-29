@@ -2,7 +2,6 @@ package com.dzy.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.dzy.common.PageRequest;
 import com.dzy.model.dto.singer.SingerSearchTextQueryRequest;
 import com.dzy.model.dto.singer.SingerTagsQueryRequest;
 import com.dzy.model.entity.Singer;
@@ -21,10 +20,11 @@ public interface SingerService extends IService<Singer> {
      * 查询所有的歌手
      * 按热度排序
      *
-     * @param pageRequest
-     * @return
+     * @param singerTagsQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.singer.SingerVO>
+     * @date 2024/4/27  15:13
      */
-    Page<SingerVO> listAllSingerPage(PageRequest pageRequest);
+    Page<SingerVO> listAllSingerPage(SingerTagsQueryRequest singerTagsQueryRequest);
 
     /**
      * 分页
@@ -47,11 +47,12 @@ public interface SingerService extends IService<Singer> {
 
     /**
      * 分页
-     * 按标签查询歌手
+     * 按标签查询歌手（包含‘全部’标签）
      * 标签为固定标签：地区、性别、类型
      *
      * @param singerTagsQueryRequest
-     * @return
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.singer.SingerVO>
+     * @date 2024/4/27  15:14
      */
     Page<SingerVO> listSingerByTagsByPage(SingerTagsQueryRequest singerTagsQueryRequest);
 

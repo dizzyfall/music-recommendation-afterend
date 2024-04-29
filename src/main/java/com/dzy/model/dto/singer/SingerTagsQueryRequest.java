@@ -31,4 +31,9 @@ public class SingerTagsQueryRequest extends PageRequest implements Serializable 
      */
     private Integer genre;
 
+    /**
+     * 歌手姓名第一个字母
+     */
+    private Integer nameSpellIndex;
+
 }

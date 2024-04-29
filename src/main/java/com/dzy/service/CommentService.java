@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.comment.CommentDeleteRequest;
 import com.dzy.model.dto.comment.CommentQueryRequest;
 import com.dzy.model.entity.Comment;
-import com.dzy.model.enums.CommentTypeEum;
+import com.dzy.model.enums.CommentTypeEnum;
 import com.dzy.model.vo.comment.CommentVO;
 
 /**
@@ -47,16 +47,16 @@ public interface CommentService extends IService<Comment> {
      * @return com.dzy.model.enums.CommentTypeEum
      * @date 2024/4/18  12:32
      */
-    CommentTypeEum getCommentTypeById(Long commentId);
+    CommentTypeEnum getCommentTypeById(Long commentId);
 
     /**
      * 根据评论类型删除对应评论表数据
      *
-     * @param commentTypeEum
+     * @param commentTypeEnum
      * @param commentId
      * @return java.lang.Boolean
      * @date 2024/4/18  12:32
      */
-    Boolean deleteCommentByCommentTypeEum(CommentTypeEum commentTypeEum, Long commentId);
+    Boolean deleteCommentByCommentTypeEum(CommentTypeEnum commentTypeEnum, Long commentId);
 
 }

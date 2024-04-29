@@ -12,7 +12,7 @@ import com.dzy.model.dto.reply.MyReplyQueryRequest;
 import com.dzy.model.dto.reply.ReplyCreateRequest;
 import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.entity.*;
-import com.dzy.model.enums.CommentTypeEum;
+import com.dzy.model.enums.CommentTypeEnum;
 import com.dzy.model.vo.reply.ReplyVO;
 import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.service.*;
@@ -258,39 +258,39 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply>
      */
     public void validCommentType(Long commentId, String commentType) {
         //获取评论类型的枚举对象
-        CommentTypeEum commentTypeEum = CommentTypeEum.getEnumByValue(commentType);
-        if (commentTypeEum == null) {
+        CommentTypeEnum commentTypeEnum = CommentTypeEnum.getEnumByValue(commentType);
+        if (commentTypeEnum == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "评论类型请求参数错误");
         }
         //评论类型和评论是否匹配
         QueryWrapper<ReSongComment> songTypeQueryWrapper = new QueryWrapper<>();
         songTypeQueryWrapper.eq("comment_id", commentId);
-        if (commentTypeEum.equals(CommentTypeEum.SONG_TYPE)) {
+        if (commentTypeEnum.equals(CommentTypeEnum.SONG_TYPE)) {
             ReSongComment reSongComment = reSongCommentService.getOne(songTypeQueryWrapper);
             if (reSongComment == null) {
                 throw new BusinessException(StatusCode.PARAMS_ERROR, "评论类型和评论不匹配错误，评论类型为"
-                        + CommentTypeEum.SONG_TYPE.getCommentType() + "类型"
-                        + "，但实际评论不为" + CommentTypeEum.SONG_TYPE.getCommentType() + "评论");
+                        + CommentTypeEnum.SONG_TYPE.getCommentType() + "类型"
+                        + "，但实际评论不为" + CommentTypeEnum.SONG_TYPE.getCommentType() + "评论");
             }
         }
         QueryWrapper<ReAlbumComment> albumTypeQueryWrapper = new QueryWrapper<>();
         albumTypeQueryWrapper.eq("comment_id", commentId);
-        if (commentTypeEum.equals(CommentTypeEum.ALBUM_TYPE)) {
+        if (commentTypeEnum.equals(CommentTypeEnum.ALBUM_TYPE)) {
             ReAlbumComment reAlbumComment = reAlbumCommentService.getOne(albumTypeQueryWrapper);
             if (reAlbumComment == null) {
                 throw new BusinessException(StatusCode.PARAMS_ERROR, "评论类型和评论不匹配错误，评论类型为"
-                        + CommentTypeEum.ALBUM_TYPE.getCommentType() + "类型"
-                        + "，但实际评论不为" + CommentTypeEum.ALBUM_TYPE.getCommentType() + "评论");
+                        + CommentTypeEnum.ALBUM_TYPE.getCommentType() + "类型"
+                        + "，但实际评论不为" + CommentTypeEnum.ALBUM_TYPE.getCommentType() + "评论");
             }
         }
         QueryWrapper<ReSonglistComment> songlistTypeQueryWrapper = new QueryWrapper<>();
         songlistTypeQueryWrapper.eq("comment_id", commentId);
-        if (commentTypeEum.equals(CommentTypeEum.SONGLIST_TYPE)) {
+        if (commentTypeEnum.equals(CommentTypeEnum.SONGLIST_TYPE)) {
             ReSonglistComment reSonglistComment = reSonglistCommentService.getOne(songlistTypeQueryWrapper);
             if (reSonglistComment == null) {
                 throw new BusinessException(StatusCode.PARAMS_ERROR, "评论类型和评论不匹配错误，评论类型为"
-                        + CommentTypeEum.SONGLIST_TYPE.getCommentType() + "类型"
-                        + "，但实际评论不为" + CommentTypeEum.SONGLIST_TYPE.getCommentType() + "评论");
+                        + CommentTypeEnum.SONGLIST_TYPE.getCommentType() + "类型"
+                        + "，但实际评论不为" + CommentTypeEnum.SONGLIST_TYPE.getCommentType() + "评论");
             }
         }
     }

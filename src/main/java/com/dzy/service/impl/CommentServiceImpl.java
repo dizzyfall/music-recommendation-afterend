@@ -12,7 +12,7 @@ import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReAlbumComment;
 import com.dzy.model.entity.ReSongComment;
 import com.dzy.model.entity.ReSonglistComment;
-import com.dzy.model.enums.CommentTypeEum;
+import com.dzy.model.enums.CommentTypeEnum;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.service.*;
@@ -107,8 +107,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
             throw new BusinessException(StatusCode.PARAMS_ERROR, "评论不存在");
         }
         //删除自己的歌曲评论,回复保留
-        CommentTypeEum commentTypeEum = getCommentTypeById(commentId);
-        Boolean isDeleteComment = deleteCommentByCommentTypeEum(commentTypeEum, commentId);
+        CommentTypeEnum commentTypeEnum = getCommentTypeById(commentId);
+        Boolean isDeleteComment = deleteCommentByCommentTypeEum(commentTypeEnum, commentId);
         if (!isDeleteComment) {
             throw new BusinessException(StatusCode.DELETE_ERROR);
         }
@@ -128,24 +128,24 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
      * @date 2024/4/18  12:20
      */
     @Override
-    public CommentTypeEum getCommentTypeById(Long commentId) {
+    public CommentTypeEnum getCommentTypeById(Long commentId) {
         QueryWrapper<ReSongComment> reSongCommentQueryWrapper = new QueryWrapper<>();
         reSongCommentQueryWrapper.eq("comment_id", commentId);
         ReSongComment reSongCommentOne = reSongCommentService.getOne(reSongCommentQueryWrapper);
         if (reSongCommentOne != null) {
-            return CommentTypeEum.SONG_TYPE;
+            return CommentTypeEnum.SONG_TYPE;
         }
         QueryWrapper<ReAlbumComment> reAlbumCommentQueryWrapper = new QueryWrapper<>();
         reAlbumCommentQueryWrapper.eq("comment_id", commentId);
         ReAlbumComment reAlbumCommentOne = reAlbumCommentService.getOne(reAlbumCommentQueryWrapper);
         if (reAlbumCommentOne != null) {
-            return CommentTypeEum.ALBUM_TYPE;
+            return CommentTypeEnum.ALBUM_TYPE;
         }
         QueryWrapper<ReSonglistComment> reSonglistCommentQueryWrapper = new QueryWrapper<>();
         reSonglistCommentQueryWrapper.eq("comment_id", commentId);
         ReSonglistComment reSonglistCommentOne = reSonglistCommentService.getOne(reSonglistCommentQueryWrapper);
         if (reSonglistCommentOne != null) {
-            return CommentTypeEum.SONGLIST_TYPE;
+            return CommentTypeEnum.SONGLIST_TYPE;
         }
         return null;
     }
@@ -153,18 +153,18 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
     /**
      * 根据评论类型删除对应评论表数据
      *
-     * @param commentTypeEum
+     * @param commentTypeEnum
      * @param commentId
      * @return java.lang.Boolean
      * @date 2024/4/18  12:30
      */
     @Override
-    public Boolean deleteCommentByCommentTypeEum(CommentTypeEum commentTypeEum, Long commentId) {
-        if (commentTypeEum == null) {
+    public Boolean deleteCommentByCommentTypeEum(CommentTypeEnum commentTypeEnum, Long commentId) {
+        if (commentTypeEnum == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "评论不存在");
         }
         //评论是歌曲类型
-        if ("song".equals(commentTypeEum.getValue())) {
+        if ("song".equals(commentTypeEnum.getValue())) {
             QueryWrapper<ReSongComment> deleteQueryWrapper = new QueryWrapper<>();
             deleteQueryWrapper.eq("comment_id", commentId);
             //删关联表数据
@@ -172,7 +172,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
             if (!isRemoveReSongComment) {
                 throw new BusinessException(StatusCode.DELETE_ERROR);
             }
-        } else if ("album".equals(commentTypeEum.getValue())) {
+        } else if ("album".equals(commentTypeEnum.getValue())) {
             QueryWrapper<ReAlbumComment> deleteQueryWrapper = new QueryWrapper<>();
             deleteQueryWrapper.eq("comment_id", commentId);
             //删关联表数据
@@ -180,7 +180,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
             if (!isRemoveReAlbumComment) {
                 throw new BusinessException(StatusCode.DELETE_ERROR);
             }
-        } else if ("songlist".equals(commentTypeEum.getValue())) {
+        } else if ("songlist".equals(commentTypeEnum.getValue())) {
             QueryWrapper<ReSonglistComment> deleteQueryWrapper = new QueryWrapper<>();
             deleteQueryWrapper.eq("comment_id", commentId);
             //删关联表数据

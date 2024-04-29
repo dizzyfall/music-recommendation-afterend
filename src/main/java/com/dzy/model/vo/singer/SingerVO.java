@@ -23,6 +23,11 @@ public class SingerVO implements Serializable {
     /**
      * 歌手名字
      */
-    private String name;
+    private String singerName;
+
+    /**
+     * 歌手头像路径
+     */
+    private String avatarPath;
 
 }

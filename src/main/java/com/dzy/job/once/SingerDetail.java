@@ -67,9 +67,9 @@ public class SingerDetail {
             }
 
             if (StringUtils.isBlank(tempSinger.getStr("singer_name"))) {
-                singer.setName(null);
+                singer.setSingerName(null);
             } else {
-                singer.setName(tempSinger.getStr("singer_name"));
+                singer.setSingerName(tempSinger.getStr("singer_name"));
             }
 
             if (StringUtils.isBlank(tempSinger.getStr("other_name"))) {

@@ -2,7 +2,6 @@ package com.dzy.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
-import com.dzy.common.PageRequest;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.singer.SingerSearchTextQueryRequest;
@@ -37,12 +36,15 @@ public class SingerController {
      * 查询所有的歌手
      * 按热度排序
      *
-     * @param pageRequest 分页请求
+     * @param singerTagsQueryRequest
      * @return
      */
     @PostMapping("/list/all")
-    public BaseResponse<List<SingerVO>> singerListRetrieveByPage(@RequestBody PageRequest pageRequest) {
-        Page<SingerVO> singerVOPage = singerService.listAllSingerPage(pageRequest);
+    public BaseResponse<List<SingerVO>> singerListRetrieveByPage(@RequestBody SingerTagsQueryRequest singerTagsQueryRequest) {
+        if (singerTagsQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Page<SingerVO> singerVOPage = singerService.listAllSingerPage(singerTagsQueryRequest);
         List<SingerVO> singerVOList = singerVOPage.getRecords();
         if (CollectionUtils.isEmpty(singerVOList)) {
             throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "查询数据为空");
@@ -73,7 +75,7 @@ public class SingerController {
 
     /**
      * 分页
-     * 按标签查询歌手
+     * 按标签查询歌手（包含‘全部’标签）
      * 标签为固定标签：地区、性别、类型
      *
      * @param singerTagsQueryRequest

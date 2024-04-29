@@ -9,11 +9,13 @@ import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.dto.songlist.*;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.reply.ReplyVO;
+import com.dzy.model.vo.songlist.SonglistIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.ReplyService;
 import com.dzy.service.SonglistService;
 import com.dzy.service.UserInfoService;
 import com.dzy.utils.ResponseUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -372,6 +374,28 @@ public class SonglistController {
         Page<ReplyVO> songlistReplyVOPage = replyService.listReplyByPage(replyQueryRequest);
         List<ReplyVO> songlistReplyVOList = songlistReplyVOPage.getRecords();
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songlistReplyVOList, "获取歌单评论的回复列表成功");
+    }
+
+    /**
+     * 分页
+     * 按标签查询歌单（包含‘全部’标签）
+     * 标签为固定标签
+     *
+     * @param songlistTagsQueryRequest
+     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.singer.SingerVO>>
+     * @date 2024/4/29  20:05
+     */
+    @PostMapping("/list/tags")
+    public BaseResponse<List<SonglistIntroVO>> songlistListRetrieveByTagsByPage(@RequestBody SonglistTagsQueryRequest songlistTagsQueryRequest) {
+        if (songlistTagsQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Page<SonglistIntroVO> songlistVOPage = songlistService.listSonglistByTagsByPage(songlistTagsQueryRequest);
+        List<SonglistIntroVO> songlistVOList = songlistVOPage.getRecords();
+        if (CollectionUtils.isEmpty(songlistVOList)) {
+            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "查询数据为空");
+        }
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songlistVOList, "获取歌单列表成功");
     }
 
 }

@@ -80,6 +80,15 @@ public interface SonglistService extends IService<Songlist> {
     Boolean createComment(SonglistCommentCreateRequest songlistCommentCreateRequest);
 
     /**
+     * 获取歌单简介视图
+     *
+     * @param songlist
+     * @return com.dzy.model.vo.songlist.SonglistIntroVO
+     * @date 2024/4/29  20:56
+     */
+    SonglistIntroVO getSonglistIntroVO(Songlist songlist);
+
+    /**
      * 根据歌单id获取歌单简介视图
      *
      * @param songlistId
@@ -96,5 +105,16 @@ public interface SonglistService extends IService<Songlist> {
      * @date 2024/4/15  12:07
      */
     Page<CommentVO> listSonglistCommentByPage(SonglistCommentQueryRequest songlistCommentQueryRequest);
+
+    /**
+     * 分页
+     * 按标签查询歌单（包含‘全部’标签）
+     * 标签为固定标签
+     *
+     * @param songlistTagsQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.songlist.SonglistIntroVO>
+     * @date 2024/4/29  20:14
+     */
+    Page<SonglistIntroVO> listSonglistByTagsByPage(SonglistTagsQueryRequest songlistTagsQueryRequest);
 
 }

@@ -413,6 +413,25 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
     }
 
     /**
+     * 获取歌单简介视图
+     *
+     * @param songlist
+     * @return com.dzy.model.vo.songlist.SonglistIntroVO
+     * @date 2024/4/29  20:55
+     */
+    @Override
+    public SonglistIntroVO getSonglistIntroVO(Songlist songlist) {
+        SonglistIntroVO songlistIntroVO = SonglistIntroVO.objToVO(songlist);
+        //获取创建者姓名
+        UserInfo userInfo = userInfoService.getById(songlist.getCreatorId());
+        String nickname = userInfo.getNickname();
+        songlistIntroVO.setCreatorName(nickname);
+        //歌单Id
+        songlistIntroVO.setSonglistId(songlist.getId());
+        return songlistIntroVO;
+    }
+
+    /**
      * 根据歌单id获取歌单简介视图
      *
      * @param songlistId
@@ -426,16 +445,9 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
         }
         Songlist songlist = this.getById(songlistId);
         if (songlist == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "无此歌单");
         }
-        SonglistIntroVO songlistIntroVO = SonglistIntroVO.objToVO(songlist);
-        //获取创建者姓名
-        UserInfo userInfo = userInfoService.getById(songlist.getCreatorId());
-        String nickname = userInfo.getNickname();
-        songlistIntroVO.setCreatorName(nickname);
-        //歌单Id
-        songlistIntroVO.setSonglistId(songlistId);
-        return songlistIntroVO;
+        return getSonglistIntroVO(songlist);
     }
 
     /**
@@ -473,6 +485,56 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
         Page<CommentVO> commentVOPage = new Page<>(pageCurrent, pageSize, commentPage.getTotal());
         commentVOPage.setRecords(commentVOList);
         return commentVOPage;
+    }
+
+    /**
+     * 分页
+     * 按标签查询歌单（包含‘全部’标签）
+     * 标签为固定标签
+     *
+     * @param songlistTagsQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.songlist.SonglistIntroVO>
+     * @date 2024/4/29  20:16
+     */
+    @Override
+    public Page<SonglistIntroVO> listSonglistByTagsByPage(SonglistTagsQueryRequest songlistTagsQueryRequest) {
+        if (songlistTagsQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<Songlist> queryWrapper = getSonglistTagQueryWrapper(songlistTagsQueryRequest);
+        //查询歌手
+        int pageCurrent = songlistTagsQueryRequest.getPageCurrent();
+        int pageSize = songlistTagsQueryRequest.getPageSize();
+        Page<Songlist> page = new Page<>(pageCurrent, pageSize);
+        Page<Songlist> songlistPage = this.page(page, queryWrapper);
+        //脱敏
+        List<SonglistIntroVO> songlistVOList = songlistPage.getRecords().stream().map(this::getSonglistIntroVO).collect(Collectors.toList());
+        //新分页对象
+        Page<SonglistIntroVO> songlistVOPage = new Page<>(pageCurrent, pageSize, songlistPage.getTotal());
+        songlistVOPage.setRecords(songlistVOList);
+        return songlistVOPage;
+    }
+
+    /**
+     * 根据歌单标签获取查询条件构造器
+     *
+     * @param songlistTagsQueryRequest
+     * @return com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<com.dzy.model.entity.Songlist>
+     * @date 2024/4/29  20:18
+     */
+    public QueryWrapper<Songlist> getSonglistTagQueryWrapper(SonglistTagsQueryRequest songlistTagsQueryRequest) {
+        if (songlistTagsQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<Songlist> songlistTagQueryWrapper = new QueryWrapper<>();
+        Integer lang = songlistTagsQueryRequest.getLang();
+        Integer era = songlistTagsQueryRequest.getEra();
+        Integer genre = songlistTagsQueryRequest.getGenre();
+        Integer scene = songlistTagsQueryRequest.getScene();
+        Integer mood = songlistTagsQueryRequest.getMood();
+        Integer theme = songlistTagsQueryRequest.getTheme();
+        //todo 转为json字符串存取
+        return songlistTagQueryWrapper;
     }
 
 }

@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @Date 2024/3/10  11:49
  */
 @Data
-public class SingerVO implements Serializable {
+public class SingerIntroVO implements Serializable {
 
     private static final long serialVersionUID = -3946719007014582672L;
 

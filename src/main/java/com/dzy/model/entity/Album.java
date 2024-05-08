@@ -82,7 +82,7 @@ public class Album implements Serializable {
     @TableField(value = "create_time")
     private Date createTime;
     /**
-     * 专辑创建时间
+     * 专辑更新时间
      */
     @TableField(value = "update_time")
     private Date updateTime;

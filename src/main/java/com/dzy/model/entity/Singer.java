@@ -29,7 +29,7 @@ public class Singer implements Serializable {
     private String avatarPath;
 
     /**
-     * 歌手名字
+     * 歌手姓名
      */
     @TableField(value = "singer_name")
     private String singerName;
@@ -41,13 +41,13 @@ public class Singer implements Serializable {
     private String alias;
 
     /**
-     *
+     * 歌手姓名拼音
      */
     @TableField(value = "spell")
     private String spell;
 
     /**
-     * 用户介绍
+     * 歌手介绍
      */
     @TableField(value = "description")
     private String description;

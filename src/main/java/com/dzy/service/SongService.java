@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
+import com.dzy.model.dto.song.SongQueryRequest;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.song.SongDetailVO;
@@ -64,5 +65,14 @@ public interface SongService extends IService<Song> {
      * @return
      */
     Page<CommentVO> listSongCommentByPage(SongCommentQueryRequest songCommentQueryRequest);
+
+    /**
+     * 分页查询歌手歌曲
+     *
+     * @param songQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.song.SongIntroVO>
+     * @date 2024/4/30  23:19
+     */
+    Page<SongIntroVO> listSongByPage(SongQueryRequest songQueryRequest);
 
 }

@@ -7,7 +7,7 @@ import com.dzy.model.dto.userinfo.UserUpdateImageRequest;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserImageService;
 import com.dzy.service.UserInfoService;
-import com.dzy.utils.ResponseUtil;
+import com.dzy.commonutils.ResponseUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;

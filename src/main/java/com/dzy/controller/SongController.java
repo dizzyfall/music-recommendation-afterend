@@ -8,13 +8,15 @@ import com.dzy.model.dto.reply.ReplyCreateRequest;
 import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
+import com.dzy.model.dto.song.SongQueryRequest;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.reply.ReplyVO;
+import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.ReplyService;
 import com.dzy.service.SongService;
 import com.dzy.service.UserInfoService;
-import com.dzy.utils.ResponseUtil;
+import com.dzy.commonutils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -139,6 +141,23 @@ public class SongController {
         Page<ReplyVO> songReplyVOPage = replyService.listReplyByPage(replyQueryRequest);
         List<ReplyVO> songReplyVOList = songReplyVOPage.getRecords();
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songReplyVOList, "获取歌曲评论的回复列表成功");
+    }
+
+    /**
+     * 分页查询歌手歌曲
+     *
+     * @param songQueryRequest
+     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.song.SongIntroVO>>
+     * @date 2024/4/30  23:17
+     */
+    @PostMapping("/list/page")
+    public BaseResponse<List<SongIntroVO>> songRetrieveByPage(@RequestBody SongQueryRequest songQueryRequest) {
+        if (songQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Page<SongIntroVO> songVOPage = songService.listSongByPage(songQueryRequest);
+        List<SongIntroVO> songVOList = songVOPage.getRecords();
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songVOList);
     }
 
 }

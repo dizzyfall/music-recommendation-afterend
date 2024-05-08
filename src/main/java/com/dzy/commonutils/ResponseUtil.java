@@ -1,4 +1,4 @@
-package com.dzy.utils;
+package com.dzy.commonutils;
 
 import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;

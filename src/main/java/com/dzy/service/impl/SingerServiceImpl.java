@@ -6,17 +6,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.SingerMapper;
+import com.dzy.model.dto.singer.SingerQueryRequest;
 import com.dzy.model.dto.singer.SingerSearchTextQueryRequest;
 import com.dzy.model.dto.singer.SingerTagsQueryRequest;
 import com.dzy.model.entity.Singer;
 import com.dzy.model.enums.SingerTagEnum;
-import com.dzy.model.vo.singer.SingerVO;
+import com.dzy.model.vo.singer.SingerDetailVO;
+import com.dzy.model.vo.singer.SingerIntroVO;
 import com.dzy.service.SingerService;
-import com.dzy.utils.JsonUtil;
+import com.dzy.service.SongService;
+import com.dzy.commonutils.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +33,9 @@ import java.util.stream.Collectors;
 public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         implements SingerService {
 
+    @Resource
+    private SongService songService;
+
     /**
      * 查询所有的歌手
      * 按热度排序
@@ -38,7 +45,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
      * @date 2024/4/27  15:15
      */
     @Override
-    public Page<SingerVO> listAllSingerPage(SingerTagsQueryRequest singerTagsQueryRequest) {
+    public Page<SingerIntroVO> listAllSingerPage(SingerTagsQueryRequest singerTagsQueryRequest) {
         if (singerTagsQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -46,9 +53,9 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         int pageSize = singerTagsQueryRequest.getPageSize();
         Page<Singer> page = new Page<>(pageCurrent, pageSize);
         Page<Singer> singerPage = this.page(page);
-        List<SingerVO> singerVOList = singerPage.getRecords().stream().map(this::singerToSingerVO).collect(Collectors.toList());
-        Page<SingerVO> singerVOPage = new Page<>(pageCurrent, pageSize, singerPage.getTotal());
-        return singerVOPage.setRecords(singerVOList);
+        List<SingerIntroVO> singerIntroVOList = singerPage.getRecords().stream().map(this::getSingerIntroVO).collect(Collectors.toList());
+        Page<SingerIntroVO> singerVOPage = new Page<>(pageCurrent, pageSize, singerPage.getTotal());
+        return singerVOPage.setRecords(singerIntroVOList);
     }
 
     /**
@@ -61,7 +68,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
      */
     //todo 搜索词搜索,使用es
     @Override
-    public Page<SingerVO> listSingerBySearchTextByPage(SingerSearchTextQueryRequest singerQueryRequest) {
+    public Page<SingerIntroVO> listSingerBySearchTextByPage(SingerSearchTextQueryRequest singerQueryRequest) {
         if (singerQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -71,23 +78,30 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         int pageSize = singerQueryRequest.getPageSize();
         Page<Singer> page = new Page<>(pageCurrent, pageSize);
         Page<Singer> singerPage = this.page(page, queryWrapper);
-        List<SingerVO> singerVOList = singerPage.getRecords().stream().map(this::singerToSingerVO).collect(Collectors.toList());
-        Page<SingerVO> singerVOPage = new Page<>(pageCurrent, pageSize, singerPage.getTotal());
-        return singerVOPage.setRecords(singerVOList);
+        List<SingerIntroVO> singerIntroVOList = singerPage.getRecords().stream().map(this::getSingerIntroVO).collect(Collectors.toList());
+        Page<SingerIntroVO> singerVOPage = new Page<>(pageCurrent, pageSize, singerPage.getTotal());
+        return singerVOPage.setRecords(singerIntroVOList);
     }
 
+    /**
+     * 转SingerIntroVO
+     *
+     * @param singer
+     * @return com.dzy.model.vo.singer.SingerVO
+     * @date 2024/4/30  11:07
+     */
     @Override
-    public SingerVO singerToSingerVO(Singer singer) {
+    public SingerIntroVO getSingerIntroVO(Singer singer) {
         if (singer == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        SingerVO singerVO = new SingerVO();
+        SingerIntroVO singerIntroVO = new SingerIntroVO();
         try {
-            BeanUtils.copyProperties(singer, singerVO);
+            BeanUtils.copyProperties(singer, singerIntroVO);
         } catch (BusinessException e) {
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
         }
-        return singerVO;
+        return singerIntroVO;
     }
 
     /**
@@ -127,7 +141,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
      * @date 2024/4/27  15:14
      */
     @Override
-    public Page<SingerVO> listSingerByTagsByPage(SingerTagsQueryRequest singerTagsQueryRequest) {
+    public Page<SingerIntroVO> listSingerByTagsByPage(SingerTagsQueryRequest singerTagsQueryRequest) {
         if (singerTagsQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -138,10 +152,10 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         Page<Singer> page = new Page<>(pageCurrent, pageSize);
         Page<Singer> singerPage = this.page(page, queryWrapper);
         //脱敏
-        List<SingerVO> singerVOList = singerPage.getRecords().stream().map(this::singerToSingerVO).collect(Collectors.toList());
+        List<SingerIntroVO> singerIntroVOList = singerPage.getRecords().stream().map(this::getSingerIntroVO).collect(Collectors.toList());
         //新分页对象
-        Page<SingerVO> singerVOPage = new Page<>(pageCurrent, pageSize, singerPage.getTotal());
-        singerVOPage.setRecords(singerVOList);
+        Page<SingerIntroVO> singerVOPage = new Page<>(pageCurrent, pageSize, singerPage.getTotal());
+        singerVOPage.setRecords(singerIntroVOList);
         return singerVOPage;
     }
 
@@ -173,6 +187,48 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
     public String getSingerNameStr(String singerIdList) {
         List<String> singerNameList = getSingerNameList(singerIdList);
         return StringUtils.join(singerNameList, "/");
+    }
+
+    /**
+     * 查询指定歌手详细信息
+     *
+     * @param singerQueryRequest
+     * @return com.dzy.model.vo.singer.SingerDetailVO
+     * @date 2024/4/30  11:31
+     */
+    @Override
+    public SingerDetailVO searchSingerDetail(SingerQueryRequest singerQueryRequest) {
+        if (singerQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long singerId = singerQueryRequest.getSingerId();
+        if (singerId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<Singer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", singerId);
+        Singer singer = this.getOne(queryWrapper);
+        if (singer == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "暂无此歌手");
+        }
+        return getSingerDetailVO(singer);
+    }
+
+    /**
+     * 获取SingerDetailVO
+     *
+     * @param singer
+     * @return com.dzy.model.vo.singer.SingerDetailVO
+     * @date 2024/4/30  12:02
+     */
+    @Override
+    public SingerDetailVO getSingerDetailVO(Singer singer) {
+        if (singer == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        SingerDetailVO singerDetailVO = SingerDetailVO.objToVO(singer);
+        singerDetailVO.setSingerId(singer.getId());
+        return singerDetailVO;
     }
 
 }

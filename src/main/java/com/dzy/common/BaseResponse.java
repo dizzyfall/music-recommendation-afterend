@@ -13,6 +13,7 @@ import java.io.Serializable;
  */
 @Data
 public class BaseResponse<T> implements Serializable {
+
     /**
      * 状态码
      */
@@ -99,4 +100,5 @@ public class BaseResponse<T> implements Serializable {
         this.msg = msg;
         this.description = description;
     }
+
 }

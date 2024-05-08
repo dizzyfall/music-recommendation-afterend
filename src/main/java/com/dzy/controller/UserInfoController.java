@@ -6,7 +6,7 @@ import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.userinfo.*;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserInfoService;
-import com.dzy.utils.ResponseUtil;
+import com.dzy.commonutils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

@@ -3,7 +3,7 @@ package com.dzy.model.vo.song;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.entity.Song;
-import com.dzy.utils.JsonUtil;
+import com.dzy.commonutils.JsonUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -25,7 +25,7 @@ public class SongDetailVO implements Serializable {
     /**
      * 歌曲id
      */
-    private Long id;
+    private Long songId;
 
     /**
      * 歌曲歌手id列表

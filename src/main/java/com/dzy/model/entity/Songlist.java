@@ -66,7 +66,7 @@ public class Songlist implements Serializable {
     @TableField(value = "comment_count")
     private Integer commentCount;
     /**
-     * 播放量
+     * 歌单播放量
      */
     @TableField(value = "play_count")
     private Long playCount;

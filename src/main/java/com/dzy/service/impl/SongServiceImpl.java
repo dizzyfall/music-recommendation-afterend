@@ -8,8 +8,10 @@ import com.dzy.exception.BusinessException;
 import com.dzy.mapper.SongMapper;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
+import com.dzy.model.dto.song.SongQueryRequest;
 import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReSongComment;
+import com.dzy.model.entity.Singer;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.song.SongDetailVO;
@@ -68,6 +70,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         String singerNameStr = singerService.getSingerNameStr(singerListId);
         songDetailVO.setSingerNameList(singerNameList);
         songDetailVO.setSingerNameStr(singerNameStr);
+        songDetailVO.setSongId(song.getId());
         return songDetailVO;
     }
 
@@ -104,7 +107,6 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         SongDetailVO songDetailVO = getSongDetailVO(song);
         SongIntroVO songIntroVO = new SongIntroVO();
         BeanUtils.copyProperties(songDetailVO, songIntroVO);
-        songIntroVO.setSongId(songDetailVO.getId());
         return songIntroVO;
     }
 
@@ -212,6 +214,44 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         Page<CommentVO> commentVOPage = new Page<>(pageCurrent, pageSize, commentPage.getTotal());
         commentVOPage.setRecords(commentVOList);
         return commentVOPage;
+    }
+
+    /**
+     * 分页查询歌手歌曲
+     *
+     * @param songQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.song.SongIntroVO>
+     * @date 2024/4/30  23:19
+     */
+    @Override
+    public Page<SongIntroVO> listSongByPage(SongQueryRequest songQueryRequest) {
+        if (songQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long singerId = songQueryRequest.getSingerId();
+        if (singerId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //判断歌手是否存在
+        Singer singer = singerService.getById(singerId);
+        if (singer == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "暂无此歌手");
+        }
+        //todo 以后再来优化 由于字段设计有一点问题 如果singerId是1，则转为"1"进行模糊查询
+        QueryWrapper<Song> queryWrapper = new QueryWrapper<>();
+        String singerIdStr = "\"" + singerId + "\"";
+        queryWrapper.like("singer_list_id", singerIdStr);
+        int pageCurrent = songQueryRequest.getPageCurrent();
+        int pageSize = songQueryRequest.getPageSize();
+        Page<Song> page = new Page<>(pageCurrent, pageSize);
+        Page<Song> songPage = this.page(page, queryWrapper);
+        List<SongIntroVO> songIntroVOList = songPage.getRecords().stream().map(this::getSongIntro).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(songIntroVOList)) {
+            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "暂无歌曲");
+        }
+        Page<SongIntroVO> songIntroVOPage = new Page<>(pageCurrent, pageSize, songPage.getTotal());
+        songIntroVOPage.setRecords(songIntroVOList);
+        return songIntroVOPage;
     }
 
 }

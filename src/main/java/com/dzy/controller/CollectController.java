@@ -14,7 +14,7 @@ import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.model.vo.songlist.SonglistIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.*;
-import com.dzy.utils.ResponseUtil;
+import com.dzy.commonutils.ResponseUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

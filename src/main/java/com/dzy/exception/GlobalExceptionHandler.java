@@ -2,7 +2,7 @@ package com.dzy.exception;
 
 import com.dzy.common.BaseResponse;
 import com.dzy.constant.StatusCode;
-import com.dzy.utils.ResponseUtil;
+import com.dzy.commonutils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

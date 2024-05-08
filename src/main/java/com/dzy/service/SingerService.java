@@ -2,10 +2,12 @@ package com.dzy.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dzy.model.dto.singer.SingerQueryRequest;
 import com.dzy.model.dto.singer.SingerSearchTextQueryRequest;
 import com.dzy.model.dto.singer.SingerTagsQueryRequest;
 import com.dzy.model.entity.Singer;
-import com.dzy.model.vo.singer.SingerVO;
+import com.dzy.model.vo.singer.SingerDetailVO;
+import com.dzy.model.vo.singer.SingerIntroVO;
 
 import java.util.List;
 
@@ -24,7 +26,7 @@ public interface SingerService extends IService<Singer> {
      * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.singer.SingerVO>
      * @date 2024/4/27  15:13
      */
-    Page<SingerVO> listAllSingerPage(SingerTagsQueryRequest singerTagsQueryRequest);
+    Page<SingerIntroVO> listAllSingerPage(SingerTagsQueryRequest singerTagsQueryRequest);
 
     /**
      * 分页
@@ -34,16 +36,15 @@ public interface SingerService extends IService<Singer> {
      * @param singerSearchTextQueryRequest
      * @return
      */
-    Page<SingerVO> listSingerBySearchTextByPage(SingerSearchTextQueryRequest singerSearchTextQueryRequest);
+    Page<SingerIntroVO> listSingerBySearchTextByPage(SingerSearchTextQueryRequest singerSearchTextQueryRequest);
 
     /**
-     * 脱敏
-     * 转SingerVO
+     * 转SingerIntroVO
      *
      * @param singer
      * @return
      */
-    SingerVO singerToSingerVO(Singer singer);
+    SingerIntroVO getSingerIntroVO(Singer singer);
 
     /**
      * 分页
@@ -54,7 +55,7 @@ public interface SingerService extends IService<Singer> {
      * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.singer.SingerVO>
      * @date 2024/4/27  15:14
      */
-    Page<SingerVO> listSingerByTagsByPage(SingerTagsQueryRequest singerTagsQueryRequest);
+    Page<SingerIntroVO> listSingerByTagsByPage(SingerTagsQueryRequest singerTagsQueryRequest);
 
     /**
      * 根据歌手id（json字符串）获取歌手姓名列表
@@ -72,5 +73,23 @@ public interface SingerService extends IService<Singer> {
      * @date 2024/4/26  17:31
      */
     String getSingerNameStr(String singerIdList);
+
+    /**
+     * 查询指定歌手详细信息
+     *
+     * @param singerQueryRequest
+     * @return com.dzy.model.vo.singer.SingerDetailVO
+     * @date 2024/4/30  11:27
+     */
+    SingerDetailVO searchSingerDetail(SingerQueryRequest singerQueryRequest);
+
+    /**
+     * 获取SingerDetailVO
+     *
+     * @param singer
+     * @return com.dzy.model.vo.singer.SingerDetailVO
+     * @date 2024/4/30  12:05
+     */
+    SingerDetailVO getSingerDetailVO(Singer singer);
 
 }

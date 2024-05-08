@@ -10,7 +10,7 @@ import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.CommentService;
 import com.dzy.service.UserInfoService;
-import com.dzy.utils.ResponseUtil;
+import com.dzy.commonutils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

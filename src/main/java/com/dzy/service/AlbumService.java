@@ -40,9 +40,9 @@ public interface AlbumService extends IService<Album> {
     /**
      * 获取专辑简介视图
      *
-     * @date 2024/6/5  21:07
      * @param album
      * @return com.dzy.model.vo.album.AlbumIntroVO
+     * @date 2024/6/5  21:07
      */
     AlbumIntroVO getAlbumIntroVO(Album album);
 

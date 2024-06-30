@@ -151,9 +151,9 @@ public interface SonglistService extends IService<Songlist> {
     /**
      * 查询自己创建的歌单
      *
-     * @date 2024/6/6  18:10
      * @param songlistQueryRequest
      * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.songlist.SonglistIntroVO>
+     * @date 2024/6/6  18:10
      */
     Page<SonglistIntroVO> listMyCreateSonglistByPage(SonglistQueryRequest songlistQueryRequest);
 

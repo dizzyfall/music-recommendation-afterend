@@ -17,7 +17,6 @@ import com.dzy.model.entity.Song;
 import com.dzy.model.vo.album.AlbumDetailVO;
 import com.dzy.model.vo.album.AlbumIntroVO;
 import com.dzy.model.vo.comment.CommentVO;
-import com.dzy.model.vo.song.SongDetailVO;
 import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.service.*;
 import org.apache.commons.collections4.CollectionUtils;

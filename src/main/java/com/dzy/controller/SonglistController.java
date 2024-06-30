@@ -5,7 +5,6 @@ import com.dzy.common.BaseResponse;
 import com.dzy.commonutils.ResponseUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
-import com.dzy.model.dto.collect.CollectQueryRequest;
 import com.dzy.model.dto.reply.ReplyCreateRequest;
 import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.dto.songlist.*;
@@ -430,10 +429,10 @@ public class SonglistController {
     /**
      * 查询自己创建的歌单
      *
-     * @date 2024/6/6  18:10
      * @param songlistQueryRequest
      * @param request
-     * @return com.dzy.common.BaseResponse<java.util.List<com.dzy.model.vo.songlist.SonglistIntroVO>>
+     * @return com.dzy.common.BaseResponse<java.util.List < com.dzy.model.vo.songlist.SonglistIntroVO>>
+     * @date 2024/6/6  18:10
      */
     @PostMapping("/my/create/page")
     public BaseResponse<List<SonglistIntroVO>> mySonglistRetrieveByPage(@RequestBody SonglistQueryRequest songlistQueryRequest, HttpServletRequest request) {

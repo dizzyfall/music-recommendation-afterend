@@ -20,6 +20,11 @@ public class UserInfoIntroVO implements Serializable {
     private static final long serialVersionUID = 6571961979854752127L;
 
     /**
+     * 创建者id(用户id)
+     */
+    private Long creatorId;
+
+    /**
      * 用户昵称
      */
     private String nickname;

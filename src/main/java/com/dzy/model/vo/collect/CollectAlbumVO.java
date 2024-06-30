@@ -1,6 +1,6 @@
 package com.dzy.model.vo.collect;
 
-import com.dzy.model.vo.album.AlbumVO;
+import com.dzy.model.vo.album.AlbumIntroVO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,7 +16,7 @@ public class CollectAlbumVO implements Serializable {
 
     private static final long serialVersionUID = -1690743240929656353L;
 
-    private AlbumVO albumVO;
+    private AlbumIntroVO albumIntroVO;
 
     /**
      * 歌曲歌手姓名字符串（前端展示）

@@ -2,21 +2,23 @@ package com.dzy.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
+import com.dzy.commonutils.ResponseUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.reply.ReplyCreateRequest;
 import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
+import com.dzy.model.dto.song.SongDetailQueryRequest;
 import com.dzy.model.dto.song.SongQueryRequest;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.reply.ReplyVO;
+import com.dzy.model.vo.song.SongDetailVO;
 import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.ReplyService;
 import com.dzy.service.SongService;
 import com.dzy.service.UserInfoService;
-import com.dzy.commonutils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -158,6 +160,21 @@ public class SongController {
         Page<SongIntroVO> songVOPage = songService.listSongByPage(songQueryRequest);
         List<SongIntroVO> songVOList = songVOPage.getRecords();
         return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songVOList);
+    }
+
+    /**
+     * 查询指定歌曲详情
+     *
+     * @param songDetailQueryRequest
+     * @return
+     */
+    @PostMapping("/detail")
+    public BaseResponse<SongDetailVO> songDetailRetrieve(@RequestBody SongDetailQueryRequest songDetailQueryRequest) {
+        if (songDetailQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        SongDetailVO songDetailVO = songService.searchSongDetail(songDetailQueryRequest);
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songDetailVO);
     }
 
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
+import com.dzy.model.dto.song.SongDetailQueryRequest;
 import com.dzy.model.dto.song.SongQueryRequest;
 import com.dzy.model.entity.Song;
 import com.dzy.model.vo.comment.CommentVO;
@@ -32,7 +33,7 @@ public interface SongService extends IService<Song> {
      * @param songId
      * @return
      */
-    SongDetailVO getSongDetailById(Long songId);
+    SongDetailVO getSongDetailVOById(Long songId);
 
     /**
      * 获取歌曲简介
@@ -40,7 +41,7 @@ public interface SongService extends IService<Song> {
      * @param song
      * @return
      */
-    SongIntroVO getSongIntro(Song song);
+    SongIntroVO getSongIntroVO(Song song);
 
     /**
      * 通过歌曲Id获取歌曲简介
@@ -48,7 +49,7 @@ public interface SongService extends IService<Song> {
      * @param songId
      * @return
      */
-    SongIntroVO getSongIntroById(Long songId);
+    SongIntroVO getSongIntroVOById(Long songId);
 
     /**
      * 创建歌曲评论
@@ -74,5 +75,14 @@ public interface SongService extends IService<Song> {
      * @date 2024/4/30  23:19
      */
     Page<SongIntroVO> listSongByPage(SongQueryRequest songQueryRequest);
+
+    /**
+     * 查询指定歌曲详情
+     *
+     * @param songDetailQueryRequest
+     * @return com.dzy.model.vo.song.SongDetailVO
+     * @date 2024/5/18  12:18
+     */
+    SongDetailVO searchSongDetail(SongDetailQueryRequest songDetailQueryRequest);
 
 }

@@ -2,19 +2,22 @@ package com.dzy.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
+import com.dzy.commonutils.ResponseUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
+import com.dzy.model.dto.collect.CollectQueryRequest;
 import com.dzy.model.dto.reply.ReplyCreateRequest;
 import com.dzy.model.dto.reply.ReplyQueryRequest;
 import com.dzy.model.dto.songlist.*;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.reply.ReplyVO;
+import com.dzy.model.vo.song.SongIntroVO;
+import com.dzy.model.vo.songlist.SonglistDetailVO;
 import com.dzy.model.vo.songlist.SonglistIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.ReplyService;
 import com.dzy.service.SonglistService;
 import com.dzy.service.UserInfoService;
-import com.dzy.commonutils.ResponseUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -386,16 +389,77 @@ public class SonglistController {
      * @date 2024/4/29  20:05
      */
     @PostMapping("/list/tags")
-    public BaseResponse<List<SonglistIntroVO>> songlistListRetrieveByTagsByPage(@RequestBody SonglistTagsQueryRequest songlistTagsQueryRequest) {
+    public BaseResponse<Page<SonglistIntroVO>> songlistListRetrieveByTagsByPage(@RequestBody SonglistTagsQueryRequest songlistTagsQueryRequest) {
         if (songlistTagsQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         Page<SonglistIntroVO> songlistVOPage = songlistService.listSonglistByTagsByPage(songlistTagsQueryRequest);
-        List<SonglistIntroVO> songlistVOList = songlistVOPage.getRecords();
-        if (CollectionUtils.isEmpty(songlistVOList)) {
-            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "查询数据为空");
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songlistVOPage, "获取歌单列表成功");
+    }
+
+    /**
+     * 查询指定歌单信息
+     *
+     * @param songlistDetailQueryRequest
+     * @return
+     */
+    @PostMapping("/detail")
+    public BaseResponse<SonglistDetailVO> songlistDetailRetrieve(@RequestBody SonglistDetailQueryRequest songlistDetailQueryRequest) {
+        if (songlistDetailQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songlistVOList, "获取歌单列表成功");
+        SonglistDetailVO songlistDetailVO = songlistService.searchSonglistDetail(songlistDetailQueryRequest);
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songlistDetailVO, "获取歌单详情成功");
+    }
+
+    /**
+     * 查询指定歌单所有歌曲
+     *
+     * @param songlistDetailQueryRequest
+     * @return
+     */
+    @PostMapping("/song")
+    public BaseResponse<List<SongIntroVO>> songlistSongRetrieve(@RequestBody SonglistDetailQueryRequest songlistDetailQueryRequest) {
+        if (songlistDetailQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        List<SongIntroVO> songIntroVOList = songlistService.listSong(songlistDetailQueryRequest);
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songIntroVOList);
+    }
+
+    /**
+     * 查询自己创建的歌单
+     *
+     * @date 2024/6/6  18:10
+     * @param songlistQueryRequest
+     * @param request
+     * @return com.dzy.common.BaseResponse<java.util.List<com.dzy.model.vo.songlist.SonglistIntroVO>>
+     */
+    @PostMapping("/my/create/page")
+    public BaseResponse<List<SonglistIntroVO>> mySonglistRetrieveByPage(@RequestBody SonglistQueryRequest songlistQueryRequest, HttpServletRequest request) {
+        if (songlistQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        if (request == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //是否登录
+        UserLoginVO loginUserVO = userInfoService.getUserInfoLoginState(request);
+        if (loginUserVO == null) {
+            throw new BusinessException(StatusCode.NO_LOGIN_ERROR);
+        }
+        //是否是本人
+        Long loginUserId = loginUserVO.getId();
+        Long requestUserId = songlistQueryRequest.getUserId();
+        if (!loginUserId.equals(requestUserId)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "用户登录信息不一致");
+        }
+        Page<SonglistIntroVO> songlistIntroVOPage = songlistService.listMyCreateSonglistByPage(songlistQueryRequest);
+        List<SonglistIntroVO> songlistIntroVOList = songlistIntroVOPage.getRecords();
+        if (CollectionUtils.isEmpty(songlistIntroVOList)) {
+            throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "暂无歌单");
+        }
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, songlistIntroVOList, "获取收藏歌单列表成功");
     }
 
 }

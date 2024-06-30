@@ -1,13 +1,11 @@
 package com.dzy.recommend.recommendationengine;
 
-import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.recommend.recommendutils.UserCFMusicRecommendUtil;
 import com.dzy.service.SongService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @Author <a href="https://github.com/dizzyfall">DZY</a>
@@ -20,7 +18,7 @@ public class UserBasedCollaborativeFilteringMusicRecommend {
     private SongService songService;
 
     public List<Long> recommendSong(Long targetUserId, int n) {
-        return UserCFMusicRecommendUtil.getRecommendSongIdList(targetUserId,n);
+        return UserCFMusicRecommendUtil.getRecommendSongIdList(targetUserId, n);
     }
 
 }

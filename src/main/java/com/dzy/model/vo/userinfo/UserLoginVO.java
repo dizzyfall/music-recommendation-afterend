@@ -26,6 +26,11 @@ public class UserLoginVO implements Serializable {
     private Long id;
 
     /**
+     * 用户图片id
+     */
+    private Long imageId;
+
+    /**
      * 用户昵称
      */
     private String nickname;

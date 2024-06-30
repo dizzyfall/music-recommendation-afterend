@@ -20,6 +20,21 @@ public class ReplyVO implements Serializable {
     private static final long serialVersionUID = -1879532154981702119L;
 
     /**
+     * 回复id
+     */
+    private Long replyId;
+
+    /**
+     * 接收回复者id
+     */
+    private Long receiverId;
+
+    /**
+     * 评论id(哪一个评论下回复)
+     */
+    private Long commentId;
+
+    /**
      * 回复者信息简介
      */
     private UserInfoIntroVO userInfoIntroVO;

@@ -1,6 +1,7 @@
 package com.dzy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dzy.constant.StatusCode;
@@ -8,11 +9,14 @@ import com.dzy.exception.BusinessException;
 import com.dzy.mapper.SongMapper;
 import com.dzy.model.dto.song.SongCommentCreateRequest;
 import com.dzy.model.dto.song.SongCommentQueryRequest;
+import com.dzy.model.dto.song.SongDetailQueryRequest;
 import com.dzy.model.dto.song.SongQueryRequest;
 import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReSongComment;
 import com.dzy.model.entity.Singer;
 import com.dzy.model.entity.Song;
+import com.dzy.model.enums.songtags.GenreEnum;
+import com.dzy.model.enums.songtags.LangEnum;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.song.SongDetailVO;
 import com.dzy.model.vo.song.SongIntroVO;
@@ -71,6 +75,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         songDetailVO.setSingerNameList(singerNameList);
         songDetailVO.setSingerNameStr(singerNameStr);
         songDetailVO.setSongId(song.getId());
+        songDetailVO.setLang(LangEnum.getLangTagNameById(song.getLang()));
+        songDetailVO.setGenre(GenreEnum.getGenreTagNameById(song.getGenre()));
         return songDetailVO;
     }
 
@@ -82,7 +88,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
      * @date 2024/4/17  18:23
      */
     @Override
-    public SongDetailVO getSongDetailById(Long songId) {
+    public SongDetailVO getSongDetailVOById(Long songId) {
         if (songId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -100,7 +106,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
      * @return
      */
     @Override
-    public SongIntroVO getSongIntro(Song song) {
+    public SongIntroVO getSongIntroVO(Song song) {
         if (song == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -117,7 +123,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
      * @return
      */
     @Override
-    public SongIntroVO getSongIntroById(Long songId) {
+    public SongIntroVO getSongIntroVOById(Long songId) {
         if (songId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
@@ -125,7 +131,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         if (song == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "无此歌曲");
         }
-        return getSongIntro(song);
+        return getSongIntroVO(song);
     }
 
     /**
@@ -177,6 +183,10 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         if (!isReSongCommentSave) {
             throw new BusinessException(StatusCode.CREATE_ERROR, "创建评论失败");
         }
+        //更新歌曲表数据
+        UpdateWrapper<Song> songUpdateWrapper = new UpdateWrapper<>();
+        songUpdateWrapper.eq("id", songId).setSql("comment_count = comment_count + 1");
+        boolean isCommentUpdate = this.update(songUpdateWrapper);
         return true;
     }
 
@@ -245,13 +255,35 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song>
         int pageSize = songQueryRequest.getPageSize();
         Page<Song> page = new Page<>(pageCurrent, pageSize);
         Page<Song> songPage = this.page(page, queryWrapper);
-        List<SongIntroVO> songIntroVOList = songPage.getRecords().stream().map(this::getSongIntro).collect(Collectors.toList());
+        List<SongIntroVO> songIntroVOList = songPage.getRecords().stream().map(this::getSongIntroVO).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(songIntroVOList)) {
             throw new BusinessException(StatusCode.DATAS_NULL_ERROR, "暂无歌曲");
         }
         Page<SongIntroVO> songIntroVOPage = new Page<>(pageCurrent, pageSize, songPage.getTotal());
         songIntroVOPage.setRecords(songIntroVOList);
         return songIntroVOPage;
+    }
+
+    /**
+     * 查询指定歌曲详情
+     *
+     * @param songDetailQueryRequest
+     * @return com.dzy.model.vo.song.SongDetailVO
+     * @date 2024/5/18  12:18
+     */
+    @Override
+    public SongDetailVO searchSongDetail(SongDetailQueryRequest songDetailQueryRequest) {
+        Long songId = songDetailQueryRequest.getSongId();
+        if (songId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<Song> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", songId);
+        Song song = this.getOne(queryWrapper);
+        if (song == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "歌手无此歌曲");
+        }
+        return getSongDetailVO(song);
     }
 
 }

@@ -16,14 +16,14 @@ import java.util.Date;
  * @Date 2024/4/7  13:49
  */
 @Data
-public class AlbumVO implements Serializable {
+public class AlbumIntroVO implements Serializable {
 
     private static final long serialVersionUID = -4559252108673377544L;
 
     /**
      * 专辑id
      */
-    private Long id;
+    private Long albumId;
 
     /**
      * 专辑名称
@@ -51,17 +51,17 @@ public class AlbumVO implements Serializable {
      * @param album
      * @return
      */
-    public static AlbumVO objToVO(Album album) {
+    public static AlbumIntroVO objToVO(Album album) {
         if (album == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        AlbumVO albumVO = new AlbumVO();
+        AlbumIntroVO albumIntroVO = new AlbumIntroVO();
         try {
-            BeanUtils.copyProperties(album, albumVO);
+            BeanUtils.copyProperties(album, albumIntroVO);
         } catch (BusinessException e) {
             throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
         }
-        return albumVO;
+        return albumIntroVO;
     }
 
 }

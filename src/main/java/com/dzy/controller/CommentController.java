@@ -2,6 +2,7 @@ package com.dzy.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
+import com.dzy.commonutils.ResponseUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.comment.CommentDeleteRequest;
@@ -10,7 +11,6 @@ import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.CommentService;
 import com.dzy.service.UserInfoService;
-import com.dzy.commonutils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

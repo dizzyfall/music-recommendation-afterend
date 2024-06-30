@@ -11,7 +11,7 @@
         <result property="alias" column="alias" jdbcType="VARCHAR"/>
         <result property="spell" column="spell" jdbcType="VARCHAR"/>
         <result property="description" column="description" jdbcType="VARCHAR"/>
-        <result property="area" column="area" jdbcType="TINYINT"/>
+        <result property="areaEnum" column="areaEnum" jdbcType="TINYINT"/>
         <result property="genre" column="genre" jdbcType="TINYINT"/>
         <result property="sex" column="sex" jdbcType="TINYINT"/>
         <result property="songCount" column="song_count" jdbcType="SMALLINT"/>
@@ -26,7 +26,7 @@
         id
         ,avatar_path,singer_name,
         alias,spell,description,
-        area,genre,sex,
+        areaEnum,genre,sex,
         song_count,album_count,fan_count,
         create_time,update_time,is_delete
     </sql>

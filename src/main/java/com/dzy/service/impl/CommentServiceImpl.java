@@ -79,6 +79,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         CommentVO commentVO = CommentVO.objToVO(comment);
+        commentVO.setCommentId(comment.getId());
         UserInfoIntroVO userInfoIntroVO = userInfoService.getUserInfoIntroVOById(comment.getUserId());
         commentVO.setUserInfoIntroVO(userInfoIntroVO);
         return commentVO;

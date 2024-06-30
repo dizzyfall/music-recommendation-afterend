@@ -10,11 +10,16 @@ import com.dzy.mapper.ReSonglistSongMapper;
 import com.dzy.mapper.SonglistMapper;
 import com.dzy.model.dto.songlist.*;
 import com.dzy.model.entity.*;
+import com.dzy.model.enums.songlisttags.*;
 import com.dzy.model.vo.comment.CommentVO;
+import com.dzy.model.vo.song.SongIntroVO;
+import com.dzy.model.vo.songlist.SonglistDetailVO;
 import com.dzy.model.vo.songlist.SonglistIntroVO;
+import com.dzy.model.vo.userinfo.UserInfoIntroVO;
 import com.dzy.service.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -412,6 +417,22 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
         return true;
     }
 
+    @Override
+    public SonglistDetailVO getSonglistDetailVO(Songlist songlist) {
+        if (songlist == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        SonglistDetailVO songlistDetailVO = SonglistDetailVO.objToVO(songlist);
+        //补充songlistDetailVO属性
+        Long songlistId = songlist.getId();
+        songlistDetailVO.setSonglistId(songlistId);
+        List<SongIntroVO> songIntroVOList = listSong(songlistId);
+        songlistDetailVO.setSongIntroVOList(songIntroVOList);
+        UserInfoIntroVO creatorInfoIntroVO = userInfoService.getUserInfoIntroVOById(songlist.getCreatorId());
+        songlistDetailVO.setCreatorInfoIntroVO(creatorInfoIntroVO);
+        return songlistDetailVO;
+    }
+
     /**
      * 获取歌单简介视图
      *
@@ -421,13 +442,13 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
      */
     @Override
     public SonglistIntroVO getSonglistIntroVO(Songlist songlist) {
-        SonglistIntroVO songlistIntroVO = SonglistIntroVO.objToVO(songlist);
-        //获取创建者姓名
-        UserInfo userInfo = userInfoService.getById(songlist.getCreatorId());
-        String nickname = userInfo.getNickname();
-        songlistIntroVO.setCreatorName(nickname);
-        //歌单Id
-        songlistIntroVO.setSonglistId(songlist.getId());
+        if (songlist == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        SonglistDetailVO songlistDetailVO = getSonglistDetailVO(songlist);
+        SonglistIntroVO songlistIntroVO = new SonglistIntroVO();
+        BeanUtils.copyProperties(songlistDetailVO, songlistIntroVO);
+        songlistIntroVO.setCreatorName(songlistDetailVO.getCreatorInfoIntroVO().getNickname());
         return songlistIntroVO;
     }
 
@@ -527,14 +548,120 @@ public class SonglistServiceImpl extends ServiceImpl<SonglistMapper, Songlist>
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         QueryWrapper<Songlist> songlistTagQueryWrapper = new QueryWrapper<>();
-        Integer lang = songlistTagsQueryRequest.getLang();
-        Integer era = songlistTagsQueryRequest.getEra();
-        Integer genre = songlistTagsQueryRequest.getGenre();
-        Integer scene = songlistTagsQueryRequest.getScene();
-        Integer mood = songlistTagsQueryRequest.getMood();
-        Integer theme = songlistTagsQueryRequest.getTheme();
         //todo 转为json字符串存取
+        Integer lang = songlistTagsQueryRequest.getLang();
+        if (lang != null && !lang.equals(LangEnum.ALL.getLangId())) {
+            songlistTagQueryWrapper.eq("lang", lang);
+        }
+        Integer era = songlistTagsQueryRequest.getEra();
+        if (era != null && !era.equals(EraEnum.ALL.getEraId())) {
+            songlistTagQueryWrapper.eq("era", era);
+        }
+        Integer genre = songlistTagsQueryRequest.getGenre();
+        if (genre != null && !genre.equals(GenreEnum.ALL.getGenreId())) {
+            songlistTagQueryWrapper.eq("genre", genre);
+        }
+        Integer scene = songlistTagsQueryRequest.getScene();
+        if (scene != null && !scene.equals(SceneEnum.ALL.getSceneId())) {
+            songlistTagQueryWrapper.eq("scene", scene);
+        }
+        Integer mood = songlistTagsQueryRequest.getMood();
+        if (mood != null && !mood.equals(MoodEnum.ALL.getMoodId())) {
+            songlistTagQueryWrapper.eq("mood", mood);
+        }
+        Integer theme = songlistTagsQueryRequest.getTheme();
+        if (theme != null && !theme.equals(ThemeEnum.ALL.getThemeId())) {
+            songlistTagQueryWrapper.eq("theme", theme);
+        }
         return songlistTagQueryWrapper;
+    }
+
+    /**
+     * 查询指定歌单信息
+     *
+     * @param songlistDetailQueryRequest
+     * @return com.dzy.model.vo.songlist.SonglistDetailVO
+     * @date 2024/6/1  19:45
+     */
+    @Override
+    public SonglistDetailVO searchSonglistDetail(SonglistDetailQueryRequest songlistDetailQueryRequest) {
+        if (songlistDetailQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long songlistId = songlistDetailQueryRequest.getSonglistId();
+        if (songlistId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        QueryWrapper<Songlist> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", songlistId);
+        Songlist songlist = this.getOne(queryWrapper);
+        if (songlist == null) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "无此歌单");
+        }
+        return getSonglistDetailVO(songlist);
+    }
+
+    /**
+     * 查询指定歌单所有歌曲
+     *
+     * @param songlistId
+     * @return
+     */
+    public List<SongIntroVO> listSong(Long songlistId) {
+        if (songlistId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        //查询专辑全部歌曲
+        QueryWrapper<ReSonglistSong> songlistSongQueryWrapper = new QueryWrapper<>();
+        songlistSongQueryWrapper.eq("songlist_id", songlistId);
+        List<ReSonglistSong> reSonglistSongList = reSonglistSongService.list(songlistSongQueryWrapper);
+        return reSonglistSongList.stream().map(reSonglistSong -> songService.getSongIntroVOById(reSonglistSong.getSongId())).collect(Collectors.toList());
+    }
+
+    /**
+     * 查询指定歌单所有歌曲
+     *
+     * @param songlistDetailQueryRequest
+     * @return java.util.List<com.dzy.model.vo.song.SongIntroVO>
+     * @date 2024/6/1  22:44
+     */
+    @Override
+    public List<SongIntroVO> listSong(SonglistDetailQueryRequest songlistDetailQueryRequest) {
+        if (songlistDetailQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long songlistId = songlistDetailQueryRequest.getSonglistId();
+        return listSong(songlistId);
+    }
+
+    /**
+     * 查询自己创建的歌单
+     *
+     * @date 2024/6/6  18:11
+     * @param songlistQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.songlist.SonglistIntroVO>
+     */
+    @Override
+    public Page<SonglistIntroVO> listMyCreateSonglistByPage(SonglistQueryRequest songlistQueryRequest) {
+        if (songlistQueryRequest == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        Long userId = songlistQueryRequest.getUserId();
+        if (userId == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        int pageCurrent = songlistQueryRequest.getPageCurrent();
+        int pageSize = songlistQueryRequest.getPageSize();
+        Page<Songlist> page = new Page<>(pageCurrent, pageSize);
+        QueryWrapper<Songlist> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("creator_id", userId);
+        Page<Songlist> songlistPage = this.page(page, queryWrapper);
+        List<SonglistIntroVO> songlistIntroVOList = songlistPage.getRecords().stream().map(songlist -> {
+            Long songlistId = songlist.getId();
+            return this.getSonglistIntroVOById(songlistId);
+        }).collect(Collectors.toList());
+        Page<SonglistIntroVO> songlistIntroVOPage = new Page<>(pageCurrent, pageSize, songlistPage.getTotal());
+        return songlistIntroVOPage.setRecords(songlistIntroVOList);
     }
 
 }

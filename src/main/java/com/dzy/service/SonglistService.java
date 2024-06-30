@@ -5,7 +5,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.dzy.model.dto.songlist.*;
 import com.dzy.model.entity.Songlist;
 import com.dzy.model.vo.comment.CommentVO;
+import com.dzy.model.vo.song.SongIntroVO;
+import com.dzy.model.vo.songlist.SonglistDetailVO;
 import com.dzy.model.vo.songlist.SonglistIntroVO;
+
+import java.util.List;
 
 /**
  * @author DZY
@@ -80,6 +84,15 @@ public interface SonglistService extends IService<Songlist> {
     Boolean createComment(SonglistCommentCreateRequest songlistCommentCreateRequest);
 
     /**
+     * 获取歌单详情视图
+     *
+     * @param songlist
+     * @return com.dzy.model.vo.songlist.SonglistDetailVO
+     * @date 2024/6/1  19:15
+     */
+    SonglistDetailVO getSonglistDetailVO(Songlist songlist);
+
+    /**
      * 获取歌单简介视图
      *
      * @param songlist
@@ -116,5 +129,32 @@ public interface SonglistService extends IService<Songlist> {
      * @date 2024/4/29  20:14
      */
     Page<SonglistIntroVO> listSonglistByTagsByPage(SonglistTagsQueryRequest songlistTagsQueryRequest);
+
+    /**
+     * 查询指定歌单信息
+     *
+     * @param songlistDetailQueryRequest
+     * @return com.dzy.model.vo.songlist.SonglistDetailVO
+     * @date 2024/6/1  19:08
+     */
+    SonglistDetailVO searchSonglistDetail(SonglistDetailQueryRequest songlistDetailQueryRequest);
+
+    /**
+     * 查询指定歌单所有歌曲
+     *
+     * @param songlistDetailQueryRequest
+     * @return java.util.List<com.dzy.model.vo.song.SongIntroVO>
+     * @date 2024/6/1  22:42
+     */
+    List<SongIntroVO> listSong(SonglistDetailQueryRequest songlistDetailQueryRequest);
+
+    /**
+     * 查询自己创建的歌单
+     *
+     * @date 2024/6/6  18:10
+     * @param songlistQueryRequest
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.dzy.model.vo.songlist.SonglistIntroVO>
+     */
+    Page<SonglistIntroVO> listMyCreateSonglistByPage(SonglistQueryRequest songlistQueryRequest);
 
 }

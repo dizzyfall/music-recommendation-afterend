@@ -1,9 +1,9 @@
 package com.dzy.model.vo.song;
 
+import com.dzy.commonutils.JsonUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.entity.Song;
-import com.dzy.commonutils.JsonUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 

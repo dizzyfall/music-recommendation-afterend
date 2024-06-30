@@ -52,6 +52,11 @@ public class Album implements Serializable {
     @TableField(value = "image_path")
     private String imagePath;
     /**
+     * 专辑类型
+     */
+    @TableField(value = "type")
+    private String type;
+    /**
      * 专辑歌曲数量
      */
     @TableField(value = "song_count")

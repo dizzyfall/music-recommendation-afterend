@@ -7,6 +7,7 @@ package com.dzy.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
+import com.dzy.commonutils.ResponseUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.album.AlbumCommentCreateRequest;
@@ -15,8 +16,8 @@ import com.dzy.model.dto.album.AlbumQueryRequest;
 import com.dzy.model.dto.album.AlbumSongQueryRequest;
 import com.dzy.model.dto.reply.ReplyCreateRequest;
 import com.dzy.model.dto.reply.ReplyQueryRequest;
-import com.dzy.model.vo.album.AlbumInfoVO;
-import com.dzy.model.vo.album.AlbumVO;
+import com.dzy.model.vo.album.AlbumDetailVO;
+import com.dzy.model.vo.album.AlbumIntroVO;
 import com.dzy.model.vo.comment.CommentVO;
 import com.dzy.model.vo.reply.ReplyVO;
 import com.dzy.model.vo.song.SongIntroVO;
@@ -24,8 +25,6 @@ import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.AlbumService;
 import com.dzy.service.ReplyService;
 import com.dzy.service.UserInfoService;
-import com.dzy.commonutils.ResponseUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,10 +38,10 @@ import java.util.List;
 @RequestMapping("/album")
 public class AlbumController {
 
-    @Autowired
+    @Resource
     private AlbumService albumService;
 
-    @Autowired
+    @Resource
     private UserInfoService userInfoService;
 
     @Resource
@@ -55,13 +54,13 @@ public class AlbumController {
      * @return
      */
     @PostMapping("/list/page")
-    public BaseResponse<List<AlbumVO>> albumRetrieveByPage(@RequestBody AlbumQueryRequest albumQueryRequest) {
+    public BaseResponse<List<AlbumIntroVO>> albumRetrieveByPage(@RequestBody AlbumQueryRequest albumQueryRequest) {
         if (albumQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        Page<AlbumVO> albumVOPage = albumService.listAlbumByPage(albumQueryRequest);
-        List<AlbumVO> albumVOList = albumVOPage.getRecords();
-        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumVOList);
+        Page<AlbumIntroVO> albumVOPage = albumService.listAlbumByPage(albumQueryRequest);
+        List<AlbumIntroVO> albumIntroVOList = albumVOPage.getRecords();
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumIntroVOList);
     }
 
     /**
@@ -71,12 +70,12 @@ public class AlbumController {
      * @return
      */
     @PostMapping("/info")
-    public BaseResponse<AlbumInfoVO> albumInfoRetrieve(@RequestBody AlbumSongQueryRequest albumSongQueryRequest) {
+    public BaseResponse<AlbumDetailVO> albumInfoRetrieve(@RequestBody AlbumSongQueryRequest albumSongQueryRequest) {
         if (albumSongQueryRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        AlbumInfoVO albumInfoVO = albumService.searchAlbumInfo(albumSongQueryRequest);
-        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumInfoVO);
+        AlbumDetailVO albumDetailVO = albumService.searchAlbumDetail(albumSongQueryRequest);
+        return ResponseUtil.success(StatusCode.RETRIEVE_SUCCESS, albumDetailVO);
     }
 
     /**

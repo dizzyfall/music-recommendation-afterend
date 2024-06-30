@@ -8,7 +8,7 @@ import com.dzy.exception.BusinessException;
 import com.dzy.mapper.CollectMapper;
 import com.dzy.model.dto.collect.CollectQueryRequest;
 import com.dzy.model.entity.*;
-import com.dzy.model.vo.album.AlbumVO;
+import com.dzy.model.vo.album.AlbumIntroVO;
 import com.dzy.model.vo.collect.CollectAlbumVO;
 import com.dzy.model.vo.collect.CollectCountVO;
 import com.dzy.model.vo.song.SongIntroVO;
@@ -94,7 +94,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
         Page<ReCollectSong> reCollectSongPage = reCollectSongService.page(page, queryWrapper);
         List<SongIntroVO> songIntroVOList = reCollectSongPage.getRecords().stream().map(reCollectSong -> {
             Long songId = reCollectSong.getSongId();
-            return songService.getSongIntroById(songId);
+            return songService.getSongIntroVOById(songId);
         }).collect(Collectors.toList());
         Page<SongIntroVO> songIntroVOPage = new Page<>(pageCurrent, pageSize, reCollectSongPage.getTotal());
         return songIntroVOPage.setRecords(songIntroVOList);
@@ -188,8 +188,8 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         CollectAlbumVO collectAlbumVO = new CollectAlbumVO();
-        AlbumVO albumVO = AlbumVO.objToVO(album);
-        collectAlbumVO.setAlbumVO(albumVO);
+        AlbumIntroVO albumIntroVO = AlbumIntroVO.objToVO(album);
+        collectAlbumVO.setAlbumIntroVO(albumIntroVO);
         String singerNameStr = singerService.getSingerNameStr(album.getSingerIdList());
         collectAlbumVO.setSingerNameStr(singerNameStr);
         return collectAlbumVO;

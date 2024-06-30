@@ -26,7 +26,7 @@ public class UserInfo implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     /**
-     * 用户头像id
+     * 用户图片id
      */
     @TableField(value = "image_id")
     private Long imageId;

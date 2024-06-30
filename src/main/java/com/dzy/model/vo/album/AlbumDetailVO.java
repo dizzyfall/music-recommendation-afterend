@@ -14,14 +14,19 @@ import java.util.List;
  * @Date 2024/4/7  14:27
  */
 @Data
-public class AlbumInfoVO implements Serializable {
+public class AlbumDetailVO implements Serializable {
 
     private static final long serialVersionUID = -8209068249296875660L;
 
     /**
      * 专辑id
      */
-    private Long id;
+    private Long albumId;
+
+    /**
+     * 歌手id
+     */
+    private Long singerId;
 
     /**
      * 专辑歌手id列表
@@ -33,6 +38,11 @@ public class AlbumInfoVO implements Serializable {
      * 歌手姓名列表
      */
     private List<String> singerNameList;
+
+    /**
+     * 歌曲歌手姓名字符串（前端展示）
+     */
+    private String singerNameStr;
 
     /**
      * 专辑名称
@@ -48,6 +58,11 @@ public class AlbumInfoVO implements Serializable {
      * 专辑封面保存路径
      */
     private String imagePath;
+
+    /**
+     * 专辑类型
+     */
+    private String type;
 
     /**
      * 专辑歌曲数量

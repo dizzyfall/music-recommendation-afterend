@@ -37,7 +37,6 @@ public class SimilarityCalculator {
         MusicRating user1MusicRating = UserCFMusicRecommendUtil.getMusicRatingById(userId1);
         MusicRating user2MusicRating = UserCFMusicRecommendUtil.getMusicRatingById(userId2);
         //获取两个用户共同评价过的音乐Id
-        //获取两个用户共同评价过的音乐Id
         HashSet<Long> commonSongIdSet = UserCFMusicRecommendUtil.getCommonSongIdSet(user1MusicRating, user2MusicRating);
         //计算点积和每个用户的向量模
         double dotProduct = 0.0;

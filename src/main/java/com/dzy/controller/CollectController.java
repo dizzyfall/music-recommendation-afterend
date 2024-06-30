@@ -2,6 +2,7 @@ package com.dzy.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dzy.common.BaseResponse;
+import com.dzy.commonutils.ResponseUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.collect.CollectAlbumRequest;
@@ -14,7 +15,6 @@ import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.model.vo.songlist.SonglistIntroVO;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.*;
-import com.dzy.commonutils.ResponseUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

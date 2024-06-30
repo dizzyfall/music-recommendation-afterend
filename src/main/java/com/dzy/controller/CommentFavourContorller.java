@@ -1,13 +1,13 @@
 package com.dzy.controller;
 
 import com.dzy.common.BaseResponse;
+import com.dzy.commonutils.ResponseUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.commentfavour.CommentFavourAddRequest;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.ReCommentFavourService;
 import com.dzy.service.UserInfoService;
-import com.dzy.commonutils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,7 +38,7 @@ public class CommentFavourContorller {
      * @return 点赞数
      */
     @PostMapping("/")
-    public BaseResponse<Boolean> doFavour(@RequestBody CommentFavourAddRequest commentFavourAddRequest, HttpServletRequest request) {
+    public BaseResponse<Boolean> doCommentFavour(@RequestBody CommentFavourAddRequest commentFavourAddRequest, HttpServletRequest request) {
         if (commentFavourAddRequest == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "更新请求参数为空");
         }

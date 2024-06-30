@@ -41,7 +41,7 @@ public class Comment implements Serializable {
     @TableField(value = "favour_count")
     private Long favourCount;
     /**
-     * 回复数
+     * 用户评论回复数
      */
     @TableField(value = "reply_count")
     private Long replyCount;

@@ -71,6 +71,7 @@ public class ReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply>
         //接收回复的用户昵称
         UserInfoIntroVO receiverInfoIntroVO = userInfoService.getUserInfoIntroVOById(reply.getReceiverId());
         replyVO.setReceiverNickName(receiverInfoIntroVO.getNickname());
+        replyVO.setReplyId(reply.getId());
         return replyVO;
     }
 

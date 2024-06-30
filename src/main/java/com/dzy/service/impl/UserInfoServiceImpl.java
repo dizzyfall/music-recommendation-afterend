@@ -92,6 +92,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         //补充属性
         UserImage userImage = userImageService.getById(userInfo.getImageId());
         userInfoIntroVO.setAvatarPath(userImage.getAvatarPath());
+        userInfoIntroVO.setCreatorId(userInfo.getId());
         return userInfoIntroVO;
     }
 
@@ -247,6 +248,109 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         if (!isCollectSave) {
             throw new BusinessException(StatusCode.CREATE_ERROR, "用户收藏数据没有加入数据库");
         }
+        //初始化用户评分表数据
+//        UserRating userRating = new UserRating();
+//        userRating.setUserId(userId);
+//        boolean isUserRatingSave = userRatingService.save(userRating);
+//        if (!isUserRatingSave) {
+//            throw new BusinessException(StatusCode.CREATE_ERROR, "用户评分数据没有加入数据库");
+//        }
+        return true;
+    }
+
+    /**
+     * 用户注册
+     *
+     * @param account
+     * @param password
+     * @param checkPassword
+     * @return java.lang.Boolean
+     * @date 2024/5/26  15:34
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean registerUser(String account, String password, String checkPassword) {
+        //校验
+        //账号、密码、确认密码是否为空、空字符串、空格
+        if (StringUtils.isAnyBlank(account, password, checkPassword)) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR, "账号、密码或确认密码为空、空字符串或空格");
+        }
+        //账号长度是否合法
+        if (account.length() < 4 || account.length() > 20) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "账号长度至少4个字符且不超过20个字符");
+        }
+        //密码长度是否合法
+        if (password.length() < 8 || password.length() > 20) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "密码长度需要8-20个字符");
+        }
+        //确认密码长度是否合法
+        if (checkPassword.length() < 8 || checkPassword.length() > 20) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "确认密码长度需要8-20个字符");
+        }
+        //账号是否重复
+        QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("account", account);
+        long count = this.count(queryWrapper);
+        if (count > 0) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "账号已被注册");
+        }
+        if (count < 0) {
+            throw new BusinessException(StatusCode.DATABASE_ERROR);
+        }
+        //账号是否合法
+        //只能包括中文、英文字母、下划线、非空白字符
+        String validPattern = "[\\u4E00-\\u9FA5A-Za-z0-9_\\S]{4,20}";
+        Matcher matcher = Pattern.compile(validPattern).matcher(account);
+        if (!matcher.matches()) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "账号存在非法字符");
+        }
+        //密码是否合法
+        //只能包括英文、数字、下划线、常用特殊字符、非空白字符
+        if (!password.matches("[A-Za-z0-9_~!@#$%^&*()+\\S]{8,20}")) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "密码存在非法字符");
+        }
+        //密码和确认密码是否相同
+        if (!password.equals(checkPassword)) {
+            throw new BusinessException(StatusCode.PARAMS_ERROR, "两次输入的密码不一致");
+        }
+        //密码加密
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + password).getBytes());
+        //加入用户信息表
+        UserInfo userInfo = new UserInfo();
+        userInfo.setAccount(account);
+        userInfo.setPassword(encryptPassword);
+        boolean isUserInfoSave = this.save(userInfo);
+        if (!isUserInfoSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "用户注册数据没有加入数据库");
+        }
+        //获取用户id
+        Long userId = userInfo.getId();
+        //上传默认头像、背景
+        Boolean isDefaultImageSave = userImageService.uploadDefaultImage(userId);
+        if (!isDefaultImageSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "用户图像数据没有加入数据库");
+        }
+        //加入用户权限表
+        UserAuthority userAuthority = new UserAuthority();
+        userAuthority.setUserId(userId);
+        boolean isUserAuthoritySave = userAuthorityService.save(userAuthority);
+        if (!isUserAuthoritySave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "用户权限数据没有加入数据库");
+        }
+        //初始化收藏表数据
+        Collect collect = new Collect();
+        collect.setUserId(userId);
+        boolean isCollectSave = collectService.save(collect);
+        if (!isCollectSave) {
+            throw new BusinessException(StatusCode.CREATE_ERROR, "用户收藏数据没有加入数据库");
+        }
+        //初始化用户评分表数据
+//        UserRating userRating = new UserRating();
+//        userRating.setUserId(userId);
+//        boolean isUserRatingSave = userRatingService.save(userRating);
+//        if (!isUserRatingSave) {
+//            throw new BusinessException(StatusCode.CREATE_ERROR, "用户评分数据没有加入数据库");
+//        }
         return true;
     }
 

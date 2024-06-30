@@ -69,12 +69,12 @@ public class Song implements Serializable {
      * 歌曲语种
      */
     @TableField(value = "lang")
-    private String lang;
+    private Integer lang;
     /**
      * 歌曲流派
      */
     @TableField(value = "genre")
-    private String genre;
+    private Integer genre;
     /**
      * 歌曲收藏数量
      */
@@ -90,6 +90,12 @@ public class Song implements Serializable {
      */
     @TableField(value = "comment_count")
     private Integer commentCount;
+    /**
+     * 歌曲播放数量
+     */
+    //todo 实体类没有更新
+    @TableField(value = "play_count")
+    private Long playCount;
     /**
      * 歌曲发行时间
      */

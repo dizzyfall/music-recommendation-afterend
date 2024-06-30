@@ -6,6 +6,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+import java.io.Serializable;
+
 /**
  * RedisTemplate配置类
  *
@@ -13,7 +15,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  * @Date 2024/2/23  15:15
  */
 @Configuration
-public class RedisTemplateConfig {
+public class RedisTemplateConfig implements Serializable {
 
     @Bean
     public RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory) {

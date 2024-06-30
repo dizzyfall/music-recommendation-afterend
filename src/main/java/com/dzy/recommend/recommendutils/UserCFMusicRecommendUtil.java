@@ -1,5 +1,6 @@
 package com.dzy.recommend.recommendutils;
 
+import com.dzy.model.entity.UserRating;
 import com.dzy.recommend.domain.MusicRating;
 import com.dzy.recommend.domain.UserMusicRating;
 
@@ -16,26 +17,33 @@ public class UserCFMusicRecommendUtil {
 
     public static Map<Long, MusicRating> constructUserMusicRatingMatrix() {
         UserMusicRating userMusicRatingMatrix = new UserMusicRating();
+        UserMusicRatingDataLoader userMusicRatingDataLoader = new UserMusicRatingDataLoader();
+        List<UserRating> userRatingList = userMusicRatingDataLoader.loadRatingData();
+        Map<Long, List<UserRating>> userRatingMap = userRatingList.stream().collect(Collectors.groupingBy(UserRating::getUserId));
+        for (Map.Entry<Long, List<UserRating>> userRatingEntry : userRatingMap.entrySet()) {
+            MusicRating userRatings = new MusicRating();
+            for (UserRating userRating : userRatingEntry.getValue()) {
+                userRatings.addSongRating(userRating.getSongId(), userRating.getSongRating());
+            }
+            userMusicRatingMatrix.adduserMusicRating(userRatingEntry.getKey(), userRatings);
+        }
+
         // 假设我们有以下用户评分数据  
-        MusicRating user1Ratings = new MusicRating();
-        user1Ratings.addSongRating(1L, 2.0);
-        user1Ratings.addSongRating(2L, 3.0);
-        user1Ratings.addSongRating(3L, 1.0);
+//        MusicRating user1Ratings = new MusicRating();
+//        user1Ratings.addSongRating(1L, 2.0);
+//        user1Ratings.addSongRating(2L, 3.0);
+//        user1Ratings.addSongRating(3L, 1.0);
+//
+//        MusicRating user2Ratings = new MusicRating();
+//        user2Ratings.addSongRating(2L, 1.0);
+//        user2Ratings.addSongRating(3L, 3.0);
+//
+//        MusicRating user3Ratings = new MusicRating();
+//        user3Ratings.addSongRating(3L, 2.0);
+//        user3Ratings.addSongRating(4L, 4.0);
+//        user3Ratings.addSongRating(5L, 3.0);
+//        user3Ratings.addSongRating(6L, 4.0);
 
-        MusicRating user2Ratings = new MusicRating();
-        user2Ratings.addSongRating(2L, 1.0);
-        user2Ratings.addSongRating(3L, 3.0);
-
-        MusicRating user3Ratings = new MusicRating();
-        user3Ratings.addSongRating(3L, 2.0);
-        user3Ratings.addSongRating(4L, 4.0);
-        user3Ratings.addSongRating(5L, 3.0);
-        user3Ratings.addSongRating(6L, 4.0);
-
-        // 将评分数据添加到推荐器中
-        userMusicRatingMatrix.adduserMusicRating(1L, user1Ratings);
-        userMusicRatingMatrix.adduserMusicRating(2L, user2Ratings);
-        userMusicRatingMatrix.adduserMusicRating(3L, user3Ratings);
         return userMusicRatingMatrix.getUserMusicRatings();
     }
 
@@ -49,6 +57,15 @@ public class UserCFMusicRecommendUtil {
             }
         }
         return currentSongIdSet;
+    }
+
+    public static Set<Long> getCurrentUserIdSet() {
+        Set<Long> currentUserIdSet = new HashSet<>();
+        Map<Long, MusicRating> userMusicRatingMatrix = constructUserMusicRatingMatrix();
+        for (Map.Entry<Long, MusicRating> userMusicRating : userMusicRatingMatrix.entrySet()) {
+            currentUserIdSet.add(userMusicRating.getKey());
+        }
+        return currentUserIdSet;
     }
 
     public static int getUserNum() {
@@ -86,10 +103,11 @@ public class UserCFMusicRecommendUtil {
 
     public static Map<Long, Double> getTargetUserSimilarityMatrix(Long targetUserId) {
         Map<Long, Double> userSimilarity = new HashMap<>();
-        for (Long otherUserId = 1L; otherUserId <= getUserNum(); otherUserId++) {
-            if (!targetUserId.equals(otherUserId)) {
-                double similarity = SimilarityCalculator.calculateCosineSimilarity(targetUserId, otherUserId);
-                userSimilarity.put(otherUserId, similarity);
+        ArrayList<Long> currentUserIdList = new ArrayList<>(getCurrentUserIdSet());
+        for (Long currentUserId : currentUserIdList) {
+            if (!targetUserId.equals(currentUserId)) {
+                double similarity = SimilarityCalculator.calculateCosineSimilarity(targetUserId, currentUserId);
+                userSimilarity.put(currentUserId, similarity);
             }
         }
         return userSimilarity;

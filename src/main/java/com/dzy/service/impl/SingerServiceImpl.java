@@ -3,6 +3,7 @@ package com.dzy.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dzy.commonutils.JsonUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.mapper.SingerMapper;
@@ -10,12 +11,13 @@ import com.dzy.model.dto.singer.SingerQueryRequest;
 import com.dzy.model.dto.singer.SingerSearchTextQueryRequest;
 import com.dzy.model.dto.singer.SingerTagsQueryRequest;
 import com.dzy.model.entity.Singer;
-import com.dzy.model.enums.SingerTagEnum;
+import com.dzy.model.enums.singertags.AreaEnum;
+import com.dzy.model.enums.singertags.GenreEnum;
+import com.dzy.model.enums.singertags.SexEnum;
 import com.dzy.model.vo.singer.SingerDetailVO;
 import com.dzy.model.vo.singer.SingerIntroVO;
 import com.dzy.service.SingerService;
 import com.dzy.service.SongService;
-import com.dzy.commonutils.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -95,12 +97,9 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         if (singer == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
+        SingerDetailVO singerDetailVO = getSingerDetailVO(singer);
         SingerIntroVO singerIntroVO = new SingerIntroVO();
-        try {
-            BeanUtils.copyProperties(singer, singerIntroVO);
-        } catch (BusinessException e) {
-            throw new BusinessException(StatusCode.SYSTEM_ERROR, "Bean复制属性错误");
-        }
+        BeanUtils.copyProperties(singerDetailVO, singerIntroVO);
         return singerIntroVO;
     }
 
@@ -117,15 +116,15 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         }
         QueryWrapper<Singer> singerTagQueryWrapper = new QueryWrapper<>();
         Integer area = singerTagsQueryRequest.getArea();
-        if (area != null && !area.equals(SingerTagEnum.ALL.getSingerTagId())) {
+        if (area != null && !area.equals(AreaEnum.ALL.getAreaId())) {
             singerTagQueryWrapper.eq("area", area);
         }
         Integer sex = singerTagsQueryRequest.getSex();
-        if (sex != null && !sex.equals(SingerTagEnum.ALL.getSingerTagId())) {
+        if (sex != null && !sex.equals(SexEnum.ALL.getSexId())) {
             singerTagQueryWrapper.eq("sex", sex);
         }
         Integer genre = singerTagsQueryRequest.getGenre();
-        if (genre != null && !genre.equals(SingerTagEnum.ALL.getSingerTagId())) {
+        if (genre != null && !genre.equals(GenreEnum.ALL.getGenreId())) {
             singerTagQueryWrapper.eq("genre", genre);
         }
         return singerTagQueryWrapper;
@@ -154,6 +153,7 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         //脱敏
         List<SingerIntroVO> singerIntroVOList = singerPage.getRecords().stream().map(this::getSingerIntroVO).collect(Collectors.toList());
         //新分页对象
+        //System.out.println(singerPage.getTotal());
         Page<SingerIntroVO> singerVOPage = new Page<>(pageCurrent, pageSize, singerPage.getTotal());
         singerVOPage.setRecords(singerIntroVOList);
         return singerVOPage;
@@ -228,6 +228,8 @@ public class SingerServiceImpl extends ServiceImpl<SingerMapper, Singer>
         }
         SingerDetailVO singerDetailVO = SingerDetailVO.objToVO(singer);
         singerDetailVO.setSingerId(singer.getId());
+        singerDetailVO.setArea(AreaEnum.getAreaTagNameById(singer.getArea()));
+        singerDetailVO.setGenre(GenreEnum.getGenreTagNameById(singer.getGenre()));
         return singerDetailVO;
     }
 

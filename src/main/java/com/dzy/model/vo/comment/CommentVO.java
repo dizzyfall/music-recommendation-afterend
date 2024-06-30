@@ -22,6 +22,11 @@ public class CommentVO implements Serializable {
     private static final long serialVersionUID = 7939516196351738858L;
 
     /**
+     * 评论id
+     */
+    private Long commentId;
+
+    /**
      * 用户信息简介
      */
     private UserInfoIntroVO userInfoIntroVO;

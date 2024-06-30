@@ -14,15 +14,15 @@ import com.dzy.model.entity.Album;
 import com.dzy.model.entity.Comment;
 import com.dzy.model.entity.ReAlbumComment;
 import com.dzy.model.entity.Song;
-import com.dzy.model.vo.album.AlbumInfoVO;
-import com.dzy.model.vo.album.AlbumVO;
+import com.dzy.model.vo.album.AlbumDetailVO;
+import com.dzy.model.vo.album.AlbumIntroVO;
 import com.dzy.model.vo.comment.CommentVO;
+import com.dzy.model.vo.song.SongDetailVO;
 import com.dzy.model.vo.song.SongIntroVO;
 import com.dzy.service.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
         implements AlbumService {
 
-    @Autowired
+    @Resource
     private SongService songService;
 
     @Resource
@@ -63,7 +63,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
      * @return
      */
     @Override
-    public Page<AlbumVO> listAlbumByPage(AlbumQueryRequest albumQueryRequest) {
+    public Page<AlbumIntroVO> listAlbumByPage(AlbumQueryRequest albumQueryRequest) {
         Long singerId = albumQueryRequest.getSingerId();
         if (singerId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
@@ -74,9 +74,9 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
         int pageSize = albumQueryRequest.getPageSize();
         Page<Album> page = new Page<>(pageCurrent, pageSize);
         Page<Album> albumPage = this.page(page, queryWrapper);
-        List<AlbumVO> albumVOList = albumPage.getRecords().stream().map(AlbumVO::objToVO).collect(Collectors.toList());
-        Page<AlbumVO> albumVOPage = new Page<>(pageCurrent, pageSize, albumPage.getTotal());
-        albumVOPage.setRecords(albumVOList);
+        List<AlbumIntroVO> albumIntroVOList = albumPage.getRecords().stream().map(this::getAlbumIntroVO).collect(Collectors.toList());
+        Page<AlbumIntroVO> albumVOPage = new Page<>(pageCurrent, pageSize, albumPage.getTotal());
+        albumVOPage.setRecords(albumIntroVOList);
         return albumVOPage;
     }
 
@@ -87,19 +87,39 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
      * @return
      */
     @Override
-    public AlbumInfoVO getAlbumInfoVO(Album album) {
+    public AlbumDetailVO getAlbumDetailVO(Album album) {
         if (album == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
-        AlbumInfoVO albumInfoVO = new AlbumInfoVO();
-        BeanUtils.copyProperties(album, albumInfoVO);
+        AlbumDetailVO albumDetailVO = new AlbumDetailVO();
+        BeanUtils.copyProperties(album, albumDetailVO);
         //补充singerNameList属性
+        albumDetailVO.setAlbumId(album.getId());
         List<String> singerNameList = singerService.getSingerNameList(album.getSingerIdList());
-        albumInfoVO.setSingerNameList(singerNameList);
+        albumDetailVO.setSingerNameList(singerNameList);
+        String singerNameStr = singerService.getSingerNameStr(album.getSingerIdList());
+        albumDetailVO.setSingerNameStr(singerNameStr);
         //补充songIntroVOList属性
         List<SongIntroVO> songIntroVOList = listSong(album.getId());
-        albumInfoVO.setSongIntroVOList(songIntroVOList);
-        return albumInfoVO;
+        albumDetailVO.setSongIntroVOList(songIntroVOList);
+        return albumDetailVO;
+    }
+
+    /**
+     * 获取专辑简介视图
+     *
+     * @param album
+     * @return
+     */
+    @Override
+    public AlbumIntroVO getAlbumIntroVO(Album album) {
+        if (album == null) {
+            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+        }
+        AlbumDetailVO albumDetailVO = getAlbumDetailVO(album);
+        AlbumIntroVO albumIntroVO = new AlbumIntroVO();
+        BeanUtils.copyProperties(albumDetailVO, albumIntroVO);
+        return albumIntroVO;
     }
 
     /**
@@ -109,22 +129,23 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
      * @return
      */
     @Override
-    public AlbumInfoVO searchAlbumInfo(AlbumSongQueryRequest albumSongQueryRequest) {
-        Long singerId = albumSongQueryRequest.getSingerId();
-        if (singerId == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
+    public AlbumDetailVO searchAlbumDetail(AlbumSongQueryRequest albumSongQueryRequest) {
+//        Long singerId = albumSongQueryRequest.getSingerId();
+//        if (singerId == null) {
+//            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+//        }
         Long albumId = albumSongQueryRequest.getAlbumId();
         if (albumId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         QueryWrapper<Album> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", albumId).eq("singer_id", singerId);
+        //queryWrapper.eq("id", albumId).eq("singer_id", singerId);
+        queryWrapper.eq("id", albumId);
         Album album = this.getOne(queryWrapper);
         if (album == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "歌手无此专辑");
         }
-        return getAlbumInfoVO(album);
+        return getAlbumDetailVO(album);
     }
 
     /**
@@ -135,16 +156,17 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
      */
     @Override
     public List<SongIntroVO> listSong(AlbumSongQueryRequest albumSongQueryRequest) {
-        Long singerId = albumSongQueryRequest.getSingerId();
-        if (singerId == null) {
-            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
-        }
+//        Long singerId = albumSongQueryRequest.getSingerId();
+//        if (singerId == null) {
+//            throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
+//        }
         Long albumId = albumSongQueryRequest.getAlbumId();
         if (albumId == null) {
             throw new BusinessException(StatusCode.PARAMS_NULL_ERROR);
         }
         QueryWrapper<Album> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", albumId).eq("singer_id", singerId);
+        //queryWrapper.eq("id", albumId).eq("singer_id", singerId);
+        queryWrapper.eq("id", albumId);
         Album album = this.getOne(queryWrapper);
         if (album == null) {
             throw new BusinessException(StatusCode.PARAMS_ERROR, "歌手无此专辑");
@@ -153,7 +175,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
         QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();
         songQueryWrapper.eq("album_id", albumId);
         List<Song> songList = songService.list(songQueryWrapper);
-        return songList.stream().map(song -> songService.getSongIntro(song)).collect(Collectors.toList());
+        return songList.stream().map(song -> songService.getSongIntroVO(song)).collect(Collectors.toList());
     }
 
     /**
@@ -170,7 +192,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album>
         QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();
         songQueryWrapper.eq("album_id", albumId);
         List<Song> songList = songService.list(songQueryWrapper);
-        return songList.stream().map(song -> songService.getSongIntro(song)).collect(Collectors.toList());
+        return songList.stream().map(song -> songService.getSongIntroVO(song)).collect(Collectors.toList());
     }
 
     /**

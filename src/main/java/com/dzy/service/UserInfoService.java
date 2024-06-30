@@ -77,6 +77,17 @@ public interface UserInfoService extends IService<UserInfo> {
     Boolean registerUser(UserRegisterRequest userRegisterRequest);
 
     /**
+     * 用户注册
+     *
+     * @param account
+     * @param password
+     * @param checkPassword
+     * @return java.lang.Boolean
+     * @date 2024/5/26  15:34
+     */
+    Boolean registerUser(String account, String password, String checkPassword);
+
+    /**
      * 用户登录
      *
      * @param userLoginRequest 登录请求的参数

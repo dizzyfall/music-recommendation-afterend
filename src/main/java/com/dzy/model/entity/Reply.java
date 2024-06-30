@@ -51,22 +51,22 @@ public class Reply implements Serializable {
     @TableField(value = "content")
     private String content;
     /**
-     * 点赞数
+     * 用户回复点赞数
      */
     @TableField(value = "favour_count")
     private Long favourCount;
     /**
-     * 发布时间
+     * 用户回复发布时间
      */
     @TableField(value = "publish_time")
     private Date publishTime;
     /**
-     * 创建时间
+     * 用户回复创建时间
      */
     @TableField(value = "create_time")
     private Date createTime;
     /**
-     * 更新时间
+     * 用户回复更新时间
      */
     @TableField(value = "update_time")
     private Date updateTime;

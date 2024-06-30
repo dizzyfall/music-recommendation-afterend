@@ -30,4 +30,9 @@ public class SongIntroVO implements Serializable {
      */
     private String singerNameStr;
 
+    /**
+     * 歌曲评分
+     */
+    private Double rating;
+
 }

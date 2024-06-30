@@ -18,7 +18,7 @@ public class SingerIntroVO implements Serializable {
     /**
      * 歌手id
      */
-    private Long id;
+    private Long singerId;
 
     /**
      * 歌手名字

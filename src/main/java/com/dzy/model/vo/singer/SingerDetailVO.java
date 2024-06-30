@@ -53,13 +53,12 @@ public class SingerDetailVO implements Serializable {
     /**
      * 歌手地区
      */
-    private Integer area;
+    private String area;
 
     /**
      * 歌手类别
      */
-    private Integer genre;
-
+    private String genre;
 
     /**
      * 歌手歌曲数量

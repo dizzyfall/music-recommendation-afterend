@@ -1,13 +1,13 @@
 package com.dzy.controller;
 
 import com.dzy.common.BaseResponse;
+import com.dzy.commonutils.ResponseUtil;
 import com.dzy.constant.StatusCode;
 import com.dzy.exception.BusinessException;
 import com.dzy.model.dto.userinfo.UserUpdateImageRequest;
 import com.dzy.model.vo.userinfo.UserLoginVO;
 import com.dzy.service.UserImageService;
 import com.dzy.service.UserInfoService;
-import com.dzy.commonutils.ResponseUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;

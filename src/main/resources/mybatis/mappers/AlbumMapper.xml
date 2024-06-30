@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dzy.mapper.AlbumMapper">
+
+    <resultMap id="BaseResultMap" type="com.dzy.model.entity.Album">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="singerId" column="singer_id" jdbcType="BIGINT"/>
+        <result property="singerIdList" column="singer_id_list" jdbcType="VARCHAR"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="imagePath" column="image_path" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="songCount" column="song_count" jdbcType="TINYINT"/>
+        <result property="collectCount" column="collect_count" jdbcType="INTEGER"/>
+        <result property="favourCount" column="favour_count" jdbcType="INTEGER"/>
+        <result property="commentCount" column="comment_count" jdbcType="INTEGER"/>
+        <result property="publishTime" column="publish_time" jdbcType="DATE"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        ,singer_id,singer_id_list,
+        title,description,image_path,
+        type,song_count,collect_count,
+        favour_count,comment_count,publish_time,
+        create_time,update_time,is_delete
+    </sql>
+</mapper>
